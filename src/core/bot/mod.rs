@@ -30,8 +30,10 @@ impl Bot {
             println!("{:?}", token);
         }
         
-        self.interpret(tokens); // FIXME -> compile
-        // compile(tokens) -> Structure { code: List, refs: List, data: List }? Operational graph?
+        self.interpret(tokens); // FIXME -> compile/build
+        // tokens -> Structure { code: List, refs: List, data: List }? 
+        // Operational graph? Smth like Computational graph but a bit broader thing
+        // then another method to run these graphs?
         Ok(())
     }
 }

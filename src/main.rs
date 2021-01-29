@@ -19,7 +19,7 @@ fn main() -> Result<()> {
         // @ # * & are literal markers for Id, Version, Time and Seal
         // Value::Structure is a json-like thing, but with more primitive types and decimal instead of float for numbers 
         r#"Show "Hello world!", SomeVariable as { 1 + 4 / 2 } (3), Struct as { column1: { 1, 2, 3 }  }.
-         Show sum column1 of Struct. Send this to @someone.
+         Sum column1 of Struct, show the result and send it to @someone.
          Show #0.0.1-alpha, @scheme://authority/path, &signature, *29-01-2021_16:20.
          SomeFlag1, SomeFlag2. If SomeFlag1 and SomeFlag2, then sum 1, 2, 3 and show result. 
          Show "Done!""#,

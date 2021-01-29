@@ -37,10 +37,11 @@ impl Bot {
                     self.context.values.append(value)
                 }
                 Token::Term(term) => {
-                    // init in self.context.terms as Value::default()?
+                    // if doesn't exist -> init in self.context.terms as Value::default()?
+                    // pull it's value into values?
                 }
                 Token::This => {
-                    // self.context.values.last?
+                    // self.context.values.last? self.context.result?
                 }
                 Token::Exp(expression) => {
                     // build a tree and evaluate until exp:end? smth simpler?
