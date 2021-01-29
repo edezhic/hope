@@ -1,0 +1,17 @@
+[package]
+name = "Hope"
+description = "Human-oriented programming environment"
+version = "0.0.1"
+authors = ["Egor Dezhic <edezhic@gmail.com>"]
+license = "GPL-3.0-or-later"
+edition = "2018"
+
+[dependencies]
+bigdecimal = { version = "0.2.0", features = ["serde"] }
+getrandom = { version = "0.2.1", features = ["js"] }
+iref = "1.4.3"
+chrono = { version = "0.4", features = ["wasmbind", "serde"] }
+serde = { version = "1.0.118", features = ["derive"] }
+unicode-normalization = "0.1.16"
+unicode-segmentation = "1.7.1"
+regex = "1.4.3"
