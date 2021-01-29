@@ -33,28 +33,37 @@ impl Bot {
                     self.execute();
                     self.context.command = Some(command);
                 }
-                Token::Case(_) => {
-                    // many different things
-                }
                 Token::Val(value) => {
                     self.context.values.append(value)
                 }
-                Token::Term(_) | Token::This => {
-                    // 
+                Token::Term(term) => {
+                    // init in self.context.terms as Value::default()?
                 }
-                Token::Exp(_) => {
-                    // build a tree and evaluate until exp:end?
+                Token::This => {
+                    // self.context.values.last?
                 }
-                Token::Mod(_) => {
-                    // ???
+                Token::Exp(expression) => {
+                    // build a tree and evaluate until exp:end? smth simpler?
                 }
-                Token::Comment(_) => (), // nothing?
+                Token::Mod(modifier ) => {
+                    match modifier {
+                        Modifier::New => {}
+                        Modifier::Next => {}
+                        Modifier::Binding => {}
+                        Modifier::Selection => {}
+                        Modifier::Targeting => {}
+                    }
+                }
+                Token::Case(_) => {
+                    // many different things
+                }
+                Token::Comment(_) => (), // ignore?
             }
         }
         self.execute()
     }
 
-    pub fn execute(&mut self) -> Result<Option<Value>> {
+    pub fn execute(&mut self) -> Result<Option<Value>> { // FIXME this thing is very wrong
         if let Some(cmd) = &self.context.command {
             if let Some(value) = cmd.execute(&self.context.values) {
                 self.context.result = Some(value);
