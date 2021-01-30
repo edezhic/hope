@@ -20,8 +20,9 @@ impl Bot {
                         continue;
                     } else if let Some(p) = self.vocab.check_pattern(piece) {
                         pattern = p;
-                    } else if let Some(num) = self.vocab.number(piece) {
-                        tokens.push(Token::Val(Value::Number(num)));
+                    } else if self.vocab.number(piece) {
+                        let number = Number::from_string(piece.replacen(",", ".", 1))?;
+                        tokens.push(Token::Val(Value::Number(number)));
                     } else if let Some(t) = self.vocab.reserved(piece) {
                         tokens.push(t);
                     } else if let Some(t) = self.vocab.term(piece) {
@@ -32,6 +33,51 @@ impl Bot {
                             piece
                         )));
                     }
+                }
+                Pattern::Collection => {
+                    tokens.push(Token::Col(Collection::Start));
+                    while let Some(piece) = pieces.next() {
+                        if self.vocab.collection_end(piece) {
+                            tokens.push(Token::Col(Collection::End));
+                            break;
+                        } else {
+                            if self.vocab.skip(piece) {
+                                continue;
+                            } else if let Some(t) = self.vocab.collection_content(piece) {
+                                tokens.push(t);
+                            } else {
+                                return Err(Error::ParsingError(format!(
+                                    r#"Unrecognized collection piece: '{}'"#,
+                                    piece
+                                )));
+                            }
+                        }
+                    }
+                    pattern = Pattern::None;
+                }
+                Pattern::Expression => {
+                    tokens.push(Token::Exp(Expression::Start));
+                    while let Some(piece) = pieces.next() {
+                        if self.vocab.expression_end(piece) {
+                            tokens.push(Token::Exp(Expression::End));
+                            break;
+                        } else {
+                            if self.vocab.skip(piece) {
+                                continue;
+                            } else if self.vocab.number(piece) {
+                                let number = Number::from_string(piece.replacen(",", ".", 1))?;
+                                tokens.push(Token::Val(Value::Number(number)));
+                            } else if let Some(t) = self.vocab.expression_content(piece) {
+                                tokens.push(t);
+                            } else {
+                                return Err(Error::ParsingError(format!(
+                                    r#"Unrecognized expression piece: '{}'"#,
+                                    piece
+                                )));
+                            }
+                        }
+                    }
+                    pattern = Pattern::None;
                 }
                 Pattern::Comment => {
                     let mut comment = Text::empty();

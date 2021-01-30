@@ -2,8 +2,10 @@ use crate::core::*;
 
 #[derive(Debug)]
 pub enum Token {
+    Assign,
     Case(Case),
     Cmd(Command),
+    Col(Collection),
     Comment(Text),
     Exp(Expression),
     Mod(Modifier),
@@ -30,8 +32,23 @@ pub enum Case {
 }
 
 #[derive(Debug)]
+pub enum Collection { 
+    End,
+    Start,
+}
+
+#[derive(Debug)]
+pub enum Command {
+    Await,
+    Seal,
+    Send,
+    Show,
+    Sum,
+    Verify,
+}
+
+#[derive(Debug)]
 pub enum Expression { 
-    Assign,
     Divide,
     End,
     Minus,

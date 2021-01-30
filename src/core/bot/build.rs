@@ -25,12 +25,16 @@ impl Context {
 }
 
 impl Bot {
-    pub fn interpret(&mut self, tokens: Vec<Token>) -> Result<Option<Value>> {
+    pub fn build(&mut self, tokens: Vec<Token>) -> Result<()> {
         let mut this: Value;
         for token in tokens.into_iter() {
             match token {
+                Token::Case(_) => {
+                    // many different things
+                }
+                Token::Assign => {}
+                Token::Col(_) => {}
                 Token::Cmd(command) => {
-                    self.execute();
                     self.context.command = Some(command);
                 }
                 Token::Val(value) => {
@@ -55,22 +59,9 @@ impl Bot {
                         Modifier::Targeting => {}
                     }
                 }
-                Token::Case(_) => {
-                    // many different things
-                }
-                Token::Comment(_) => (), // ignore?
+                Token::Comment(_) => ()
             }
         }
-        self.execute()
-    }
-
-    pub fn execute(&mut self) -> Result<Option<Value>> { // FIXME this thing is very wrong
-        if let Some(cmd) = &self.context.command {
-            if let Some(value) = cmd.execute(&self.context.values) {
-                self.context.result = Some(value);
-                self.context.values = List::new();
-            }
-        }
-        Ok(None)
+        Ok(())
     }
 }

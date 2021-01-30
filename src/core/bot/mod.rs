@@ -1,12 +1,10 @@
-mod execute;
+mod build;
 mod scan;
 mod token;
-mod command;
 mod vocabulary;
 pub use token::*;
 pub use vocabulary::*;
-pub use execute::Context;
-pub use command::Command;
+pub use build::Context;
 
 use crate::core::*;
 
@@ -30,10 +28,7 @@ impl Bot {
             println!("{:?}", token);
         }
         
-        self.interpret(tokens); // FIXME -> compile/build
-        // tokens -> Structure { code: List, refs: List, data: List }? 
-        // Operational graph? Smth like Computational graph but a bit broader thing
-        // then another method to run these graphs?
+        let program = self.build(tokens);
         Ok(())
     }
 }

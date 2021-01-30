@@ -4,12 +4,17 @@ use regex::Regex as R;
 impl Vocabulary {
     pub fn english() -> Result<Vocabulary> {
         Ok(Vocabulary {
+            assign: R::new(r"^(?i)(as|:)$")?,
             whitespace: R::new(r"^(\p{Zs}|\t)+$")?,
-            new: R::new(r"^[\.\n\p{Zl}]$")?,
-            next: R::new(r"^(,|;)$")?,
+            new: R::new(r"^[;\.\n\p{Zl}]$")?,
+            next: R::new(r"^,$")?,
             ignore: R::new(r"^(?i)(the|a|let)$")?,
             term: R::new(r"^\p{Letter}+")?,
             this: R::new(r"^(?i)(this|result|it)$")?,
+            collection_end: R::new(r"^\]$")?,
+            collection_start: R::new(r"^\[$")?,
+            comment_end: R::new(r"^\)$")?,
+            comment_start: R::new(r"^\($")?,
             
             case_and: R::new(r"^(?i)and$")?,
             case_equal: R::new(r"^(?i)(=|is)$")?,
@@ -19,9 +24,6 @@ impl Vocabulary {
             cmd_send: R::new(r"^(?i)send$")?,
             cmd_show: R::new(r"^(?i)show$")?,
             cmd_sum: R::new(r"^(?i)sum$")?,
-            comment_end: R::new(r"^\)$")?,
-            comment_start: R::new(r"^\($")?,
-            exp_assign: R::new(r"^(?i)(as|:)$")?,
             exp_divide: R::new(r"^/$")?,
             exp_minus: R::new(r"^\-$")?,
             exp_multiply: R::new(r"^\*$")?,

@@ -1,4 +1,3 @@
-mod binary;
 mod fact;
 mod id;
 mod list;
@@ -8,7 +7,6 @@ mod structure;
 mod text;
 mod time;
 mod version;
-pub use binary::Binary;
 pub use fact::Fact;
 pub use id::Id;
 pub use list::List;
@@ -21,7 +19,6 @@ pub use version::Version;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub enum Value {
-    Binary(Binary),
     Fact(Fact),
     Id(Id),
     Number(Number),
