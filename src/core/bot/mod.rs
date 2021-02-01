@@ -12,6 +12,7 @@ use crate::core::*;
 pub struct Bot {
     vocab: Vocabulary,
     terms: Structure,
+    result: Option<Value>
 }
 
 impl Bot {
@@ -19,6 +20,7 @@ impl Bot {
         Ok(Bot {
             vocab: Vocabulary::english()?,
             terms: Structure::new(),
+            result: None
         })
     }
     pub fn perform(&mut self, s: &str) -> Result<()> {

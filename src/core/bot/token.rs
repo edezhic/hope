@@ -9,6 +9,8 @@ pub enum Token {
     Comment(Text),
     Exp(Expression),
     Mod(Modifier),
+    New,
+    Next,
     Term(Text),
     This,
     Val(Value),
@@ -33,8 +35,10 @@ pub enum Case {
 
 #[derive(Debug)]
 pub enum Collection { 
-    End,
-    Start,
+    ListEnd,
+    ListStart,
+    StructEnd,
+    StructStart
 }
 
 #[derive(Debug)]
@@ -50,8 +54,6 @@ pub enum Expression {
 #[derive(Debug)]
 pub enum Modifier {
     Binding,
-    New,
-    Next,
     Selection,
     Targeting,
 }

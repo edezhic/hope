@@ -4,7 +4,6 @@ use regex::Regex as R;
 
 pub enum Pattern {
     None,
-    Collection,
     Comment,
     Expression,
     Id,
@@ -22,8 +21,10 @@ pub struct Vocabulary {
     new: R,
     this: R,
     term: R,
-    collection_start: R,
-    collection_end: R,
+    list_start: R,
+    list_end: R,
+    struct_start: R,
+    struct_end: R,
     comment_start: R,
     comment_end: R,
 
@@ -61,7 +62,6 @@ pub struct Vocabulary {
 impl Vocabulary {
     pub fn check_pattern(&self, piece: &str) -> Option<Pattern> {
         match piece {
-            piece if self.collection_start.is_match(piece) => Some(Pattern::Collection),
             piece if self.comment_start.is_match(piece) => Some(Pattern::Comment),
             piece if self.exp_start.is_match(piece) => Some(Pattern::Expression),
             piece if self.val_id.is_match(piece) => Some(Pattern::Id),
@@ -90,8 +90,8 @@ impl Vocabulary {
 
     pub fn literal_end(&self, piece: &str) -> Option<Token> {
         match piece {
-            piece if self.new.is_match(piece) => Some(Token::Mod(Modifier::New)),
-            piece if self.next.is_match(piece) => Some(Token::Mod(Modifier::Next)),
+            piece if self.new.is_match(piece) => Some(Token::New),
+            piece if self.next.is_match(piece) => Some(Token::Next),
             _ => None,
         }
     }
@@ -107,9 +107,15 @@ impl Vocabulary {
     pub fn reserved(&self, piece: &str) -> Option<Token> {
         match piece {
             piece if self.assign.is_match(piece) => Some(Token::Assign),
-            piece if self.next.is_match(piece) => Some(Token::Mod(Modifier::Next)),
-            piece if self.new.is_match(piece) => Some(Token::Mod(Modifier::New)),
+            piece if self.next.is_match(piece) => Some(Token::Next),
+            piece if self.new.is_match(piece) => Some(Token::New),
             piece if self.this.is_match(piece) => Some(Token::This),
+            
+            piece if self.list_start.is_match(piece) => Some(Token::Col(Collection::ListStart)),
+            piece if self.list_end.is_match(piece) => Some(Token::Col(Collection::ListEnd)),
+            piece if self.struct_start.is_match(piece) => Some(Token::Col(Collection::StructStart)),
+            piece if self.struct_end.is_match(piece) => Some(Token::Col(Collection::StructEnd)),
+
             piece if self.case_and.is_match(piece) => Some(Token::Case(Case::And)),
             piece if self.case_equal.is_match(piece) => Some(Token::Case(Case::Equal)),
             piece if self.case_if.is_match(piece) => Some(Token::Case(Case::If)),
@@ -117,7 +123,6 @@ impl Vocabulary {
             piece if self.cmd_send.is_match(piece) => Some(Token::Cmd(Command::Send)),
             piece if self.cmd_show.is_match(piece) => Some(Token::Cmd(Command::Show)),
             piece if self.cmd_sum.is_match(piece) => Some(Token::Cmd(Command::Sum)),
-
             piece if self.mod_binding.is_match(piece) => Some(Token::Mod(Modifier::Binding)),
             piece if self.mod_selection.is_match(piece) => Some(Token::Mod(Modifier::Selection)),
             piece if self.mod_targeting.is_match(piece) => Some(Token::Mod(Modifier::Targeting)),
@@ -139,16 +144,6 @@ impl Vocabulary {
         }
     }
 
-    pub fn collection_content(&self, piece: &str) -> Option<Token> {
-        match piece {
-            piece if self.assign.is_match(piece) => Some(Token::Assign),
-            piece if self.next.is_match(piece) => Some(Token::Mod(Modifier::Next)),
-            piece if self.new.is_match(piece) => Some(Token::Mod(Modifier::Next)),
-            piece if self.term.is_match(piece) => Some(Token::Term(Text::lowercase(piece))),
-            _ => None,
-        }
-    }
-
     pub fn expression_content(&self, piece: &str) -> Option<Token> {
         match piece {
             piece if self.exp_divide.is_match(piece) => Some(Token::Exp(Expression::Divide)),
@@ -162,13 +157,6 @@ impl Vocabulary {
 
     pub fn text_end(&self, piece: &str) -> bool {
         if self.val_text.is_match(piece) {
-            return true;
-        }
-        false
-    }
-
-    pub fn collection_end(&self, piece: &str) -> bool {
-        if self.collection_end.is_match(piece) {
             return true;
         }
         false

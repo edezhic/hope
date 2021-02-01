@@ -16,12 +16,13 @@ fn main() -> Result<()> {
     Commands are executed in intuitive manner
     Terms are initialized with value Fact::truth()
     @ # * & are literal markers for Id, Version, Time and Seal
-    Collections(List and Structure), are defined with [] like [x, y, z] or [x: xx, y: yy, z: zz].
-    Structure is a json-like thing, but with more primitive types and decimal instead of float for numbers
-    Expressions inside {} evaluated into some Value with mathematical op precedence
-    Comments in ()
+    Lists are defined in [] like [x, y, z]
+    Structures are defined in {} like {x: x, y: y, z: z}, or simply {x, y, z} as a shorthand
+    Expressions inside () evaluated into some Value with mathematical op precedence
+    Comments inside ``
     */
-    bot.perform(r#"Xyz as "Hello world!". Show xyz."#)?;
+    bot.perform(r#"X as "Hello ", y as "world!", list as [x, y], struct as {x, y, z: 1.0}."#)?;
+    bot.perform(r#"Show struct."#)?;
 
     Ok(())
 }

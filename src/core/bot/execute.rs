@@ -1,16 +1,13 @@
-use std::vec::IntoIter;
+use std::{iter::Peekable, vec::IntoIter};
 
 use crate::core::*;
 
 impl Bot {
     pub fn execute(&mut self, tokens: Vec<Token>) -> Result<()> {
-        let mut iter = tokens.into_iter();
+        let mut iter = tokens.into_iter().peekable();
         let mut current_term: Option<Text> = None;
-        let mut result: Option<Value> = None;
 
         while let Some(token) = iter.next() {
-            //println!("---");
-            //println!("{:?}", token);
             match token {
                 Token::Term(term) => {
                     if !self.terms.contains(&term) {
@@ -19,62 +16,100 @@ impl Bot {
                     current_term = Some(term);
                 }
                 Token::Assign => {
-                    result = Some(self.evaluate(&mut iter)?);
-                    self.terms.set(current_term.take().unwrap(), result.take().unwrap());
+                    self.result = Some(self.resolve(&mut iter)?);
+                    self.terms
+                        .set(current_term.take().unwrap(), self.result.take().unwrap());
                 }
                 Token::Cmd(command) => {
-                    result = command.execute(self.evaluate(&mut iter)?)?;
+                    self.result = command.execute(self.resolve(&mut iter)?)?;
                 }
-                Token::Mod(Modifier::New) => {}
-                
-                Token::Col(Collection::Start) => {
-                    // value(collection) = self.collect?
-                }
-                Token::Val(value) => {
-                    // this = value
-                    //self.context.values.append(value)
-                }
-                Token::This => {
-                    // self.context.values.last? self.context.result?
-                }
+
                 Token::Exp(Expression::Start) => {
                     // value = evaluate until exp::end
                 }
-                Token::Mod(Modifier::Next) => {}
-                Token::Mod(Modifier::Binding) => {}
-                Token::Mod(Modifier::Selection) => {}
-                Token::Mod(Modifier::Targeting) => {}
+
                 Token::Case(_) => {
                     // many different things
                 }
-                _ => ()
+                _ => (),
             }
         }
         Ok(())
     }
 
-    fn evaluate(&mut self, iter: &mut IntoIter<Token>) -> Result<Value> {
+    fn resolve(&mut self, iter: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
         if let Some(token) = iter.next() {
             if let Token::Val(value) = token {
-                return Ok(value)
+                Ok(value)
+            } else if let Token::This = token {
+                if let Some(_) = self.result {
+                    Ok(self.result.take().unwrap())
+                } else {
+                    Err(Error::Error("Result is undefined here"))
+                }
+                
             } else if let Token::Term(term) = token {
                 if self.terms.contains(&term) {
-                    let value = self.terms.get(&term).unwrap().clone();
-                    return Ok(value);
+                    Ok(self.terms.get(&term).unwrap().clone())
                 } else {
-                    return Err(Error::ExecutionError(format!(
+                    Err(Error::ExecutionError(format!(
                         r#"Unknown term: '{:?}'"#,
                         term
-                    )));
+                    )))
                 }
+            } else if let Token::Col(Collection::ListStart) = token {
+                self.collect_list(iter)
+            } else if let Token::Col(Collection::StructStart) = token {
+                self.collect_struct(iter)
             } else {
-                return Err(Error::ExecutionError(format!(
+                Err(Error::ExecutionError(format!(
                     r#"Cannot evaluate: '{:?}'"#,
                     token
-                )));
+                )))
             }
         } else {
-            return Err(Error::Error("Expected Value"));
+            Err(Error::Error("Expected Value"))
         }
+    }
+
+    fn collect_struct(&mut self, iter: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
+        let mut structure = Structure::new();
+        while let Some(token) = iter.peek() {
+            if let Token::Col(Collection::StructEnd) = token {
+                break;
+            } else if let Token::Next = token {
+                iter.next();
+            } else if let Some(Token::Term(term)) = iter.next() {
+                if let Some(Token::Assign) = iter.peek() {
+                    iter.next();
+                    structure.add(term, self.resolve(iter)?);
+                } else {
+                    // clone, add
+                    let value;
+                    if self.terms.contains(&term) {
+                        value = self.terms.get(&term).unwrap().clone();
+                    } else {
+                        value = Value::default();
+                    }
+                    structure.add(term, value);
+                }
+                
+            }
+        }
+        Ok(Value::Structure(structure))
+    }
+
+    fn collect_list(&mut self, iter: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
+        let mut list = List::new();
+        while let Some(token) = iter.peek() {
+            if let Token::Col(Collection::ListEnd) = token {
+                break;
+            } else if let Token::Next = token {
+                iter.next();
+            } else {
+                list.append(self.resolve(iter)?);
+            }
+        }
+        Ok(Value::List(list))
     }
 }

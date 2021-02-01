@@ -34,27 +34,6 @@ impl Bot {
                         )));
                     }
                 }
-                Pattern::Collection => {
-                    tokens.push(Token::Col(Collection::Start));
-                    while let Some(piece) = pieces.next() {
-                        if self.vocab.collection_end(piece) {
-                            tokens.push(Token::Col(Collection::End));
-                            break;
-                        } else {
-                            if self.vocab.skip(piece) {
-                                continue;
-                            } else if let Some(t) = self.vocab.collection_content(piece) {
-                                tokens.push(t);
-                            } else {
-                                return Err(Error::ParsingError(format!(
-                                    r#"Unrecognized collection piece: '{}'"#,
-                                    piece
-                                )));
-                            }
-                        }
-                    }
-                    pattern = Pattern::None;
-                }
                 Pattern::Expression => {
                     tokens.push(Token::Exp(Expression::Start));
                     while let Some(piece) = pieces.next() {
