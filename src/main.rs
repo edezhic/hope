@@ -6,6 +6,8 @@
 #![allow(non_snake_case)]
 #![allow(unused_assignments)]
 
+extern crate derive_more;
+
 mod core;
 use crate::core::*;
 
@@ -21,8 +23,8 @@ fn main() -> Result<()> {
     Expressions inside () evaluated into some Value with mathematical op precedence
     Comments inside ``
     */
-    bot.perform(r#"X as "Hello ", y as "world!", list as [x, y], struct as {x, y, z: 1.0}."#)?;
-    bot.perform(r#"Show struct."#)?;
+    bot.perform(r#"column as [1.333, 2, 3,5], table as {column, column2: [0, 0]}, struct as {table, flag}."#)?;
+    bot.perform(r#"Sum column of table of struct. Show result."#)?;
 
     Ok(())
 }

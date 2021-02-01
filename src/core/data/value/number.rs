@@ -1,8 +1,9 @@
 use crate::core::Result;
-use bigdecimal::BigDecimal;
+use bigdecimal::{BigDecimal, Zero};
 use std::str::FromStr;
+use derive_more::{Add, AddAssign};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Add, AddAssign)]
 pub struct Number(BigDecimal);
 
 impl Number {
@@ -16,5 +17,8 @@ impl Number {
     }
     pub fn value(&self) -> &BigDecimal {
         &self.0
+    }
+    pub fn zero() -> Number {
+        Number(BigDecimal::zero())
     }
 }
