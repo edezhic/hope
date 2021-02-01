@@ -38,16 +38,6 @@ pub enum Collection {
 }
 
 #[derive(Debug)]
-pub enum Command {
-    Await,
-    Seal,
-    Send,
-    Show,
-    Sum,
-    Verify,
-}
-
-#[derive(Debug)]
 pub enum Expression { 
     Divide,
     End,

@@ -4,6 +4,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub enum Error {
+    ExecutionError(String),
     ParsingError(String),
     RegexError(String),
     RNGError,

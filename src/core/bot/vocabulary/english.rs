@@ -15,6 +15,8 @@ impl Vocabulary {
             collection_start: R::new(r"^\[$")?,
             comment_end: R::new(r"^\)$")?,
             comment_start: R::new(r"^\($")?,
+            exp_start: R::new(r"^\{$")?,
+            exp_end: R::new(r"^\}$")?,
             
             case_and: R::new(r"^(?i)and$")?,
             case_equal: R::new(r"^(?i)(=|is)$")?,
@@ -28,8 +30,6 @@ impl Vocabulary {
             exp_minus: R::new(r"^\-$")?,
             exp_multiply: R::new(r"^\*$")?,
             exp_plus: R::new(r"^\+$")?,
-            exp_start: R::new(r"^\{$")?,
-            exp_end: R::new(r"^\}$")?,
             mod_binding: R::new(r"^(?i)(with)$")?,
             mod_selection: R::new(r"^(?i)(of|from)$")?,
             mod_targeting: R::new(r"^(?i)(to|for|in)$")?,

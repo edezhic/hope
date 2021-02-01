@@ -17,7 +17,7 @@ pub use text::Text;
 pub use time::Time;
 pub use version::Version;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum Value {
     Fact(Fact),
     Id(Id),

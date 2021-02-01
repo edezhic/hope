@@ -2,7 +2,7 @@ use crate::core::Result;
 use bigdecimal::BigDecimal;
 use std::str::FromStr;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct Number(BigDecimal);
 
 impl Number {

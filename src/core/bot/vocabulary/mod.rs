@@ -133,7 +133,7 @@ impl Vocabulary {
 
     pub fn term(&self, piece: &str) -> Option<Token> {
         if self.term.is_match(piece) {
-            Some(Token::Term(Text::from_str(piece)))
+            Some(Token::Term(Text::lowercase(piece)))
         } else {
             None
         }
@@ -143,14 +143,8 @@ impl Vocabulary {
         match piece {
             piece if self.assign.is_match(piece) => Some(Token::Assign),
             piece if self.next.is_match(piece) => Some(Token::Mod(Modifier::Next)),
-            piece if self.new.is_match(piece) => Some(Token::Mod(Modifier::New)),
-            piece if self.val_fact_true.is_match(piece) => {
-                Some(Token::Val(Value::Fact(Fact::truth())))
-            }
-            piece if self.val_fact_false.is_match(piece) => {
-                Some(Token::Val(Value::Fact(Fact::falsehood())))
-            }
-            piece if self.term.is_match(piece) => Some(Token::Term(Text::from_str(piece))),
+            piece if self.new.is_match(piece) => Some(Token::Mod(Modifier::Next)),
+            piece if self.term.is_match(piece) => Some(Token::Term(Text::lowercase(piece))),
             _ => None,
         }
     }
@@ -161,7 +155,7 @@ impl Vocabulary {
             piece if self.exp_minus.is_match(piece) => Some(Token::Exp(Expression::Minus)),
             piece if self.exp_multiply.is_match(piece) => Some(Token::Exp(Expression::Multiply)),
             piece if self.exp_plus.is_match(piece) => Some(Token::Exp(Expression::Plus)),
-            piece if self.term.is_match(piece) => Some(Token::Term(Text::from_str(piece))),
+            piece if self.term.is_match(piece) => Some(Token::Term(Text::lowercase(piece))),
             _ => None,
         }
     }

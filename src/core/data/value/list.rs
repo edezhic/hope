@@ -1,6 +1,6 @@
 use super::Value;
 use std::collections::VecDeque;
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct List(VecDeque<Value>);
 
 impl List {

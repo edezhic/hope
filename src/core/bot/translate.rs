@@ -2,7 +2,7 @@ use super::vocabulary::*;
 use crate::core::*;
 
 impl Bot {
-    pub fn scan(&mut self, text: Text) -> Result<Vec<Token>> {
+    pub fn translate(&mut self, text: Text) -> Result<Vec<Token>> {
         let mut pieces = text.split_by_word_bounds();
         let mut piece;
         let mut tokens = Vec::<Token>::new();

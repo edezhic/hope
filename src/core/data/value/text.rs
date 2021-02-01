@@ -3,7 +3,7 @@ use crate::core::Result;
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::{UWordBounds, UnicodeSegmentation};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq, Hash)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Text(String);
 impl Text {
     pub fn new(s: Option<&str>) -> Text {
