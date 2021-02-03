@@ -24,7 +24,7 @@ impl Vocabulary {
             case_equal: R::new(r"^(?i)(=|is)$")?,
             case_if: R::new(r"^(?i)if$")?,
             case_then: R::new(r"^(?i)(then|do)$")?,
-            cmd_include: R::new(r"^(?i)include$")?,
+            cmd_set: R::new(r"^(?i)set$")?,
             cmd_send: R::new(r"^(?i)send$")?,
             cmd_show: R::new(r"^(?i)show$")?,
             cmd_sum: R::new(r"^(?i)sum$")?,

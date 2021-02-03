@@ -1,9 +1,8 @@
-mod command;
+mod commands;
 mod execute;
 mod token;
 mod translate;
 mod vocabulary;
-pub use command::*;
 pub use token::*;
 pub use vocabulary::*;
 
@@ -12,7 +11,7 @@ use crate::core::*;
 pub struct Bot {
     vocab: Vocabulary,
     terms: Structure,
-    result: Option<Value>
+    result: Value,
 }
 
 impl Bot {
@@ -20,7 +19,7 @@ impl Bot {
         Ok(Bot {
             vocab: Vocabulary::english()?,
             terms: Structure::new(),
-            result: None
+            result: Value::None,
         })
     }
     pub fn perform(&mut self, s: &str) -> Result<()> {

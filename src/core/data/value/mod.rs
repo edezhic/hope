@@ -19,6 +19,7 @@ pub use version::Version;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum Value {
+    None,
     Fact(Fact),
     Id(Id),
     Number(Number),

@@ -23,7 +23,8 @@ fn main() -> Result<()> {
     Expressions inside () evaluated into some Value with mathematical op precedence
     Comments inside ``
     */
-    bot.perform(r#"column as [1.333, 2, 3,5], table as {column, column2: [0, 0]}, struct as {table, flag}."#)?;
+    bot.perform(r#"Column as [1.333, 2, 3,5], table as {column, column2: [0, 0]}, struct as {table, flag}."#)?;
+    bot.perform(r#"Show flag of struct. Set flag of struct to no. Show flag of struct."#)?;
     bot.perform(r#"Sum column of table of struct. Show result."#)?;
 
     Ok(())

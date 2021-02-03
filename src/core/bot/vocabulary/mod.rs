@@ -46,8 +46,8 @@ pub struct Vocabulary {
     case_if: R,
     case_then: R,
 
-    cmd_include: R,
     cmd_send: R,
+    cmd_set: R,
     cmd_show: R,
     cmd_sum: R,
 
@@ -121,6 +121,7 @@ impl Vocabulary {
             piece if self.case_if.is_match(piece) => Some(Token::Case(Case::If)),
             piece if self.case_then.is_match(piece) => Some(Token::Case(Case::Then)),
             piece if self.cmd_send.is_match(piece) => Some(Token::Cmd(Command::Send)),
+            piece if self.cmd_set.is_match(piece) => Some(Token::Cmd(Command::Set)),
             piece if self.cmd_show.is_match(piece) => Some(Token::Cmd(Command::Show)),
             piece if self.cmd_sum.is_match(piece) => Some(Token::Cmd(Command::Sum)),
             piece if self.mod_binding.is_match(piece) => Some(Token::Mod(Modifier::Binding)),
