@@ -1,11 +1,9 @@
-mod commands;
-mod execute;
+mod perform;
 mod token;
 mod translate;
-mod vocabulary;
-pub use token::*;
-pub use vocabulary::*;
 
+pub use token::*;
+use translate::Vocabulary;
 use crate::core::*;
 
 pub struct Bot {
@@ -22,8 +20,8 @@ impl Bot {
             result: Value::None,
         })
     }
-    pub fn perform(&mut self, s: &str) -> Result<()> {
+    pub fn _do(&mut self, s: &str) -> Result<()> {
         let task = self.translate(Text::from_str(s))?;
-        self.execute(task)
+        self.perform(task)
     }
 }

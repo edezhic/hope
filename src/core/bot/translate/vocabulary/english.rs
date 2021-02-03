@@ -1,5 +1,6 @@
 use crate::core::*;
 use regex::Regex as R;
+use super::Vocabulary;
 
 impl Vocabulary {
     pub fn english() -> Result<Vocabulary> {

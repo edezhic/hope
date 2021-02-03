@@ -4,9 +4,11 @@ use regex::Regex as R;
 
 pub enum Pattern {
     None,
+    Skip,
     Comment,
     Expression,
     Id,
+    Number,
     Seal,
     Text,
     Time,
@@ -60,16 +62,18 @@ pub struct Vocabulary {
 }
 
 impl Vocabulary {
-    pub fn check_pattern(&self, piece: &str) -> Option<Pattern> {
+    pub fn check_pattern(&self, piece: &str) -> Pattern {
         match piece {
-            piece if self.comment_start.is_match(piece) => Some(Pattern::Comment),
-            piece if self.exp_start.is_match(piece) => Some(Pattern::Expression),
-            piece if self.val_id.is_match(piece) => Some(Pattern::Id),
-            piece if self.val_seal.is_match(piece) => Some(Pattern::Seal),
-            piece if self.val_text.is_match(piece) => Some(Pattern::Text),
-            piece if self.val_time.is_match(piece) => Some(Pattern::Time),
-            piece if self.val_version.is_match(piece) => Some(Pattern::Version),
-            _ => None,
+            piece if self.skip(piece) => Pattern::Skip,
+            piece if self.comment_start.is_match(piece) => Pattern::Comment,
+            piece if self.exp_start.is_match(piece) => Pattern::Expression,
+            piece if self.val_id.is_match(piece) => Pattern::Id,
+            piece if self.val_number.is_match(piece) => Pattern::Number,
+            piece if self.val_seal.is_match(piece) => Pattern::Seal,
+            piece if self.val_text.is_match(piece) => Pattern::Text,
+            piece if self.val_time.is_match(piece) => Pattern::Time,
+            piece if self.val_version.is_match(piece) => Pattern::Version,
+            _ => Pattern::None,
         }
     }
 

@@ -31,8 +31,14 @@ pub enum Value {
     Version(Version),
 }
 
+impl Value {
+    pub fn flag() -> Value {
+        Value::Fact(Fact::truth())
+    }
+}
+
 impl Default for Value {
     fn default() -> Value { 
-        Value::Fact(Fact::truth())
+        Value::None
     }
 }

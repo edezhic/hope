@@ -2,62 +2,7 @@ use std::{iter::Peekable, vec::IntoIter};
 use crate::core::*;
 
 impl Bot {
-    pub fn execute(&mut self, tokens: Vec<Token>) -> Result<()> {
-        let mut tokens = &mut tokens.into_iter().peekable();
-        let mut current_term: Option<Text> = None;
-
-        while let Some(token) = tokens.next() {
-            match token {
-                Token::Term(term) => {
-                    if !self.terms.contains(&term) {
-                        self.terms.set(term.clone(), Value::default())
-                    }
-                    current_term = Some(term);
-                }
-                Token::Assign => {
-                    let term = current_term.take().unwrap();
-                    let value = self.collect_value(tokens)?;
-                    self.terms.set(term, value);
-                }
-                Token::Cmd(command) => {
-                    match command {
-                        Command::Set => { 
-                            let reference = self.collect_reference(tokens)?;
-                            Bot::expect(tokens, Token::Mod(Modifier::Targeting))?;
-                            let value = self.collect_value(tokens)?;
-                            self.result = Command::set(reference, value)?;
-                        }
-                        Command::Show => {
-                            let reference = self.collect_reference(tokens)?;
-                            self.result = Command::show(reference)?;
-                        }
-                        Command::Sum => {
-                            let reference = self.collect_reference(tokens)?;
-                            self.result = Command::sum(reference)?;
-                        }
-                        _ => {
-                            return Err(Error::ExecutionError(format!(
-                                r#"I don't know how to '{:?}'"#,
-                                command
-                            )));
-                        }
-                    }
-                }
-
-                Token::Exp(Expression::Start) => {
-                    // self.result = self.evaluate until exp::end
-                }
-
-                Token::Case(_) => {
-                    // many different things
-                }
-                _ => (),
-            }
-        }
-        Ok(())
-    }
-
-    fn collect_reference(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<&Value> {
+    pub fn collect_reference(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<&Value> {
         if let Some(token) = tokens.next() {
             if let Token::This = token {
                 Ok(&self.result)
@@ -74,7 +19,7 @@ impl Bot {
         }
     }
 
-    fn collect_value(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
+    pub fn collect_value(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
         if let Some(token) = tokens.next() {
             if let Token::Val(value) = token {
                 Ok(value)
@@ -97,7 +42,7 @@ impl Bot {
         }
     }
 
-    fn select(&self, term: Text, tokens: &mut Peekable<IntoIter<Token>>) -> Result<&Value> {
+    pub fn select(&self, term: Text, tokens: &mut Peekable<IntoIter<Token>>) -> Result<&Value> {
         let mut selectors: Vec<Text> = vec![term];
         let mut value: &Value;
         while let Some(Token::Mod(Modifier::Selection)) = tokens.peek() {
@@ -135,7 +80,7 @@ impl Bot {
         Ok(value)
     }
 
-    fn collect_struct(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
+    pub fn collect_struct(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
         let mut structure = Structure::new();
         while let Some(token) = tokens.peek() {
             if let Token::Col(Collection::StructEnd) = token {
@@ -160,7 +105,7 @@ impl Bot {
         Ok(Value::Structure(structure))
     }
 
-    fn collect_list(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
+    pub fn collect_list(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
         let mut list = List::new();
         while let Some(token) = tokens.peek() {
             if let Token::Col(Collection::ListEnd) = token {
@@ -172,13 +117,5 @@ impl Bot {
             }
         }
         Ok(Value::List(list))
-    }
-
-    fn expect(tokens: &mut Peekable<IntoIter<Token>>, token: Token) -> Result<()> {
-        if let Some(token) = tokens.next() {
-            Ok(())
-        } else {
-            Err(Error::Error("Expected target value"))
-        }
     }
 }
