@@ -16,17 +16,10 @@ pub enum Pattern {
 }
 
 pub struct Vocabulary {
-    assign: R,
     ignore: R,
     whitespace: R,
-    next: R,
-    new: R,
     result: R,
     term: R,
-    list_start: R,
-    list_end: R,
-    struct_start: R,
-    struct_end: R,
     comment_start: R,
     comment_end: R,
 
@@ -39,8 +32,15 @@ pub struct Vocabulary {
     val_time: R,
     val_version: R,
 
+    mod_assign: R,
     mod_binding: R,
+    mod_exp_end: R,
+    mod_exp_start: R,
+    mod_list_end: R,
+    mod_list_start: R,
     mod_selection: R,
+    mod_struct_end: R,
+    mod_struct_start: R,
     mod_targeting: R,
 
     case_and: R,
@@ -53,12 +53,10 @@ pub struct Vocabulary {
     cmd_show: R,
     cmd_sum: R,
 
-    exp_divide: R,
-    exp_end: R,
-    exp_start: R,
-    exp_minus: R,
-    exp_multiply: R,
-    exp_plus: R,
+    op_divide: R,
+    op_minus: R,
+    op_multiply: R,
+    op_plus: R,
 }
 
 impl Vocabulary {
@@ -66,7 +64,7 @@ impl Vocabulary {
         match piece {
             piece if self.skip(piece) => Pattern::Skip,
             piece if self.comment_start.is_match(piece) => Pattern::Comment,
-            piece if self.exp_start.is_match(piece) => Pattern::Expression,
+            piece if self.mod_exp_start.is_match(piece) => Pattern::Expression,
             piece if self.val_id.is_match(piece) => Pattern::Id,
             piece if self.val_number.is_match(piece) => Pattern::Number,
             piece if self.val_seal.is_match(piece) => Pattern::Seal,
@@ -92,11 +90,10 @@ impl Vocabulary {
         false
     }
 
-    pub fn literal_end(&self, piece: &str) -> Option<Token> {
+    pub fn literal_end(&self, piece: &str) -> bool {
         match piece {
-            piece if self.new.is_match(piece) => Some(Token::New),
-            piece if self.next.is_match(piece) => Some(Token::Next),
-            _ => None,
+            piece if self.whitespace.is_match(piece) => true,
+            _ => false,
         }
     }
 
@@ -110,16 +107,8 @@ impl Vocabulary {
 
     pub fn reserved(&self, piece: &str) -> Option<Token> {
         match piece {
-            piece if self.assign.is_match(piece) => Some(Token::Assign),
-            piece if self.next.is_match(piece) => Some(Token::Next),
-            piece if self.new.is_match(piece) => Some(Token::New),
             piece if self.result.is_match(piece) => Some(Token::Result),
             
-            piece if self.list_start.is_match(piece) => Some(Token::Col(Collection::ListStart)),
-            piece if self.list_end.is_match(piece) => Some(Token::Col(Collection::ListEnd)),
-            piece if self.struct_start.is_match(piece) => Some(Token::Col(Collection::StructStart)),
-            piece if self.struct_end.is_match(piece) => Some(Token::Col(Collection::StructEnd)),
-
             piece if self.case_and.is_match(piece) => Some(Token::Case(Case::And)),
             piece if self.case_equal.is_match(piece) => Some(Token::Case(Case::Equal)),
             piece if self.case_if.is_match(piece) => Some(Token::Case(Case::If)),
@@ -130,8 +119,14 @@ impl Vocabulary {
             piece if self.cmd_show.is_match(piece) => Some(Token::Cmd(Command::Show)),
             piece if self.cmd_sum.is_match(piece) => Some(Token::Cmd(Command::Sum)),
 
+            
+            piece if self.mod_assign.is_match(piece) => Some(Token::Mod(Modifier::Assign)),
             piece if self.mod_binding.is_match(piece) => Some(Token::Mod(Modifier::Binding)),
+            piece if self.mod_list_end.is_match(piece) => Some(Token::Mod(Modifier::ListEnd)),
+            piece if self.mod_list_start.is_match(piece) => Some(Token::Mod(Modifier::ListStart)),
             piece if self.mod_selection.is_match(piece) => Some(Token::Mod(Modifier::Selection)),
+            piece if self.mod_struct_end.is_match(piece) => Some(Token::Mod(Modifier::StructEnd)),
+            piece if self.mod_struct_start.is_match(piece) => Some(Token::Mod(Modifier::StructStart)),
             piece if self.mod_targeting.is_match(piece) => Some(Token::Mod(Modifier::Targeting)),
             
             piece if self.val_fact_true.is_match(piece) => {
@@ -154,10 +149,10 @@ impl Vocabulary {
 
     pub fn expression_content(&self, piece: &str) -> Option<Token> {
         match piece {
-            piece if self.exp_divide.is_match(piece) => Some(Token::Exp(Expression::Divide)),
-            piece if self.exp_minus.is_match(piece) => Some(Token::Exp(Expression::Minus)),
-            piece if self.exp_multiply.is_match(piece) => Some(Token::Exp(Expression::Multiply)),
-            piece if self.exp_plus.is_match(piece) => Some(Token::Exp(Expression::Plus)),
+            piece if self.op_divide.is_match(piece) => Some(Token::Op(Op::Divide)),
+            piece if self.op_minus.is_match(piece) => Some(Token::Op(Op::Minus)),
+            piece if self.op_multiply.is_match(piece) => Some(Token::Op(Op::Multiply)),
+            piece if self.op_plus.is_match(piece) => Some(Token::Op(Op::Plus)),
             piece if self.term.is_match(piece) => Some(Token::Term(Text::lowercase(piece))),
             _ => None,
         }
@@ -178,7 +173,7 @@ impl Vocabulary {
     }
 
     pub fn expression_end(&self, piece: &str) -> bool {
-        if self.exp_end.is_match(piece) {
+        if self.mod_exp_end.is_match(piece) {
             return true;
         }
         false

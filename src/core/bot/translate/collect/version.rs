@@ -11,8 +11,7 @@ impl Bot {
     ) -> Result<()> {
         let mut version = Text::empty();
         while let Some(piece) = pieces.next() {
-            if let Some(end) = self.vocab.literal_end(piece) {
-                tokens.push(end);
+            if self.vocab.literal_end(piece) {
                 break;
             } else if self.vocab.whitespace(piece) {
                 break;

@@ -2,18 +2,12 @@ use crate::core::*;
 
 #[derive(Debug)]
 pub enum Token {
-    Assign,
     Case(Case),
     Cmd(Command),
-    Col(Collection),
-    Comment(Text),
-    Exp(Expression),
     Mod(Modifier),
-    New,
-    Next,
+    Op(Op),
     Result,
     Term(Text),
-    This,
     Val(Value),
 }
 
@@ -21,6 +15,7 @@ pub enum Token {
 pub enum Case {
     And,
     Any,
+    Do,
     Each,
     Else,
     Equal,
@@ -35,14 +30,6 @@ pub enum Case {
 }
 
 #[derive(Debug)]
-pub enum Collection { 
-    ListEnd,
-    ListStart,
-    StructEnd,
-    StructStart
-}
-
-#[derive(Debug)]
 pub enum Command {
     Await,
     Seal,
@@ -54,18 +41,24 @@ pub enum Command {
 }
 
 #[derive(Debug)]
-pub enum Expression { 
+pub enum Op { 
     Divide,
     End,
     Minus,
     Multiply,
     Plus,
-    Start,
 }
 
 #[derive(Debug)]
 pub enum Modifier {
+    Assign,
     Binding,
+    ExpEnd,
+    ExpStart,
+    ListEnd,
+    ListStart,
     Selection,
+    StructEnd,
+    StructStart,
     Targeting,
 }

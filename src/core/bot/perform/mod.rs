@@ -11,7 +11,7 @@ impl Bot {
         while let Some(token) = tokens.next() {
             match token {
                 Token::Term(term) => {
-                    self.expect(tokens, Token::Assign)?;
+                    self.expect(tokens, Token::Mod(Modifier::Assign))?;
                     let value = self.reference(tokens)?.clone();
                     self.terms.set(term, value);
                 }

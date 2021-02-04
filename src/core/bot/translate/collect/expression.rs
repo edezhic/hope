@@ -9,10 +9,10 @@ impl Bot {
         pieces: &mut Peekable<UWordBounds<'_>>,
         tokens: &mut Vec<Token>,
     ) -> Result<()> {
-        tokens.push(Token::Exp(Expression::Start));
+        tokens.push(Token::Mod(Modifier::ExpStart));
         while let Some(piece) = pieces.next() {
             if self.vocab.expression_end(piece) {
-                tokens.push(Token::Exp(Expression::End));
+                tokens.push(Token::Mod(Modifier::ExpEnd));
                 break;
             } else {
                 if self.vocab.skip(piece) {

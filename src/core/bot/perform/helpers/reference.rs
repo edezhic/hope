@@ -10,15 +10,15 @@ impl Bot {
                 self.result.unsafe_set(value);
                 Ok(&self.result)
             }
-            Some(Token::Col(Collection::ListStart)) => {
+            Some(Token::Mod(Modifier::ListStart)) => {
                 self.result.unsafe_set(self.collect_list(tokens)?);
                 Ok(&self.result)
             }
-            Some(Token::Col(Collection::StructStart)) => {
+            Some(Token::Mod(Modifier::StructStart)) => {
                 self.result.unsafe_set(self.collect_struct(tokens)?);
                 Ok(&self.result)
             }
-            Some(Token::Exp(Expression::Start)) => {
+            Some(Token::Mod(Modifier::ExpStart)) => {
                 self.result.unsafe_set(self.evaluate(tokens)?);
                 Ok(&self.result)
             }

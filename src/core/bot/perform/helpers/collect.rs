@@ -5,12 +5,10 @@ impl Bot {
     pub fn collect_struct(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
         let mut structure = Structure::new();
         while let Some(token) = tokens.peek() {
-            if let Token::Col(Collection::StructEnd) = token {
+            if let Token::Mod(Modifier::StructEnd) = token {
                 break;
-            } else if let Token::Next = token {
-                tokens.next();
             } else if let Some(Token::Term(term)) = tokens.next() {
-                if let Some(Token::Assign) = tokens.peek() {
+                if let Some(Token::Mod(Modifier::Assign)) = tokens.peek() {
                     tokens.next();
                     structure.set(term, self.reference(tokens)?.clone());
                 } else {
@@ -30,10 +28,8 @@ impl Bot {
     pub fn collect_list(&self, tokens: &mut Peekable<IntoIter<Token>>) -> Result<Value> {
         let mut list = List::new();
         while let Some(token) = tokens.peek() {
-            if let Token::Col(Collection::ListEnd) = token {
+            if let Token::Mod(Modifier::ListEnd) = token {
                 break;
-            } else if let Token::Next = token {
-                tokens.next();
             } else {
                 list.append(self.reference(tokens)?.clone());
             }

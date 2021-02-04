@@ -17,7 +17,7 @@ impl Bot {
                 comment.add(piece);
             }
         }
-        tokens.push(Token::Comment(comment));
+        //tokens.push(Token::Comment(comment));
         Ok(())
     }
 }
