@@ -21,7 +21,7 @@ pub struct Vocabulary {
     whitespace: R,
     next: R,
     new: R,
-    this: R,
+    result: R,
     term: R,
     list_start: R,
     list_end: R,
@@ -113,7 +113,7 @@ impl Vocabulary {
             piece if self.assign.is_match(piece) => Some(Token::Assign),
             piece if self.next.is_match(piece) => Some(Token::Next),
             piece if self.new.is_match(piece) => Some(Token::New),
-            piece if self.this.is_match(piece) => Some(Token::This),
+            piece if self.result.is_match(piece) => Some(Token::Result),
             
             piece if self.list_start.is_match(piece) => Some(Token::Col(Collection::ListStart)),
             piece if self.list_end.is_match(piece) => Some(Token::Col(Collection::ListEnd)),
@@ -124,13 +124,16 @@ impl Vocabulary {
             piece if self.case_equal.is_match(piece) => Some(Token::Case(Case::Equal)),
             piece if self.case_if.is_match(piece) => Some(Token::Case(Case::If)),
             piece if self.case_then.is_match(piece) => Some(Token::Case(Case::Then)),
+
             piece if self.cmd_send.is_match(piece) => Some(Token::Cmd(Command::Send)),
             piece if self.cmd_set.is_match(piece) => Some(Token::Cmd(Command::Set)),
             piece if self.cmd_show.is_match(piece) => Some(Token::Cmd(Command::Show)),
             piece if self.cmd_sum.is_match(piece) => Some(Token::Cmd(Command::Sum)),
+
             piece if self.mod_binding.is_match(piece) => Some(Token::Mod(Modifier::Binding)),
             piece if self.mod_selection.is_match(piece) => Some(Token::Mod(Modifier::Selection)),
             piece if self.mod_targeting.is_match(piece) => Some(Token::Mod(Modifier::Targeting)),
+            
             piece if self.val_fact_true.is_match(piece) => {
                 Some(Token::Val(Value::Fact(Fact::truth())))
             }

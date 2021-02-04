@@ -11,6 +11,7 @@ pub enum Token {
     Mod(Modifier),
     New,
     Next,
+    Result,
     Term(Text),
     This,
     Val(Value),

@@ -11,7 +11,7 @@ impl Vocabulary {
             next: R::new(r"^,$")?,
             ignore: R::new(r"^(?i)(the|a|let)$")?,
             term: R::new(r"^\p{Letter}+")?,
-            this: R::new(r"^(?i)(this|result|it)$")?,
+            result: R::new(r"^(?i)(result|this|it)$")?,
             list_end: R::new(r"^\]$")?,
             list_start: R::new(r"^\[$")?,
             struct_end: R::new(r"^\}$")?,

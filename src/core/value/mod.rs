@@ -35,6 +35,15 @@ impl Value {
     pub fn flag() -> Value {
         Value::Fact(Fact::truth())
     }
+
+    pub fn unsafe_set(&self, value: Value) {
+        // forgive me god and rust compiler for mutating the immutable
+        unsafe {
+            // FIXME get rid of this abomination
+            let mut_self = &mut *((self as *const Self) as *mut Self);
+            *mut_self = value;
+        }
+    }
 }
 
 impl Default for Value {
