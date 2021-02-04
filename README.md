@@ -1,24 +1,32 @@
 # Hope
 Human-oriented programming environment
 
-WIP
-
-Look into main.rs and cargo run to see what happens :)
+Currently this project is about making an interpretable 'programming language' with intuitive syntax to make it human-readable for anyone, not just software engineers. Working name for this 'language' - Hopes (Hope Specification). An example: 
+```
+Column as [1.333, 2, 3,5], structure as {column, flag}. Sum column of structure and show the result.
+```
+This 'code' already works, with more coming. Also, it's parsed following unicode standards and decoupled language-specific vocabulary, so it can be easily extended to other input languages as well. However, interpreter is not the end goal and just the base for the broader project, whose long-term goals are not yet clear and up for discussion.
 
 Current targets:
-* interpreter/compiler for basic operations
-* http and p2p networking
-* cryptographic primitives
-* browser-based "IDE"
+-[x] basic interpretation: variables, collections, some commands
+-[ ] expressions
+-[ ] conditions and loops
+-[ ] http requests
+-[ ] cryptographic primitives
+-[ ] browser-based "IDE"
+-[ ] p2p networking
+-[ ] ...?
 
 Milestones for v1.0:
-* basic pandas-like data mangling
-* possibility of transfering repo into the platform itself
+* pandas-like data mangling
+* functionality for distributed teams/companies
+* 
+* possibility of moving the repo and development process through the Hope itself using some kind of distributed protocol
 * court-like functionality
-* basic functionality for distributed teams/companies
-* ...
+* ...?
 
 Questionable ideas:
-* Support for WASM/WebGPU modules, for high-performance custom logic and ML
-* Hope OS, based on Redox kernel or smth alike
+* Support for WASM/WebGPU modules, for high-performance custom logic, ML and compatability with modules written in other languages while keeping them sandboxed for security
+* Hope OS, based on Redox kernel or smth alike. Hopes as a replacement for shell.
 * SNARKs and homomorphic encryption primitives
+* ...!
