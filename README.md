@@ -8,14 +8,15 @@ Column as [1.333, 2, 3,5], structure as {column, flag}. Sum column of structure 
 This 'code' already works, with more coming. Also, it's parsed following unicode standards and decoupled language-specific vocabulary, so it can be easily extended to other input languages as well. However, interpreter is not the end goal and just the base for the broader project, whose long-term goals are not yet clear and up for discussion.
 
 Current targets:
--[x] basic interpretation: variables, collections, some commands
--[ ] expressions
--[ ] conditions and loops
--[ ] http requests
--[ ] cryptographic primitives
--[ ] browser-based "IDE"
--[ ] p2p networking
--[ ] ...?
+
+- [x] basic interpretation: variables, collections, some commands
+- [ ] expressions
+- [ ] conditions and loops
+- [ ] http requests
+- [ ] cryptographic primitives
+- [ ] browser-based "IDE"
+- [ ] p2p networking
+- [ ] ...?
 
 Milestones for v1.0:
 * pandas-like data mangling
