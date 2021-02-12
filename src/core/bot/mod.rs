@@ -1,8 +1,10 @@
-mod perform;
+mod build;
 mod token;
 mod translate;
+mod op_structure;
 
 pub use token::*;
+pub use op_structure::*;
 use translate::Vocabulary;
 use crate::core::*;
 
@@ -22,6 +24,11 @@ impl Bot {
     }
     pub fn _do(&mut self, s: &str) -> Result<()> {
         let tokens = self.translate(Text::from_str(s))?;
-        self.perform(tokens)
+        for token in tokens {
+            println!("{:?}", token);
+        }
+        let algorithm = self.build(tokens)?;
+        //self.perform(tokens)
+        Ok(())
     }
 }

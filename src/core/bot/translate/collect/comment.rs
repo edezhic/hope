@@ -9,15 +9,16 @@ impl Bot {
         pieces: &mut Peekable<UWordBounds<'_>>,
         tokens: &mut Vec<Token>,
     ) -> Result<()> {
+        pieces.next();
         let mut comment = Text::empty();
         while let Some(piece) = pieces.next() {
-            if self.vocab.comment_end(piece) {
+            if self.vocab.comment_end.is_match(piece) {
                 break;
             } else {
                 comment.add(piece);
             }
         }
-        //tokens.push(Token::Comment(comment));
+        //tokens.push(Token::Comment(comment)); ???
         Ok(())
     }
 }

@@ -9,17 +9,16 @@ impl Bot {
         pieces: &mut Peekable<UWordBounds<'_>>,
         tokens: &mut Vec<Token>,
     ) -> Result<()> {
+        pieces.next();
         let mut time = Text::empty();
         while let Some(piece) = pieces.next() {
-            if self.vocab.literal_end(piece) {
-                break;
-            } else if self.vocab.whitespace(piece) {
+            if self.vocab.whitespace.is_match(piece) {
                 break;
             } else {
                 time.add(piece);
             }
         }
-        tokens.push(Token::Val(Value::Time(Time::from_text(time)?)));
+        tokens.push(Token::Ref(Value::Time(Time::from_text(time)?)));
         Ok(())
     }
 }

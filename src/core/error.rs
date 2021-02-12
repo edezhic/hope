@@ -7,9 +7,7 @@ pub enum Error { // TODO https://crates.io/crates/thiserror ?
     ExecutionError(String),
     ParsingError(String),
     RegexError(String),
-    RNGError,
     Error(&'static str),
-    NoMatch,
 }
 
 impl From<regex::Error> for Error {

@@ -3,12 +3,9 @@ use crate::core::*;
 #[derive(Debug)]
 pub enum Token {
     Case(Case),
-    Cmd(Command),
     Mod(Modifier),
     Op(Op),
-    Result,
-    Term(Text),
-    Val(Value),
+    Ref(Value),
 }
 
 #[derive(Debug)]
@@ -18,11 +15,10 @@ pub enum Case {
     Do,
     Each,
     Else,
-    Equal,
+    Identical,
     If,
     Not,
     Or,
-    Repeat,
     Stop,
     Then,
     When,
@@ -30,35 +26,23 @@ pub enum Case {
 }
 
 #[derive(Debug)]
-pub enum Command {
+pub enum Op {
+    Add,
     Await,
-    Seal,
+    Divide, 
+    Multiply,
+    Resolve,
+    Sign,
     Send,
-    Set,
-    Show,
+    Define,
+    Substract,
     Sum,
     Verify,
 }
 
 #[derive(Debug)]
-pub enum Op { 
-    Divide,
-    End,
-    Minus,
-    Multiply,
-    Plus,
-}
-
-#[derive(Debug)]
 pub enum Modifier {
-    Assign,
     Binding,
-    ExpEnd,
-    ExpStart,
-    ListEnd,
-    ListStart,
     Selection,
-    StructEnd,
-    StructStart,
     Targeting,
 }

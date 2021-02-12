@@ -50,9 +50,3 @@ impl From<String> for Text {
         Text::from_string(item)
     }
 }
-
-impl From<Id> for Text {
-    fn from(id: Id) -> Self {
-        Text::from_string(id.to_string())
-    }
-}
