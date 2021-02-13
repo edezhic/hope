@@ -20,12 +20,6 @@ impl From<regex::Error> for Error {
     }
 }
 
-impl From<iref::Error> for Error {
-    fn from(e: iref::Error) -> Self {
-        Error::Error("something went wrong with iref")
-    }
-}
-
 impl From<rust_decimal::Error> for Error {
     fn from(e: rust_decimal::Error) -> Self {
         Error::Error("something went wrong with numbers")

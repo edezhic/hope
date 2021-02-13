@@ -5,8 +5,7 @@ use super::Vocabulary;
 impl Vocabulary {
     pub fn english() -> Result<Vocabulary> {
         Ok(Vocabulary {
-            whitespace: R::new(r"^(\p{Zs}|\t)+$")?,
-            ignore: R::new(r"^(?i)(the|a|let|,|/|\(|\))$")?,
+            ignore: R::new(r"^(?i)(the|let|,|\p{Zs}|\t)+$")?,
             term: R::new(r"^\p{Letter}+")?,
             result: R::new(r"^(?i)(result|this|it)$")?,
             comment_end: R::new(r"^`$")?,

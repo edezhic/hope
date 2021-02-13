@@ -12,7 +12,7 @@ impl Bot {
         pieces.next();
         let mut time = Text::empty();
         while let Some(piece) = pieces.next() {
-            if self.vocab.whitespace.is_match(piece) {
+            if self.vocab.ignore.is_match(piece) {
                 break;
             } else {
                 time.add(piece);

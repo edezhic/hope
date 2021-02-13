@@ -8,81 +8,28 @@ impl Bot {
         &self,
         pieces: &mut Peekable<UWordBounds<'_>>,
         tokens: &mut Vec<Token>,
-    ) -> Result<bool> {
-        //piece if self.result.is_match(piece) => Some(Token::Result),
-        if self.vocab.term.is_match(piece) {
-            Some(Token::Term(Text::lowercase(piece)))
-        } else {
-            None
-        }
-        // match term, result, selects, values?
-        /*
-        match tokens.next() {
-            Some(Token::Result) => Ok(&self.result),
-            Some(Token::Term(term)) => self.select(term, tokens),
-            Some(Token::Val(value)) => {
-                self.result.unsafe_set(value);
-                Ok(&self.result)
-            }
-            Some(Token::Mod(Modifier::ListStart)) => {
-                self.result.unsafe_set(self.collect_list(tokens)?);
-                Ok(&self.result)
-            }
-            Some(Token::Mod(Modifier::StructStart)) => {
-                self.result.unsafe_set(self.collect_struct(tokens)?);
-                Ok(&self.result)
-            }
-            Some(Token::Mod(Modifier::ExpStart)) => {
-                self.result.unsafe_set(self.evaluate(tokens)?);
-                Ok(&self.result)
-            }
-            Some(token) => Err(Error::ExecutionError(format!(
-                r#"I expected some reference or value, but found '{:?}'"#,
-                token
-            ))),
-            None => Err(Error::Error(
-                "I expected some reference or value, but found nothing",
-            )),
-        }*/
-        /*
-        pub fn select(&self, term: Text, tokens: &mut Peekable<IntoIter<Token>>) -> Result<&Value> {
-        let mut selectors: Vec<Text> = vec![term];
-        let mut value: &Value;
-        while let Some(Token::Mod(Modifier::Selection)) = tokens.peek() {
-            tokens.next();
-            if let Some(Token::Term(selector)) = tokens.next() {
-                selectors.push(selector);
+    ) -> Result<()> {
+        let mut selectors: Vec<Text> = vec![Text::lowercase(pieces.next().unwrap())];
+        while let Some(piece) = pieces.peek() {
+            if self.vocab.ignore.is_match(piece) {
+                pieces.next();
+            } else if self.vocab.mod_selection.is_match(piece) {
+                pieces.next();
+                let selector = pieces.find(|p| self.vocab.term.is_match(p)).unwrap();
+                selectors.push(Text::lowercase(selector));
             } else {
-                return Err(Error::Error("I can select only from terms"));
+                break;
             }
-        }
-        let term = &selectors.pop().unwrap();
-        if self.terms.contains(term) {
-            value = self.terms.get(term).unwrap();
-        } else {
-            return Err(Error::ExecutionError(format!(
-                r#"Term: '{:?}' not found"#,
-                term
-            )));
         }
 
-        for selector in selectors.into_iter().rev() {
-            if let Value::Structure(structure) = value {
-                if structure.contains(&selector) {
-                    value = structure.get(&selector).unwrap()
-                } else {
-                    return Err(Error::ExecutionError(format!(
-                        r#"Term '{:?}' of '{:?}' not found"#,
-                        term, selector
-                    )));
-                }
-            } else {
-                return Err(Error::Error("I can select only from structures"));
-            }
+        let term = selectors.pop();
+        selectors.reverse();
+
+        if selectors.len() > 0 {
+            tokens.push(Token::Ref(Value::Id(Id::reference(term, Some(selectors)))));
+        } else {
+            tokens.push(Token::Ref(Value::Id(Id::reference(term, None))));
         }
-        Ok(value)
-    }   */
-        
-        
+        Ok(())
     }
 }

@@ -7,7 +7,6 @@ license = "GPL-3.0-or-later"
 edition = "2018"
 
 [dependencies]
-iref = "1.4.3"
 chrono = { version = "0.4.19", features = ["wasmbind", "serde"] }
 serde = { version = "1.0.123", features = ["derive"] }
 unicode-normalization = "0.1.16"

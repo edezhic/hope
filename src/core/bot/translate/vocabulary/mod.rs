@@ -3,7 +3,6 @@ use regex::Regex as R;
 
 pub struct Vocabulary {
     pub ignore: R,
-    pub whitespace: R,
     pub result: R,
     pub term: R,
     pub comment_start: R,

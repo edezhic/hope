@@ -27,4 +27,16 @@ impl Id {
     pub fn from_text(t: Text) -> Result<Id> {
         Ok(Id::from_str(t.as_str())?)
     }
+
+    pub fn reference(term: Option<Text>, selectors: Option<Vec<Text>>) -> Id {
+        Id {
+            scheme: Scheme::Ref,
+            domain: term,
+            path: selectors,
+        }
+    }
+
+    pub fn ref_result() -> Id {
+        Id::reference(None, None)
+    }
 }

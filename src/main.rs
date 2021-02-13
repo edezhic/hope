@@ -17,7 +17,10 @@ fn main() -> Result<()> {
     /*
     @ # & are literal markers for Id, Version and Seal (need smth for time)
     */
-    bot._do(r#"x as [@display, 1,5], y as {z: x, abc}. Show x and y"#)?;
+    //bot._do(r#"x as [@display, 1,5], y as {z: x, abc}. Show x and y"#)?;
+
+    bot._do(r#"x as @http, y as 1.5. Show z of x and y"#)?;
+
 
     Ok(())
 }

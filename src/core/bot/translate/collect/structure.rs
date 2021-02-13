@@ -8,6 +8,8 @@ impl Bot {
         pieces: &mut Peekable<UWordBounds<'_>>,
         tokens: &mut Vec<Token>,
     ) -> Result<()> {
+        pieces.next();
+        /*
         let mut structure = Structure::new();
         while let Some(token) = tokens.peek() {
             if let Token::Mod(Modifier::StructEnd) = token {
@@ -28,6 +30,7 @@ impl Bot {
             }
         }
         tokens.push(Token::Ref(Value::Structure(structure)));
+        */
         Ok(())
     }
 }
