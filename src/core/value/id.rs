@@ -29,7 +29,8 @@ impl Id {
     }
 
     pub fn get_term(&self) -> Result<Text> {
-        if let Some(segments) = self.path && Scheme::Ref = self.scheme {
+        if let Some(segments) = &self.path {
+            // check Scheme::Ref = self.scheme?
             if segments.len() == 1 {
                 Ok(segments[0].clone())
             } else {

@@ -4,8 +4,14 @@ use unicode_segmentation::UWordBounds;
 
 impl Bot {
     pub fn read(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Lexeme> {
+        while let Some(piece) = pieces.peek() {
+            if self.vocab.ignore.is_match(piece) {
+                pieces.next();
+            } else {
+                break;
+            }
+        }
         let lexeme = match *pieces.peek().unwrap() {
-            piece if self.vocab.ignore.is_match(piece) => Lexeme::None,
             piece if self.vocab.comment_start.is_match(piece) => Lexeme::Comment(self.collect_comment(pieces)?),
             piece if self.vocab.list_start.is_match(piece) => Lexeme::List(self.collect_list(pieces)?),
             piece if self.vocab.struct_start.is_match(piece) => Lexeme::Struct(self.collect_structure(pieces)?),

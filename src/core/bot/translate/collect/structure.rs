@@ -12,12 +12,9 @@ impl Bot {
                 break;
             }
             match self.read(pieces)? {
-                Lexeme::None => {
-                    pieces.next();
-                }
                 Lexeme::Reference(value) => {
                     if let Value::Id(reference) = value {
-                        let term = reference.term()?;
+                        let term = reference.get_term()?;
                         if self.vocab.op_define.is_match(pieces.peek().unwrap()) {
                             pieces.next();
                             match self.read(pieces)? {
@@ -32,7 +29,7 @@ impl Bot {
                                 }
                             }
                         } else {
-                            structure.set(term, reference);
+                            structure.set(term, Value::Id(reference));
                         } 
                     } else {
                         return Err(Error::ParsingError(format!(

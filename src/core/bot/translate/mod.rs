@@ -12,9 +12,6 @@ impl Bot {
         let mut tokens = Vec::<Token>::new();
         while let Some(_) = pieces.peek() {
             match self.read(pieces)? {
-                Lexeme::None => {
-                    pieces.next();
-                }
                 Lexeme::Comment(_) => (),
                 Lexeme::Item(item) => tokens.push(Token::Ref(item)),
                 Lexeme::List(list) => tokens.push(Token::Ref(Value::List(list))),

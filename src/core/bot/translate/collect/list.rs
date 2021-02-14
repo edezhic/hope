@@ -12,9 +12,6 @@ impl Bot {
                 break;
             }
             match self.read(pieces)? {
-                Lexeme::None => {
-                    pieces.next();
-                }
                 Lexeme::Item(item) => list.append(item),
                 Lexeme::Reference(reference) => list.append(reference),
                 lexeme => {
