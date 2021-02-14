@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Go nightly
+      run: rustup default nightly
     - name: Build
       run: cargo +nightly build --verbose
     - name: Add wasm target
