@@ -17,8 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo +nightly build --verbose
     - name: Add wasm target
-      run: rustup target add wasm32-unknown-unknown
+      run: rustup +nightly target add wasm32-unknown-unknown
     - name: Build WASM
-      run: cargo build --target wasm32-unknown-unknown --release
+      run: cargo +nightly build --target wasm32-unknown-unknown --release
