@@ -4,11 +4,7 @@ use unicode_segmentation::UWordBounds;
 use crate::core::*;
 
 impl Bot {
-    pub fn collect_reference(
-        &self,
-        pieces: &mut Peekable<UWordBounds<'_>>,
-        tokens: &mut Vec<Token>,
-    ) -> Result<()> {
+    pub fn collect_reference(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Id> {
         let mut selectors: Vec<Text> = vec![Text::lowercase(pieces.next().unwrap())];
         while let Some(piece) = pieces.peek() {
             if self.vocab.ignore.is_match(piece) {
@@ -21,15 +17,7 @@ impl Bot {
                 break;
             }
         }
-
-        let term = selectors.pop();
         selectors.reverse();
-
-        if selectors.len() > 0 {
-            tokens.push(Token::Ref(Value::Id(Id::reference(term, Some(selectors)))));
-        } else {
-            tokens.push(Token::Ref(Value::Id(Id::reference(term, None))));
-        }
-        Ok(())
+        Ok(Id::reference(selectors))
     }
 }

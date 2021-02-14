@@ -3,7 +3,7 @@ mod token;
 mod translate;
 
 pub use token::*;
-use translate::Vocabulary;
+pub use translate::*;
 use crate::core::*;
 
 pub struct Bot {

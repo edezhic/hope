@@ -1,9 +1,11 @@
 use crate::core::*;
 use std::{collections::HashMap, ops::Index};
 
+type Key = Text;
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct Structure {
-    content: HashMap<Text, Value>,
+    content: HashMap<Key, Value>,
 }
 
 impl Structure {
@@ -12,18 +14,18 @@ impl Structure {
             content: HashMap::new() 
         }
     }
-    pub fn get(&self, key: &Text) -> Option<&Value> {
+    pub fn get(&self, key: &Key) -> Option<&Value> {
         self.content.get(&key)
     }
-    pub fn get_mut(&mut self, key: &Text) -> Option<&mut Value> {
+    pub fn get_mut(&mut self, key: &Key) -> Option<&mut Value> {
         self.content.get_mut(&key)
     }
 
-    pub fn contains(&self, key: &Text) -> bool {
+    pub fn contains(&self, key: &Key) -> bool {
         self.content.contains_key(key)
     }
 
-    pub fn set(&mut self, key: Text, value: Value) {
+    pub fn set(&mut self, key: Key, value: Value) {
         self.content.insert(key, value);
     }
 }

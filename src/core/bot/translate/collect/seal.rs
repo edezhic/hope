@@ -4,11 +4,7 @@ use unicode_segmentation::UWordBounds;
 use crate::core::*;
 
 impl Bot {
-    pub fn collect_seal(
-        &self,
-        pieces: &mut Peekable<UWordBounds<'_>>,
-        tokens: &mut Vec<Token>,
-    ) -> Result<()> {
+    pub fn collect_seal(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Seal> {
         pieces.next();
         let mut seal = Text::empty();
         while let Some(piece) = pieces.next() {
@@ -18,7 +14,6 @@ impl Bot {
                 seal.add(piece);
             }
         }
-        tokens.push(Token::Ref(Value::Seal(Seal::from_text(seal)?)));
-        Ok(())
+        Seal::from_text(seal)
     }
 }

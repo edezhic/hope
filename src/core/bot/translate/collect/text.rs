@@ -4,11 +4,7 @@ use unicode_segmentation::UWordBounds;
 use crate::core::*;
 
 impl Bot {
-    pub fn collect_text(
-        &self,
-        pieces: &mut Peekable<UWordBounds<'_>>,
-        tokens: &mut Vec<Token>,
-    ) -> Result<()> {
+    pub fn collect_text(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Text> {
         pieces.next();
         let mut text = Text::empty();
         while let Some(piece) = pieces.next() {
@@ -18,7 +14,6 @@ impl Bot {
                 text.add(piece);
             }
         }
-        tokens.push(Token::Ref(Value::Text(text)));
-        Ok(())
+        Ok(text)
     }
 }

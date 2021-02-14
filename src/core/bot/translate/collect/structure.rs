@@ -3,34 +3,52 @@ use std::{iter::Peekable, vec::IntoIter};
 use unicode_segmentation::UWordBounds;
 
 impl Bot {
-    pub fn collect_structure(
-        &self,
-        pieces: &mut Peekable<UWordBounds<'_>>,
-        tokens: &mut Vec<Token>,
-    ) -> Result<()> {
+    pub fn collect_structure(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Structure> {
         pieces.next();
-        /*
         let mut structure = Structure::new();
-        while let Some(token) = tokens.peek() {
-            if let Token::Mod(Modifier::StructEnd) = token {
+        while let Some(piece) = pieces.peek() {
+            if self.vocab.struct_end.is_match(piece) {
+                pieces.next();
                 break;
-            } else if let Some(Token::Term(term)) = tokens.next() {
-                if let Some(Token::Mod(Modifier::Assign)) = tokens.peek() {
-                    tokens.next();
-                    structure.set(term, self.reference(tokens)?.clone());
-                } else {
-                    let value;
-                    if self.terms.contains(&term) {
-                        value = self.terms.get(&term).unwrap().clone();
+            }
+            match self.read(pieces)? {
+                Lexeme::None => {
+                    pieces.next();
+                }
+                Lexeme::Reference(value) => {
+                    if let Value::Id(reference) = value {
+                        let term = reference.term()?;
+                        if self.vocab.op_define.is_match(pieces.peek().unwrap()) {
+                            pieces.next();
+                            match self.read(pieces)? {
+                                Lexeme::Reference(value) | Lexeme::Item(value) => {
+                                    structure.set(term, value)
+                                }
+                                lexeme => {
+                                    return Err(Error::ParsingError(format!(
+                                        r#"Unexpected structure attribute '{:?}'"#,
+                                        lexeme
+                                    )));
+                                }
+                            }
+                        } else {
+                            structure.set(term, reference);
+                        } 
                     } else {
-                        value = Value::flag();
+                        return Err(Error::ParsingError(format!(
+                            r#"Unexpected structure attribute '{:?}'"#,
+                            value
+                        )));
                     }
-                    structure.set(term, value);
+                }
+                lexeme => {
+                    return Err(Error::ParsingError(format!(
+                        r#"Unexpected structure lexeme '{:?}'"#,
+                        lexeme
+                    )));
                 }
             }
         }
-        tokens.push(Token::Ref(Value::Structure(structure)));
-        */
-        Ok(())
+        Ok(structure)
     }
 }

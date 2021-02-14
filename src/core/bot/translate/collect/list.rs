@@ -3,23 +3,29 @@ use std::{iter::Peekable, vec::IntoIter};
 use unicode_segmentation::UWordBounds;
 
 impl Bot {
-    pub fn collect_list(
-        &self,
-        pieces: &mut Peekable<UWordBounds<'_>>,
-        tokens: &mut Vec<Token>,
-    ) -> Result<()> {
+    pub fn collect_list(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<List> {
         pieces.next();
-        /*
         let mut list = List::new();
-        while let Some(token) = tokens.peek() {
-            if let Token::Mod(Modifier::ListEnd) = token {
+        while let Some(piece) = pieces.peek() {
+            if self.vocab.list_end.is_match(piece) {
+                pieces.next();
                 break;
-            } else {
-                list.append(self.reference(tokens)?.clone());
+            }
+            match self.read(pieces)? {
+                Lexeme::None => {
+                    pieces.next();
+                }
+                Lexeme::Item(item) => list.append(item),
+                Lexeme::Reference(reference) => list.append(reference),
+                lexeme => {
+                    return Err(Error::ParsingError(format!(
+                        r#"Unexpected list lexeme '{:?}'"#,
+                        lexeme
+                    )));
+                }
             }
         }
-        tokens.push(Token::Ref(Value::List(list)));
-        */
-        Ok(())
+
+        Ok(list)
     }
 }
