@@ -2,9 +2,10 @@ mod collect;
 mod lexeme;
 mod read;
 mod vocabulary;
+
 use crate::core::*;
 pub use lexeme::Lexeme;
-pub use vocabulary::*;
+pub use vocabulary::Vocabulary;
 
 impl Bot {
     pub fn translate(&self, text: Text) -> Result<Vec<Token>> {
@@ -13,12 +14,10 @@ impl Bot {
         while let Some(_) = pieces.peek() {
             match self.read(pieces)? {
                 Lexeme::Comment(_) => (),
-                Lexeme::Item(item) => tokens.push(Token::Ref(item)),
-                Lexeme::List(list) => tokens.push(Token::Ref(Value::List(list))),
-                Lexeme::Struct(structure) => tokens.push(Token::Ref(Value::Structure(structure))),
+                Lexeme::Command(command) => tokens.extend(command),
                 Lexeme::Keyword(keyword) => tokens.push(keyword),
                 Lexeme::Reference(reference) => tokens.push(Token::Ref(reference)),
-                Lexeme::Command(command) => tokens.extend(command),
+                Lexeme::Value(item) => tokens.push(Token::Ref(item)),
             }
         }
         Ok(tokens)

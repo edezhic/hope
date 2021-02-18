@@ -2,6 +2,7 @@ use crate::core::Result;
 use derive_more::{Add, AddAssign};
 use rust_decimal::prelude::*;
 use std::str::FromStr;
+use core::fmt;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Add, AddAssign)]
 pub struct Number {
@@ -24,5 +25,11 @@ impl Number {
         Number {
             value: Decimal::zero(),
         }
+    }
+}
+
+impl fmt::Display for Number {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.value)
     }
 }

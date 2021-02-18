@@ -1,5 +1,5 @@
 use crate::core::*;
-
+use core::fmt;
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct Version {
     major: u16,
@@ -20,3 +20,23 @@ impl Version {
         })
     }
 }
+
+impl fmt::Display for Version {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "#{}", self.major);
+        if let Some(minor) = &self.minor {
+            write!(f, ".{}", minor);
+            if let Some(patch) = &self.patch {
+                write!(f, ".{}", patch);
+                if let Some(rc) = &self.rc {
+                    write!(f, "-{}", rc);
+                    if let Some(meta) = &self.meta {
+                        write!(f, "-{}", meta);
+                    }
+                }
+            }
+        }
+        write!(f, "")
+    }
+}
+

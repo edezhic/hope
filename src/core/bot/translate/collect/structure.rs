@@ -15,10 +15,10 @@ impl Bot {
                 Lexeme::Reference(value) => {
                     if let Value::Id(reference) = value {
                         let term = reference.get_term()?;
-                        if self.vocab.op_define.is_match(pieces.peek().unwrap()) {
+                        if self.vocab.op_assign.is_match(pieces.peek().unwrap()) {
                             pieces.next();
                             match self.read(pieces)? {
-                                Lexeme::Reference(value) | Lexeme::Item(value) => {
+                                Lexeme::Reference(value) | Lexeme::Value(value) => {
                                     structure.set(term, value)
                                 }
                                 lexeme => {

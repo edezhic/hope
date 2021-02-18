@@ -1,4 +1,5 @@
 use crate::core::*;
+use core::fmt;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct Seal(Text);
@@ -13,3 +14,8 @@ impl Seal {
     }
 }
 
+impl fmt::Display for Seal {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "&{}", self.0)
+    }
+}

@@ -22,6 +22,7 @@ pub struct Vocabulary {
     pub val_version: R,
 
     pub mod_binding: R,
+    pub mod_break: R,
     pub mod_selection: R,
     pub mod_targeting: R,
 
@@ -34,7 +35,7 @@ pub struct Vocabulary {
     pub op_divide: R,
     pub op_multiply: R,
     pub op_send: R,
-    pub op_define: R,
+    pub op_assign: R,
     pub op_substract: R,
     pub op_sum: R,
 

@@ -16,10 +16,10 @@ pub use structure::*;
 pub use text::Text;
 pub use time::Time;
 pub use version::Version;
+use core::fmt;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub enum Value {
-    None,
     Fact(Fact),
     Id(Id),
     Number(Number),
@@ -33,10 +33,6 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn flag() -> Value {
-        Value::Fact(Fact::truth())
-    }
-
     pub fn unsafe_set(&self, value: Value) {
         // forgive me god and rust compiler for mutating the immutable
         unsafe {
@@ -47,8 +43,18 @@ impl Value {
     }
 }
 
-impl Default for Value {
-    fn default() -> Value { 
-        Value::None
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::Fact(fact) => write!(f, "{}", fact),
+            Value::Id(id) => write!(f, "{}", id),
+            Value::Number(number) => write!(f, "{}", number),
+            Value::List(list) => write!(f, "{}", list),
+            Value::Seal(seal) => write!(f, "{}", seal),
+            Value::Structure(structure) => write!(f, "{}", structure),
+            Value::Text(text) => write!(f, "{}", text),
+            Value::Time(time) => write!(f, "{}", time),
+            Value::Version(version) => write!(f, "{}", version),
+        }
     }
 }

@@ -12,7 +12,7 @@ impl Bot {
                 break;
             }
             match self.read(pieces)? {
-                Lexeme::Item(item) => list.append(item),
+                Lexeme::Value(value) => list.append(value),
                 Lexeme::Reference(reference) => list.append(reference),
                 lexeme => {
                     return Err(Error::ParsingError(format!(

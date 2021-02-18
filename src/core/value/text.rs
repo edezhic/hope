@@ -1,4 +1,5 @@
 use super::*;
+use core::fmt;
 use crate::core::Result;
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::{UWordBounds, UnicodeSegmentation};
@@ -48,5 +49,11 @@ impl From<&str> for Text {
 impl From<String> for Text {
     fn from(item: String) -> Self {
         Text::from_string(item)
+    }
+}
+
+impl fmt::Display for Text {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.as_str())
     }
 }
