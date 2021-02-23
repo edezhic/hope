@@ -5,7 +5,7 @@ use unicode_segmentation::UWordBounds;
 impl Bot {
     pub fn read(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Lexeme> {
         while let Some(piece) = pieces.peek() {
-            if self.vocab.ignore.is_match(piece) {
+            if self.vocab.mod_none.is_match(piece) {
                 pieces.next();
             } else {
                 break;
@@ -43,7 +43,7 @@ impl Bot {
                 if let Some(fact) = self.lookup_fact(pieces) {
                     Lexeme::Value(Value::Fact(fact))
                 } else if let Some(keyword) = self.lookup_keyword(pieces) {
-                    Lexeme::Keyword(keyword)
+                    Lexeme::Token(keyword)
                 } else if let Some(command) = self.lookup_command(pieces) {
                     Lexeme::Command(command)
                 } else if self.vocab.result.is_match(piece) {
@@ -63,12 +63,11 @@ impl Bot {
 
     fn lookup_keyword(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Option<Token> {
         let keyword = match *pieces.peek().unwrap() {
-            piece if self.vocab.case_and.is_match(piece) => Some(Token::Case(Case::And)),
-            piece if self.vocab.case_identical.is_match(piece) => {
-                Some(Token::Case(Case::Identical))
-            }
-            piece if self.vocab.case_if.is_match(piece) => Some(Token::Case(Case::If)),
-            piece if self.vocab.case_then.is_match(piece) => Some(Token::Case(Case::Then)),
+            piece if self.vocab.mod_c_and.is_match(piece) => Some(Token::Mod(Modifier::Case(Case::And))),
+            piece if self.vocab.mod_c_identical.is_match(piece) =>
+                Some(Token::Mod(Modifier::Case(Case::Identical))),
+            piece if self.vocab.mod_c_if.is_match(piece) => Some(Token::Case(Case::If)),
+            piece if self.vocab.mod_c_then.is_match(piece) => Some(Token::Case(Case::Then)),
 
             piece if self.vocab.op_add.is_match(piece) => Some(Token::Op(Op::Add)),
             piece if self.vocab.op_divide.is_match(piece) => Some(Token::Op(Op::Divide)),
@@ -80,8 +79,9 @@ impl Bot {
 
             piece if self.vocab.mod_binding.is_match(piece) => Some(Token::Mod(Modifier::Binding)),
             piece if self.vocab.mod_break.is_match(piece) => Some(Token::Mod(Modifier::Break)),
-            piece if self.vocab.mod_selection.is_match(piece) => {
-                Some(Token::Mod(Modifier::Selection))
+            piece if self.vocab.mod_gap.is_match(piece) => Some(Token::Mod(Modifier::Gap)),
+            piece if self.vocab.mod_s_of.is_match(piece) => {
+                Some(Token::Mod(Modifier::Selector(Selector::Of)))
             }
             piece if self.vocab.mod_targeting.is_match(piece) => {
                 Some(Token::Mod(Modifier::Targeting))

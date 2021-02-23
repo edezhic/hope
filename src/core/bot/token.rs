@@ -1,41 +1,29 @@
 use crate::core::*;
 use core::fmt;
 
+// Spec :: Section :: Tokens
+// Spec X, Include X
+// Section Y with { arg1: value1, arg2: value2, ... } `default values for args`
+// Invoke Y (with { ... } `optional args override`)
+
 #[derive(Debug)]
 pub enum Token {
-    Case(Case), // part => Mod, part => higher-level Instruction(Vec<token>) thingy?
-    Mod(Modifier), // How ...
-    Op(Op), // ... to do ...
-    Ref(Value), // ... stuff
-    // Val(Value) + Term(Text)?
-}
-
-// Section {Linear, Condition, Conditioned, ... ?}
-// Section X + Include X?
-// Method Y + Invoke Y? Protocol?
-// Module Z?
-// ... Hash of X of Y? ... X of Op of Y? Dont read more than 1 piece at a time?
-
-#[derive(Debug)]
-pub enum Case { // -> ? Instruction?
-    // None/Block(Vec<Token>)? Type/Struct Block = Vec<Token>? Methods/Protocols/Sections?
-    // If/When/While/?:(?)
-    // Condition(Vec<Token>)
-    // Conditioned?
-    And, // Modifier::Both?
-    Any, // Modifier?
-    Do, // -> Block? ??? -> Then?
-    Each, // Modifier?
-    Else, // -> Block?
-    Identical, // Modifier?
-    If, // -> Block(Conditions)?
-    Not, // Modifier::Negation?
-    Or, // Modifier::Either?
-    Stop, // Modifier? Op?
-    Then, // Modifier?
-    When, // Block(Conditions)?
-    While, // Block(Conditions)?
-    // Where? Modifier? ???
+    Mod(Modifier),
+    Op(Op),
+    Ref(Value),
+    If { // => Token::Block? Token::Flow? +Token::Flow(Invoke)?
+        condition: Vec<Token>,
+        then: Vec<Token>,
+        other: Option<Vec<Token>>,
+    },
+    While {
+        condition: Vec<Token>,
+        repeat: Vec<Token>,
+    }, 
+       // When?
+       // Then?
+       // End (for protocols/methods and loops?)
+       // For
 }
 
 #[derive(Debug)]
@@ -43,30 +31,54 @@ pub enum Op {
     Add,
     Assign,
     Await,
-    Divide, 
+    Divide,
     Multiply,
     Send,
-    Sign, // Request @person to sign payload?
+    Sign,
     Substract,
     Sum,
     Verify,
 }
 
 #[derive(Debug)]
-pub enum Modifier { // -> ?
+pub enum Modifier {
     Binding,
-    Break, // Split ";|." and newlines into different modifiers?
-    Selection,
+    Break,
+    Case(Case),
+    Gap,
+    Selector(Selector),
     Targeting,
+}
+
+#[derive(Debug)]
+pub enum Case {
+    And,
+    Identical,
+    Not,
+    Or,
+}
+
+#[derive(Debug)]
+pub enum Selector {
+    Any,
+    Each,
+    Of,
 }
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Token::Case(case) => write!(f, "{:?}", case),
-            Token::Mod(modifier) => write!(f, "{:?}", modifier),
-            Token::Op(op) => write!(f, "{:?}", op),
+            Token::Mod(modifier) => write!(f, "Mod:{:?}", modifier),
+            Token::Op(op) => write!(f, "Op:{:?}", op),
             Token::Ref(value) => write!(f, "{}", value),
+            Token::If {
+                condition,
+                then,
+                other,
+            } => write!(f, "if {:?} then {:?} else {:?}", condition, then, other),
+            Token::While { condition, repeat } => {
+                write!(f, "while {:?} do {:?}", condition, repeat)
+            }
         }
     }
 }

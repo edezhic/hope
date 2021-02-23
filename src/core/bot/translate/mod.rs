@@ -15,7 +15,7 @@ impl Bot {
             match self.read(pieces)? {
                 Lexeme::Comment(_) => (),
                 Lexeme::Command(command) => tokens.extend(command),
-                Lexeme::Keyword(keyword) => tokens.push(keyword),
+                Lexeme::Token(token) => tokens.push(token),
                 Lexeme::Reference(reference) => tokens.push(Token::Ref(reference)),
                 Lexeme::Value(item) => tokens.push(Token::Ref(item)),
             }

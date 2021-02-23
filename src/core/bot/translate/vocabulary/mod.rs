@@ -2,7 +2,6 @@ mod english;
 use regex::Regex as R;
 
 pub struct Vocabulary {
-    pub ignore: R,
     pub result: R,
     pub term: R,
     pub comment_start: R,
@@ -23,13 +22,16 @@ pub struct Vocabulary {
 
     pub mod_binding: R,
     pub mod_break: R,
-    pub mod_selection: R,
+    pub mod_c_and: R,
+    pub mod_c_identical: R,
+    pub mod_c_if: R,
+    pub mod_c_then: R,
+    pub mod_gap: R,
+    pub mod_none: R,
+    pub mod_s_any:R,
+    pub mod_s_each: R,
+    pub mod_s_of: R,
     pub mod_targeting: R,
-
-    pub case_and: R,
-    pub case_identical: R,
-    pub case_if: R,
-    pub case_then: R,
 
     pub op_add: R,
     pub op_divide: R,

@@ -5,6 +5,15 @@ pub enum Lexeme {
     Command(Vec<Token>),
     Comment(Text),
     Value(Value),
-    Keyword(Token),
+    Token(Token),
     Reference(Value),
+    ???
+    If,
+    Then,
+    Else,
+    While,
+    Do,
+    When,
+    End,
+    For,
 }
