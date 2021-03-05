@@ -12,12 +12,11 @@ impl Bot {
                 break;
             }
             match self.read(pieces)? {
-                Lexeme::Value(value) => list.append(value),
-                Lexeme::Reference(reference) => list.append(reference),
-                lexeme => {
+                Token::Ref(value) => list.append(value),
+                token => {
                     return Err(Error::ParsingError(format!(
-                        r#"Unexpected list lexeme '{:?}'"#,
-                        lexeme
+                        r#"Unexpected list token '{:?}'"#,
+                        token
                     )));
                 }
             }

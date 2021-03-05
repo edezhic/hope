@@ -11,19 +11,6 @@ pub enum Token {
     Mod(Modifier),
     Op(Op),
     Ref(Value),
-    If { // => Token::Block? Token::Flow? +Token::Flow(Invoke)?
-        condition: Vec<Token>,
-        then: Vec<Token>,
-        other: Option<Vec<Token>>,
-    },
-    While {
-        condition: Vec<Token>,
-        repeat: Vec<Token>,
-    }, 
-       // When?
-       // Then?
-       // End (for protocols/methods and loops?)
-       // For
 }
 
 #[derive(Debug)]
@@ -45,6 +32,7 @@ pub enum Modifier {
     Binding,
     Break,
     Case(Case),
+    Flow(Flow),
     Gap,
     Selector(Selector),
     Targeting,
@@ -56,6 +44,19 @@ pub enum Case {
     Identical,
     Not,
     Or,
+}
+
+#[derive(Debug)]
+pub enum Flow {
+    Do,
+    Else,
+    End,
+    For,
+    If,
+    Invoke,
+    Then,
+    When,
+    While,
 }
 
 #[derive(Debug)]
@@ -71,14 +72,6 @@ impl fmt::Display for Token {
             Token::Mod(modifier) => write!(f, "Mod:{:?}", modifier),
             Token::Op(op) => write!(f, "Op:{:?}", op),
             Token::Ref(value) => write!(f, "{}", value),
-            Token::If {
-                condition,
-                then,
-                other,
-            } => write!(f, "if {:?} then {:?} else {:?}", condition, then, other),
-            Token::While { condition, repeat } => {
-                write!(f, "while {:?} do {:?}", condition, repeat)
-            }
         }
     }
 }

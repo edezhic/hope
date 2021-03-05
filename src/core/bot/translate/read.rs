@@ -3,53 +3,52 @@ use std::{iter::Peekable, vec::IntoIter};
 use unicode_segmentation::UWordBounds;
 
 impl Bot {
-    pub fn read(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Lexeme> {
+    pub fn read(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Result<Token> {
         while let Some(piece) = pieces.peek() {
-            if self.vocab.mod_none.is_match(piece) {
+            if self.vocab.skip.is_match(piece) {
                 pieces.next();
             } else {
                 break;
             }
         }
-        let lexeme = match *pieces.peek().unwrap() {
+        let token = match *pieces.peek().unwrap() {
             piece if self.vocab.comment_start.is_match(piece) => {
-                Lexeme::Comment(self.collect_comment(pieces)?)
+                self.collect_comment(pieces)?;
+                self.read(pieces)?
             }
             piece if self.vocab.list_start.is_match(piece) => {
-                Lexeme::Value(Value::List(self.collect_list(pieces)?))
+                Token::Ref(Value::List(self.collect_list(pieces)?))
             }
             piece if self.vocab.struct_start.is_match(piece) => {
-                Lexeme::Value(Value::Structure(self.collect_structure(pieces)?))
+                Token::Ref(Value::Structure(self.collect_structure(pieces)?))
             }
             piece if self.vocab.val_id.is_match(piece) => {
-                Lexeme::Value(Value::Id(self.collect_id(pieces)?))
+                Token::Ref(Value::Id(self.collect_id(pieces)?))
             }
             piece if self.vocab.val_number.is_match(piece) => {
-                Lexeme::Value(Value::Number(self.collect_number(pieces)?))
+                Token::Ref(Value::Number(self.collect_number(pieces)?))
             }
             piece if self.vocab.val_seal.is_match(piece) => {
-                Lexeme::Value(Value::Seal(self.collect_seal(pieces)?))
+                Token::Ref(Value::Seal(self.collect_seal(pieces)?))
             }
             piece if self.vocab.val_text.is_match(piece) => {
-                Lexeme::Value(Value::Text(self.collect_text(pieces)?))
+                Token::Ref(Value::Text(self.collect_text(pieces)?))
             }
             piece if self.vocab.val_time.is_match(piece) => {
-                Lexeme::Value(Value::Time(self.collect_time(pieces)?))
+                Token::Ref(Value::Time(self.collect_time(pieces)?))
             }
             piece if self.vocab.val_version.is_match(piece) => {
-                Lexeme::Value(Value::Version(self.collect_version(pieces)?))
+                Token::Ref(Value::Version(self.collect_version(pieces)?))
             }
             piece => {
                 if let Some(fact) = self.lookup_fact(pieces) {
-                    Lexeme::Value(Value::Fact(fact))
-                } else if let Some(keyword) = self.lookup_keyword(pieces) {
-                    Lexeme::Token(keyword)
-                } else if let Some(command) = self.lookup_command(pieces) {
-                    Lexeme::Command(command)
+                    Token::Ref(Value::Fact(fact))
+                } else if let Some(token) = self.lookup_keyword(pieces) {
+                    token
                 } else if self.vocab.result.is_match(piece) {
-                    Lexeme::Reference(Value::Id(Id::ref_result()))
+                    Token::Ref(Value::Id(Id::ref_result()))
                 } else if self.vocab.term.is_match(piece) {
-                    Lexeme::Reference(Value::Id(self.collect_reference(pieces)?))
+                    Token::Ref(Value::Id(self.collect_reference(pieces)?))
                 } else {
                     return Err(Error::ParsingError(format!(
                         r#"I don't know how to translate '{}'"#,
@@ -58,7 +57,7 @@ impl Bot {
                 }
             }
         };
-        Ok(lexeme)
+        Ok(token)
     }
 
     fn lookup_keyword(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Option<Token> {
@@ -66,8 +65,8 @@ impl Bot {
             piece if self.vocab.mod_c_and.is_match(piece) => Some(Token::Mod(Modifier::Case(Case::And))),
             piece if self.vocab.mod_c_identical.is_match(piece) =>
                 Some(Token::Mod(Modifier::Case(Case::Identical))),
-            piece if self.vocab.mod_c_if.is_match(piece) => Some(Token::Case(Case::If)),
-            piece if self.vocab.mod_c_then.is_match(piece) => Some(Token::Case(Case::Then)),
+            piece if self.vocab.mod_c_if.is_match(piece) => Some(Token::Mod(Modifier::Flow(Flow::If))),
+            piece if self.vocab.mod_c_then.is_match(piece) => Some(Token::Mod(Modifier::Flow(Flow::Then))),
 
             piece if self.vocab.op_add.is_match(piece) => Some(Token::Op(Op::Add)),
             piece if self.vocab.op_divide.is_match(piece) => Some(Token::Op(Op::Divide)),
@@ -104,20 +103,5 @@ impl Bot {
             pieces.next();
         }
         fact
-    }
-
-    fn lookup_command(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Option<Vec<Token>> {
-        let command = match *pieces.peek().unwrap() {
-            piece if self.vocab.cmd_show.is_match(piece) => Some(vec![
-                Token::Op(Op::Send),
-                Token::Mod(Modifier::Targeting),
-                Token::Ref(Value::Id(Id::from_str("display").unwrap())),
-            ]),
-            _ => None,
-        };
-        if let Some(_) = command {
-            pieces.next();
-        }
-        command
     }
 }

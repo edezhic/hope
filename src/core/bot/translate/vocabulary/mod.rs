@@ -4,6 +4,7 @@ use regex::Regex as R;
 pub struct Vocabulary {
     pub result: R,
     pub term: R,
+    pub skip: R,
     pub comment_start: R,
     pub comment_end: R,
     pub list_end: R,
@@ -27,7 +28,6 @@ pub struct Vocabulary {
     pub mod_c_if: R,
     pub mod_c_then: R,
     pub mod_gap: R,
-    pub mod_none: R,
     pub mod_s_any:R,
     pub mod_s_each: R,
     pub mod_s_of: R,
@@ -39,7 +39,6 @@ pub struct Vocabulary {
     pub op_send: R,
     pub op_assign: R,
     pub op_substract: R,
+    pub op_show: R,
     pub op_sum: R,
-
-    pub cmd_show: R,
 }

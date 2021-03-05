@@ -1,10 +1,8 @@
 mod collect;
-mod lexeme;
 mod read;
 mod vocabulary;
 
 use crate::core::*;
-pub use lexeme::Lexeme;
 pub use vocabulary::Vocabulary;
 
 impl Bot {
@@ -12,12 +10,8 @@ impl Bot {
         let mut pieces = &mut text.split_by_word_bounds().peekable();
         let mut tokens = Vec::<Token>::new();
         while let Some(_) = pieces.peek() {
-            match self.read(pieces)? {
-                Lexeme::Comment(_) => (),
-                Lexeme::Command(command) => tokens.extend(command),
-                Lexeme::Token(token) => tokens.push(token),
-                Lexeme::Reference(reference) => tokens.push(Token::Ref(reference)),
-                Lexeme::Value(item) => tokens.push(Token::Ref(item)),
+            if let Ok(token) = self.read(pieces) {
+                tokens.push(token)
             }
         }
         Ok(tokens)

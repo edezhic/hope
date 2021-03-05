@@ -8,7 +8,7 @@ impl Bot {
         pieces.next();
         let mut time = Text::empty();
         while let Some(piece) = pieces.next() {
-            if self.vocab.mod_none.is_match(piece) {
+            if self.vocab.skip.is_match(piece) {
                 break;
             } else {
                 time.add(piece);

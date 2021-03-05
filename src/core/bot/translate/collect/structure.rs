@@ -12,19 +12,19 @@ impl Bot {
                 break;
             }
             match self.read(pieces)? {
-                Lexeme::Reference(value) => {
+                Token::Ref(value) => {
                     if let Value::Id(reference) = value {
                         let term = reference.get_term()?;
                         if self.vocab.op_assign.is_match(pieces.peek().unwrap()) {
                             pieces.next();
                             match self.read(pieces)? {
-                                Lexeme::Reference(value) | Lexeme::Value(value) => {
+                                Token::Ref(value) => {
                                     structure.set(term, value)
                                 }
-                                lexeme => {
+                                token => {
                                     return Err(Error::ParsingError(format!(
                                         r#"Unexpected structure attribute '{:?}'"#,
-                                        lexeme
+                                        token
                                     )));
                                 }
                             }
@@ -38,10 +38,10 @@ impl Bot {
                         )));
                     }
                 }
-                lexeme => {
+                token => {
                     return Err(Error::ParsingError(format!(
-                        r#"Unexpected structure lexeme '{:?}'"#,
-                        lexeme
+                        r#"Unexpected structure token '{:?}'"#,
+                        token
                     )));
                 }
             }

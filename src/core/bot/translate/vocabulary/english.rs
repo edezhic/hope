@@ -7,6 +7,7 @@ impl Vocabulary {
         Ok(Vocabulary {
             term: R::new(r"^\p{Letter}+")?,
             result: R::new(r"^(?i)(result|this|it)$")?,
+            skip: R::new(r"^(?i)(the|let|,|\p{Zs}|\t)+$")?,
             comment_end: R::new(r"^`$")?,
             comment_start: R::new(r"^`$")?,
             list_end: R::new(r"^\]$")?,
@@ -14,8 +15,6 @@ impl Vocabulary {
             struct_end: R::new(r"^\}$")?,
             struct_start: R::new(r"^\{$")?,
 
-            cmd_show: R::new(r"^(?i)show$")?,
-            
             mod_binding: R::new(r"^(?i)(with)$")?,
             mod_break: R::new(r"^[;\.]$")?,
             mod_c_and: R::new(r"^(?i)and$")?,
@@ -23,7 +22,6 @@ impl Vocabulary {
             mod_c_if: R::new(r"^(?i)if$")?,
             mod_c_then: R::new(r"^(?i)(then)$")?,
             mod_gap: R::new(r"^[\n\p{Zl}]$")?,
-            mod_none: R::new(r"^(?i)(the|let|,|\p{Zs}|\t)+$")?,
             mod_s_any: R::new(r"^(?i)any$")?,
             mod_s_each: R::new(r"^(?i)each$")?,
             mod_s_of: R::new(r"^(?i)of$")?,
@@ -33,6 +31,7 @@ impl Vocabulary {
             op_divide: R::new(r"^(?i)(divide|/)$")?,
             op_multiply: R::new(r"^(?i)(multiply|\*)$")?,
             op_send: R::new(r"^(?i)send$")?,
+            op_show: R::new(r"^(?i)show$")?,
             op_substract: R::new(r"^(?i)(substract|\-)$")?,
             op_sum: R::new(r"^(?i)sum$")?,
             val_fact_false: R::new(r"^(?i)(false|no)$")?,
