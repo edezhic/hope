@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     println!("\x1B[2J\x1B[1;1H Compilation ✓ =======================================");
     let mut bot = Bot::init()?;
     
-    bot._do(r#"x as {a: 1.5, b: y of z, c}, y as [1.5, @abc, "123"]"#)?;
+    bot._do(r#"x as {a: 1.5, b: y of z, c}, y as [1.5, @abc, "123"]. Sum a of x and 2.0 and show result"#)?;
     
     Ok(())
 }

@@ -41,12 +41,8 @@ impl Bot {
                 Token::Ref(Value::Version(self.collect_version(pieces)?))
             }
             piece => {
-                if let Some(fact) = self.lookup_fact(pieces) {
-                    Token::Ref(Value::Fact(fact))
-                } else if let Some(token) = self.lookup_keyword(pieces) {
+                if let Some(token) = self.lookup_keyword(pieces) {
                     token
-                } else if self.vocab.result.is_match(piece) {
-                    Token::Ref(Value::Id(Id::ref_result()))
                 } else if self.vocab.term.is_match(piece) {
                     Token::Ref(Value::Id(self.collect_reference(pieces)?))
                 } else {
@@ -62,6 +58,9 @@ impl Bot {
 
     fn lookup_keyword(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Option<Token> {
         let keyword = match *pieces.peek().unwrap() {
+            piece if self.vocab.result.is_match(piece) => Some(Token::Ref(Value::Id(Id::ref_result()))),
+            piece if self.vocab.val_fact_true.is_match(piece) => Some(Token::Ref(Value::Fact(Fact::truth()))),
+            piece if self.vocab.val_fact_false.is_match(piece) => Some(Token::Ref(Value::Fact(Fact::falsehood()))),
             piece if self.vocab.mod_c_and.is_match(piece) => Some(Token::Mod(Modifier::Case(Case::And))),
             piece if self.vocab.mod_c_identical.is_match(piece) =>
                 Some(Token::Mod(Modifier::Case(Case::Identical))),
@@ -72,6 +71,7 @@ impl Bot {
             piece if self.vocab.op_divide.is_match(piece) => Some(Token::Op(Op::Divide)),
             piece if self.vocab.op_multiply.is_match(piece) => Some(Token::Op(Op::Multiply)),
             piece if self.vocab.op_send.is_match(piece) => Some(Token::Op(Op::Send)),
+            piece if self.vocab.op_show.is_match(piece) => Some(Token::Op(Op::Show)),
             piece if self.vocab.op_assign.is_match(piece) => Some(Token::Op(Op::Assign)),
             piece if self.vocab.op_substract.is_match(piece) => Some(Token::Op(Op::Substract)),
             piece if self.vocab.op_sum.is_match(piece) => Some(Token::Op(Op::Sum)),
@@ -91,17 +91,5 @@ impl Bot {
             pieces.next();
         }
         keyword
-    }
-
-    fn lookup_fact(&self, pieces: &mut Peekable<UWordBounds<'_>>) -> Option<Fact> {
-        let fact = match *pieces.peek().unwrap() {
-            piece if self.vocab.val_fact_true.is_match(piece) => Some(Fact::truth()),
-            piece if self.vocab.val_fact_false.is_match(piece) => Some(Fact::falsehood()),
-            _ => None,
-        };
-        if let Some(_) = fact {
-            pieces.next();
-        }
-        fact
     }
 }

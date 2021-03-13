@@ -1,11 +1,6 @@
 use crate::core::*;
 use core::fmt;
 
-// Spec :: Section :: Tokens
-// Spec X, Include X
-// Section Y with { arg1: value1, arg2: value2, ... } `default values for args`
-// Invoke Y (with { ... } `optional args override`)
-
 #[derive(Debug)]
 pub enum Token {
     Mod(Modifier),
@@ -21,6 +16,7 @@ pub enum Op {
     Divide,
     Multiply,
     Send,
+    Show,
     Sign,
     Substract,
     Sum,
