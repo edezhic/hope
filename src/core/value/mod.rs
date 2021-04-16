@@ -33,6 +33,12 @@ pub enum Value {
 }
 
 impl Value {
+    pub fn truth() -> Value {
+        Value::Fact(Fact::truth())
+    }
+    pub fn falsehood() -> Value {
+        Value::Fact(Fact::falsehood())
+    }
     pub fn unsafe_set(&self, value: Value) {
         // forgive me god and rust compiler for mutating the immutable
         unsafe {

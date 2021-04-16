@@ -32,9 +32,11 @@ impl Text {
     pub fn lowercase(s: &str) -> Text {
         Text::new(Some(&s.to_lowercase()))
     }
+    
     pub fn split_by_word_bounds(&self) -> UWordBounds {
         UnicodeSegmentation::split_word_bounds(self.as_str())
     }
+    
     fn norm(s: String) -> String {
         s.nfc().collect::<String>() // Canonical Normalization
     }

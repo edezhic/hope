@@ -6,7 +6,7 @@ pub use error::{Error, Result};
 pub use value::*;
 
 
-pub struct Message { // FIXME 
+pub struct Message { // TODO
     address: Id,
-    content: Structure,
+    content: Structure, // Value?
 }

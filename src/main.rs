@@ -8,7 +8,20 @@ fn main() -> Result<()> {
     println!("\x1B[2J\x1B[1;1H Compilation ✓ =======================================");
     let mut bot = Bot::init()?;
     
-    bot._do(r#"x as {a: 1.5, b: y of z, c}, y as [1.5, @abc, "123"]. Sum a of x and 2.0 and show result"#)?;
+    bot._do(r#"Lbl as { type: "Label", text: "1" }, Btn as { type: "Button", text: "+1" }, show Lbl and Btn. Expect event at @screen://btn/click, then set @screen://lbl/text to "2"."#)?;
+    bot._do(r#"Request X from @database, sum y of x and send to @user"#)?;
+    bot._do(r#"Define X as sum of Y"#)?;
+    bot._do(r#"Send @screen://lbl/text to Y"#)?;
+    //bot._do(r#""#)?;
+    // Expect + Request + all awaity stuff => Token? => Input? + Output? Request input or output????
+    // Translate => Link =?> Build
     
+    // @hopes://spec/section/subsection?selectors+attributes#term
+    // @hopes:#term
+    // @hopes:?a=Y#X
+    // Invoke @hopes://X/Y with @hopes:#Z
+    // Expect @hopes:#X at/from @(source)
+    // Send @hopes:#X to @(target)
     Ok(())
 }
+ 

@@ -4,16 +4,16 @@ use crate::core::*;
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize)]
 pub enum Scheme {
     Custom(Text),
-    Display,
+    Screen,
     Http,
-    Ref,
+    Hopes,
 }
 
 impl fmt::Display for Scheme {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Scheme::Ref => write!(f, "ref"),
-            Scheme::Display => write!(f, "display"),
+            Scheme::Hopes => write!(f, "hopes"),
+            Scheme::Screen => write!(f, "screen"),
             Scheme::Http => write!(f, "http"),
             Scheme::Custom(scheme) => write!(f, "{}", scheme)
         }
@@ -79,7 +79,7 @@ impl Id {
 
     pub fn get_term(&self) -> Result<Text> {
         if !self.path.empty() {
-            // check Scheme::Ref = self.scheme?
+            // check Scheme::Hopes = self.scheme?
             if self.path.single() {
                 Ok(self.path.first_selector())
             } else {
@@ -92,7 +92,7 @@ impl Id {
 
     pub fn reference(selectors: Vec<Text>) -> Id {
         Id {
-            scheme: Scheme::Ref,
+            scheme: Scheme::Hopes,
             domain: None,
             path: Path(selectors),
         }
@@ -100,7 +100,7 @@ impl Id {
 
     pub fn ref_result() -> Id { // FIXME reference(vec!["result"])?
         Id {
-            scheme: Scheme::Ref,
+            scheme: Scheme::Hopes,
             domain: None,
             path: Path::new(),
         }
