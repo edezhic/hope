@@ -98,7 +98,7 @@ impl Id {
         }
     }
 
-    pub fn ref_result() -> Id { // FIXME reference(vec!["result"])?
+    pub fn ref_result() -> Id {
         Id {
             scheme: Scheme::Hopes,
             domain: None,

@@ -29,7 +29,7 @@ pub enum Value {
     Text(Text),
     Time(Time),
     Version(Version),
-    // FIXME add Tensor?
+    // FIXME add Tensor? Categorical variables? Tables?
 }
 
 impl Value {

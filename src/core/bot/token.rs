@@ -10,24 +10,34 @@ pub enum Token {
     F(Flow),
     M(Modifier),
     S(Set),
-    // + Request
-    // Expect => Op?
     Being,
 }
 
 #[derive(Debug)]
 pub enum Op {
-    Add, // X ?T/?B 
-    Divide, // X ?T/?+by
-    Multiply, // X ?T/?+by
-    Send, // X T ?B
-    Show, // X ?T
-    Sign, // X ?B
-    Substract, // X S
-    Sum, // X ?B
-    Verify, // X ?B
-    // + Request // X ?S ?B
-    // ?+ Expect // X ?S
+    Add,          // X +T
+    Divide,       // X +by
+    Multiply,     // X +by
+    Send,         // X +T
+    Show,         // X ?T
+    Sign,         // X ?B
+    Substract,    // X +S
+    Sum,          // X ?B
+    Verify,       // X ?B
+    Request,      // X ?S
+    Expect,       // X ?S
+    Model,        // X
+    Predict,      // X +S
+    Exponentiate, // X +T
+    Mean,         // S
+    Deviation,    // S
+    Plot,         // X ?
+    Query,        // ?
+    Sort,         // X ?+by
+    Filter,       // X +by
+    Collect,      // X ?
+    Pack,
+    Unpack,
 }
 
 #[derive(Debug)]
@@ -77,28 +87,21 @@ impl fmt::Display for Token {
             Token::O(op) => write!(f, "O"),
             Token::V(value) => write!(f, "V"),
             Token::C(case) => write!(f, "C"),
-            Token::F(flow) => 
-            {
-                match flow {
-                    Flow::Break => write!(f, "."),
-                    _ => write!(f, "F")
-                }
-            }
-            Token::M(modifier) => {
-                match modifier {
-                    Modifier::Binding => write!(f, "b"),
-                    Modifier::Selection => write!(f, "s"),
-                    Modifier::Targeting => write!(f, "->"),
-                }
-            }
-            Token::S(set) => {
-                match set {
-                    Set::StructStart => write!(f, "{{"),
-                    Set::StructEnd => write!(f, "}}"),
-                    Set::ListStart => write!(f, "["),
-                    Set::ListEnd => write!(f, "]"),
-                }
-            }
+            Token::F(flow) => match flow {
+                Flow::Break => write!(f, "."),
+                _ => write!(f, "F"),
+            },
+            Token::M(modifier) => match modifier {
+                Modifier::Binding => write!(f, "b"),
+                Modifier::Selection => write!(f, "s"),
+                Modifier::Targeting => write!(f, "->"),
+            },
+            Token::S(set) => match set {
+                Set::StructStart => write!(f, "{{"),
+                Set::StructEnd => write!(f, "}}"),
+                Set::ListStart => write!(f, "["),
+                Set::ListEnd => write!(f, "]"),
+            },
             Token::T(_) => write!(f, "T"),
         }
     }
