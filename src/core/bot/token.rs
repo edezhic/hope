@@ -14,30 +14,27 @@ pub enum Token {
 }
 
 #[derive(Debug)]
-pub enum Op {
-    Add,          // X +T
-    Divide,       // X +by
-    Multiply,     // X +by
-    Send,         // X +T
-    Show,         // X ?T
+pub enum Op { // by == B(Binding)
+    Add,          // X T
+    Divide,       // X B
+    Multiply,     // X B
+    Send,         // X T
+    Filter,       // X B
+    Collect,      // X B
+    Substract,    // X S
+    Predict,      // X S
+    Exponentiate, // X T
+    Sum,          // X ?B??
+    Verify,       // X ?B/S
+    Request,      // X ?S/?T
     Sign,         // X ?B
-    Substract,    // X +S
-    Sum,          // X ?B
-    Verify,       // X ?B
-    Request,      // X ?S
+    Sort,         // X ?B
     Expect,       // X ?S
     Model,        // X
-    Predict,      // X +S
-    Exponentiate, // X +T
     Mean,         // S
     Deviation,    // S
+    Show,         // X ?T
     Plot,         // X ?
-    Query,        // ?
-    Sort,         // X ?+by
-    Filter,       // X +by
-    Collect,      // X ?
-    Pack,
-    Unpack,
 }
 
 #[derive(Debug)]
@@ -92,8 +89,8 @@ impl fmt::Display for Token {
                 _ => write!(f, "F"),
             },
             Token::M(modifier) => match modifier {
-                Modifier::Binding => write!(f, "b"),
-                Modifier::Selection => write!(f, "s"),
+                Modifier::Binding => write!(f, "_"),
+                Modifier::Selection => write!(f, "<-"),
                 Modifier::Targeting => write!(f, "->"),
             },
             Token::S(set) => match set {
