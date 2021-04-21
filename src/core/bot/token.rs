@@ -14,27 +14,34 @@ pub enum Token {
 }
 
 #[derive(Debug)]
-pub enum Op { // by == B(Binding)
+pub enum Op {
     Add,          // X T
     Divide,       // X B
     Multiply,     // X B
+    Substract,    // X S
     Send,         // X T
     Filter,       // X B
     Collect,      // X B
-    Substract,    // X S
-    Predict,      // X S
     Exponentiate, // X T
+    Read,         // X S
+    Write,        // X T
     Sum,          // X ?B??
-    Verify,       // X ?B/S
     Request,      // X ?S/?T
-    Sign,         // X ?B
     Sort,         // X ?B
     Expect,       // X ?S
-    Model,        // X
     Mean,         // S
     Deviation,    // S
-    Show,         // X ?T
-    Plot,         // X ?
+
+    Sync, // X B
+
+    Show, // X ?T
+    Plot, // X ?
+
+    Sign,   // X ?B
+    Verify, // X ?B/S
+
+    Predict, // X S
+    Model,   // X
 }
 
 #[derive(Debug)]
@@ -60,6 +67,8 @@ pub enum Flow {
     Invoke,
     Then,
     While,
+    ExpressionStart,
+    ExpressionEnd,
 }
 
 #[derive(Debug)]
@@ -90,8 +99,8 @@ impl fmt::Display for Token {
             },
             Token::M(modifier) => match modifier {
                 Modifier::Binding => write!(f, "_"),
-                Modifier::Selection => write!(f, "<-"),
-                Modifier::Targeting => write!(f, "->"),
+                Modifier::Selection => write!(f, "_"),
+                Modifier::Targeting => write!(f, "_"),
             },
             Token::S(set) => match set {
                 Set::StructStart => write!(f, "{{"),

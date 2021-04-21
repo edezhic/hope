@@ -10,11 +10,9 @@ fn main() -> Result<()> {
     
     bot._do(r#"Lbl as { type: "Label", text: "1" }, Btn as { type: "Button", text: "+1" }, show Lbl and Btn. Expect event at @screen://btn/click, then set @screen://lbl/text to "2"."#)?;
     bot._do(r#"Request X from @database, sum y of x and send to @user"#)?;
-    bot._do(r#"Define X as sum of Y"#)?;
+    bot._do(r#"Define X as sum of (Y + Z)"#)?;
     bot._do(r#"Send @screen://lbl/text to Y"#)?;
     //bot._do(r#""#)?;
-    // Expect + Request + all awaity stuff => Token? => Input? + Output? Request input or output????
-    // Translate => Link =?> Build
     
     // @hopes://spec/section/subsection?selectors+attributes#term
     // @hopes:#term

@@ -56,14 +56,6 @@ impl<'a, 'b> Pieces<'a, 'b> {
         while let Some(piece) = self.iter.peek() {
             if self.vocab.skip.is_match(piece) {
                 self.iter.next();
-            } else if self.vocab.comment.is_match(piece) {
-                self.iter.next();
-                while let Some(piece) = self.iter.next() {
-                    if self.vocab.comment.is_match(piece) {
-                        self.iter.next();
-                        break;
-                    }
-                }
             } else {
                 break;
             }

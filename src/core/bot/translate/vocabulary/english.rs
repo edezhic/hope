@@ -8,9 +8,10 @@ impl Vocabulary {
             be: R::new(r"^(?i)(define|set|assign|as|:|=|is|are)$")?, // Shall/Will?
             term: R::new(r"^\p{Letter}+")?,
             result: R::new(r"^(?i)(result|this|it)$")?,
-            skip: R::new(r"^(?i)(a|the|let|,|\p{Zs}|\t)+$")?,
-            comment: R::new(r"^`$")?,
-            binding: R::new(r"^(?i)(with)$")?,
+            skip: R::new(r"^(?i)(a|the|let|,|\p{Zs}|\t|\?|!)+$")?,
+            expression_start: R::new(r"^\($")?,
+            expression_end: R::new(r"^\)$")?,
+            binding: R::new(r"^(?i)(with|by)$")?,
             selection: R::new(r"^(?i)(of|from)$")?,
             targeting: R::new(r"^(?i)(to|in|at)$")?,
             
@@ -42,7 +43,7 @@ impl Vocabulary {
             v_number: R::new(r"^(\d+([\.,]\d+)?)$")?,
             v_seal: R::new(r"^\&$")?,
             v_text: R::new(r#"^"$"#)?,
-            v_time: R::new(r"^nada$")?, // TODO need time pattern
+            v_time: R::new(r"^~$")?,
             v_version: R::new(r"^#$")?,
         }) 
     }
