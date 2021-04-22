@@ -26,7 +26,7 @@ pub enum Op {
     Read,         // X S
     Write,        // X T
     Sum,          // X ?B??
-    Request,      // X ?S/?T
+    Request,      // X ?S/?T => Trash?
     Sort,         // X ?B
     Expect,       // X ?S
     Mean,         // S
@@ -41,7 +41,7 @@ pub enum Op {
     Verify, // X ?B/S
 
     Predict, // X S
-    Model,   // X
+    Adjust, // ????
 }
 
 #[derive(Debug)]
@@ -61,12 +61,11 @@ pub enum Flow {
     Do,
     Else,
     End,
-    Expect,
     For,
     If,
-    Invoke,
     Then,
     While,
+    Return,
     ExpressionStart,
     ExpressionEnd,
 }

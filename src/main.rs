@@ -8,18 +8,21 @@ fn main() -> Result<()> {
     println!("\x1B[2J\x1B[1;1H Compilation ✓ =======================================");
     let mut bot = Bot::init()?;
     
-    bot._do(r#"Lbl as { type: "Label", text: "1" }, Btn as { type: "Button", text: "+1" }, show Lbl and Btn. Expect event at @screen://btn/click, then set @screen://lbl/text to "2"."#)?;
-    bot._do(r#"Request X from @database, sum y of x and send to @user"#)?;
-    bot._do(r#"Define X as sum of (Y + Z)"#)?;
-    bot._do(r#"Send @screen://lbl/text to Y"#)?;
-    //bot._do(r#""#)?;
+    bot._do(r#" SpecName #1.2 &hash: Abc, Def
+    "#)?;
     
-    // @hopes://spec/section/subsection?selectors+attributes#term
-    // @hopes:#term
-    // @hopes:?a=Y#X
-    // Invoke @hopes://X/Y with @hopes:#Z
-    // Expect @hopes:#X at/from @(source)
-    // Send @hopes:#X to @(target)
+    bot._do(r#" Set label to be { type: "Label", text: "0" }, show it
+                Expect request at @http://domain/path, send query of request to @database and expect result,
+                then set @screen://label/text to sum of result
+    "#)?;
+    // Send request to @abc (and expect response)? Op::Request -> Trash?
+
+    bot._do(r#" OpName X of Y
+                Do this and that with X and return result 
+    "#)?;
+
+    //bot._do(r#"Define X as sum of (Y + Z)"#)?;
+    
     Ok(())
 }
  

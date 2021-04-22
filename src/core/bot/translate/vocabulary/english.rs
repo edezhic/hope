@@ -23,7 +23,6 @@ impl Vocabulary {
             flow_break: R::new(r"^(;|\.|\n|\p{Zl})$")?,
             flow_if: R::new(r"^(?i)if$")?,
             flow_then: R::new(r"^(?i)(then)$")?,
-            flow_expect: R::new(r"^(?i)(expect|when)$")?,
             
             case_and: R::new(r"^(?i)and$")?,
             case_any: R::new(r"^(?i)any$")?,
@@ -36,6 +35,7 @@ impl Vocabulary {
             op_show: R::new(r"^(?i)show$")?,
             op_substract: R::new(r"^(?i)(substract|\-)$")?,
             op_sum: R::new(r"^(?i)sum$")?,
+            op_expect: R::new(r"^(?i)(expect|when)$")?,
             
             v_fact_false: R::new(r"^(?i)(false|no)$")?,
             v_fact_true: R::new(r"^(?i)(true|yes|ok)$")?,

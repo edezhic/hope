@@ -30,7 +30,6 @@ pub struct Vocabulary {
     pub flow_break: R,
     pub flow_if: R,
     pub flow_then: R,
-    pub flow_expect: R,
 
     pub case_and: R,
     pub case_any: R,
@@ -43,6 +42,7 @@ pub struct Vocabulary {
     pub op_substract: R,
     pub op_show: R,
     pub op_sum: R,
+    pub op_expect: R,
 }
 
 impl Vocabulary {
@@ -80,7 +80,6 @@ impl Vocabulary {
             piece if self.result.is_match(piece) => Some(V(Value::Id(Id::ref_result()))),
             piece if self.case_and.is_match(piece) => Some(C(Case::And)),
             piece if self.flow_if.is_match(piece) => Some(F(Flow::If)),
-            piece if self.flow_expect.is_match(piece) => Some(F(Flow::Expect)),
             piece if self.flow_then.is_match(piece) => Some(F(Flow::Then)),
             piece if self.flow_break.is_match(piece) => Some(F(Flow::Break)),
             piece if self.expression_start.is_match(piece) => Some(F(Flow::ExpressionStart)),
@@ -92,6 +91,7 @@ impl Vocabulary {
             piece if self.op_show.is_match(piece) => Some(O(Op::Show)),
             piece if self.op_substract.is_match(piece) => Some(O(Op::Substract)),
             piece if self.op_sum.is_match(piece) => Some(O(Op::Sum)),
+            piece if self.op_expect.is_match(piece) => Some(O(Op::Expect)),
             piece if self.struct_start.is_match(piece) => Some(S(Set::StructStart)),
             piece if self.struct_end.is_match(piece) => Some(S(Set::StructEnd)),
             piece if self.list_start.is_match(piece) => Some(S(Set::ListStart)),

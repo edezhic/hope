@@ -9,15 +9,14 @@ pub struct Pieces<'a, 'b> {
 impl<'a, 'b> Pieces<'a, 'b> {
     pub fn split(text: &'a Text, vocab: &'b Vocabulary) -> Pieces<'a, 'b> {
         let mut iter = text.split_by_word_bounds().peekable();
-        let mut peek = None;
-        if let Some(piece) = iter.peek() {
-            peek = Some(*piece);
-        }
-        Pieces {
+        let mut pieces = Pieces {
             iter,
             vocab,
-            peek
-        }
+            peek: None
+        };
+        pieces.skip();
+        pieces.update_peek();
+        pieces
     }
     fn update_peek(&mut self) {
         if let Some(piece) = self.iter.peek() {
