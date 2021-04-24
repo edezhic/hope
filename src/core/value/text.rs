@@ -38,7 +38,7 @@ impl Text {
     }
     
     fn norm(s: String) -> String {
-        s.nfc().collect::<String>() // Canonical Normalization
+        s.nfc().collect::<String>()
     }
 }
 

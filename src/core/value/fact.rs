@@ -1,6 +1,6 @@
 use core::fmt;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub struct Fact(bool);
 
 impl Fact {

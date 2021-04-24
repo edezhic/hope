@@ -4,7 +4,7 @@ use rust_decimal::prelude::*;
 use std::str::FromStr;
 use core::fmt;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Add, AddAssign)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, Add, AddAssign, PartialEq)]
 pub struct Number {
     value: Decimal,
 }

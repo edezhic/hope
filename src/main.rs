@@ -8,18 +8,20 @@ fn main() -> Result<()> {
     println!("\x1B[2J\x1B[1;1H Compilation ✓ =======================================");
     let mut bot = Bot::init()?;
     
-    bot._do(r#" SpecName #1.2 &hash: Abc, Def
-    "#)?;
+    bot.debug(r#" SpecName #1.2: Abc, Def "#)?;
     
-    bot._do(r#" Set label to be { type: "Label", text: "0" }, show it
-                Expect request at @http://domain/path, send query of request to @database and expect result,
-                then set @screen://label/text to sum of result
-    "#)?;
-    // Send request to @abc (and expect response)? Op::Request -> Trash?
+    bot.debug(" Label is { type: 'Label', text: '0' }, show it.
+                Expect message at @http://domain/path, \
+                Request @database with query from content of the message, \
+                then write the sum of result to @screen://label/text \
+                and show (2 + 2) * 2
+    ")?;
 
-    bot._do(r#" OpName X of Y
-                Do this and that with X and return result 
+    /*
+    bot.debug(r#" OpName X with Y
+                Sum (X + 1) with Y and return result 
     "#)?;
+     */
 
     //bot._do(r#"Define X as sum of (Y + Z)"#)?;
     

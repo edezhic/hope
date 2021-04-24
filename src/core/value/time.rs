@@ -2,7 +2,7 @@ use crate::core::*;
 use chrono::{DateTime, Duration, TimeZone, Utc};
 use std::str::FromStr;
 use core::fmt;
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Time {
     Stamp(DateTime<Utc>),
     //Duration(Duration), // TODO Add duration, but there is no serde support for this one

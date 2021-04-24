@@ -1,6 +1,6 @@
 use crate::core::*;
 use core::fmt;
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub struct Version {
     major: u16,
     minor: Option<u16>,

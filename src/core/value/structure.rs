@@ -3,7 +3,7 @@ use core::fmt;
 use std::{collections::HashMap, iter::FromIterator, ops::Index};
 type Key = Text;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub struct Structure {
     content: HashMap<Key, Value>,
 }
