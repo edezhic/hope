@@ -31,6 +31,7 @@ impl Vocabulary {
             case_or: R::new(r"^(?i)or$")?,
             case_any: R::new(r"^(?i)any$")?,
             case_each: R::new(r"^(?i)each$")?,
+            case_has: R::new(r"^(?i)(has|have)$")?,
 
             op_add: R::new(r"^(?i)(add|\+)$")?,
             op_divide: R::new(r"^(?i)(divide|/)$")?,
@@ -51,7 +52,7 @@ impl Vocabulary {
             op_deviation: R::new(r"^(?i)deviation$")?,
             op_sync: R::new(r"^(?i)sync$")?,
             op_sign: R::new(r"^(?i)sign$")?,
-            op_verify: R::new(r"^(?i)verify$")?,
+            op_check: R::new(r"^(?i)check$")?,
             op_predict: R::new(r"^(?i)predict$")?,
             
             v_fact_false: R::new(r"^(?i)(false|no)$")?,

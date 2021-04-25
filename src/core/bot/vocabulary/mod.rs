@@ -40,6 +40,7 @@ pub struct Vocabulary {
     pub case_or: R,
     pub case_any: R,
     pub case_each: R,
+    pub case_has: R,
 
     pub op_add: R,
     pub op_divide: R,
@@ -60,7 +61,7 @@ pub struct Vocabulary {
     pub op_deviation: R,
     pub op_sync: R,
     pub op_sign: R,
-    pub op_verify: R,
+    pub op_check: R,
     pub op_predict: R,
 }
 
@@ -113,6 +114,7 @@ impl Vocabulary {
             piece if self.case_or.is_match(piece) => Some(C(Case::Or)),
             piece if self.case_any.is_match(piece) => Some(C(Case::Any)),
             piece if self.case_each.is_match(piece) => Some(C(Case::Each)),
+            piece if self.case_has.is_match(piece) => Some(C(Case::Has)),
 
             piece if self.flow_if.is_match(piece) => Some(F(Flow::If)),
             piece if self.flow_then.is_match(piece) => Some(F(Flow::Then)),
@@ -138,7 +140,7 @@ impl Vocabulary {
             piece if self.op_deviation.is_match(piece) => Some(O(Op::Deviation)),
             piece if self.op_sync.is_match(piece) => Some(O(Op::Sync)),
             piece if self.op_sign.is_match(piece) => Some(O(Op::Sign)),
-            piece if self.op_verify.is_match(piece) => Some(O(Op::Verify)),
+            piece if self.op_check.is_match(piece) => Some(O(Op::Check)),
             piece if self.op_predict.is_match(piece) => Some(O(Op::Predict)),
             _ => None,
         }

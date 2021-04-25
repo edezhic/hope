@@ -28,7 +28,7 @@ pub enum Op {
     Read,      // X S
     Write,     // X T
     Sum,       // X ?B??
-    Request,   // X ?S/?T => Trash?
+    Request,   // X ?S/?T
     Sort,      // X ?B
     Expect,    // X ?S
     Mean,      // S
@@ -37,8 +37,9 @@ pub enum Op {
     Show,      // X ?T
     Plot,      // X ?
     Sign,      // X ?B
-    Verify,    // X ?B/S
+    Check,     // X ?B/S
     Predict,   // X S
+    // Run Specname?
 }
 
 #[derive(Debug, PartialEq)]
@@ -50,6 +51,7 @@ pub enum Case {
     Or,
     Any,
     Each,
+    Has,
 }
 
 #[derive(Debug, PartialEq)]

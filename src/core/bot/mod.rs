@@ -19,7 +19,7 @@ impl Bot {
     }
     pub fn debug(&self, s: &str) -> Result<()> {
         println!("{} ", s);
-        let tokens = self.read(s)?;
+        let tokens = self.translate(s)?;
         print!("-----: ");
         tokens.print();
         println!("");
@@ -27,7 +27,7 @@ impl Bot {
         Ok(())
     }
 
-    pub fn read(&self, s: &str) -> Result<Tokens> {
+    pub fn translate(&self, s: &str) -> Result<Tokens> {
         let text = Text::from_str(s);
         let mut pieces = Pieces::split(&text, &self.vocab);
         let mut tokens = Tokens::new();
