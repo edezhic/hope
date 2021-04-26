@@ -39,7 +39,14 @@ pub enum Op {
     Sign,      // X ?B
     Check,     // X ?B/S
     Predict,   // X S
-    // Run Specname?
+    // + Split X B
+
+    Custom {
+        term: Text, 
+        args: Arguments,
+        // tokens/algorithm?
+        // return: bool ?
+    },
 }
 
 #[derive(Debug, PartialEq)]

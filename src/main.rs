@@ -14,7 +14,7 @@ fn main() -> Result<()> {
                 Expect message at @http://domain/path, \
                 Request @database with query from content of the message, \
                 then write the sum of result to @screen://label/text \
-                and show (2 + 2) * 2
+                and show 2 + 2 * 2 + ((2 + 2) * 2)
     ")?;
 
     /*

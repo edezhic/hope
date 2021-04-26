@@ -1,9 +1,11 @@
 mod token;
 mod vocabulary;
+mod spec;
 
 use crate::core::*;
 pub use token::*;
 pub use vocabulary::*;
+pub use spec::*;
 
 use Token::{T, V};
 
