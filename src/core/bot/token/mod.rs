@@ -43,9 +43,8 @@ pub enum Op {
 
     Custom {
         term: Text, 
-        args: Arguments,
+        syntax: OpSyntax,
         // tokens/algorithm?
-        // return: bool ?
     },
 }
 

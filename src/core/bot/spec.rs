@@ -4,33 +4,28 @@ pub struct Spec<'a> {
     refs: &'a str, // T (#v) (&h): T(Op1), T(Op2), ...
     main: &'a str,
     ops: Vec<&'a str>, // T (T???) (m T). ... (return)
-    // options: Option<&'a str>?
+    // options: Option<&'a str>? For CLI-like purposes godlike shit
 }
 
 pub struct Process {
-    // recursevily translate and include Specs
-    // construct namespace(s?): link terms to values and ops, ops' arguments. 
-    // replace T with R or smth alike? With Vs(Ids) and Os?
+    // recursevily translate and include Specs (or include and then translate?)
+    // (add indexes to pieces and show errors with them)
+    // construct namespace
+    // replace Ts with Vs(Ids) and Os
+    // (think rly hard how to do routing in @hopes://...; structures, lists and other weird cases)
+    // ...
     // build graph(algorithm)
-    algorithm: Algorithm
-    //inputs: Vec<&Node>,?
+
+    // algorithm: Algorithm { graph, ...? }
+    // inputs: Vec<&Node>,?
 }
 
-pub struct Algorithm {
-
-}
+// Case::And -> Token::Join?
 
 #[derive(Debug, PartialEq)]
-pub struct Arguments {
-    reference: ArgumentSyntax, // reference -> ???
-    selection: ArgumentSyntax,
-    targeting: ArgumentSyntax,
-    binding: ArgumentSyntax,
-}
-#[derive(Debug, PartialEq)]
-pub enum ArgumentSyntax {
-    None,
-    Optional,
-    Required,
+pub struct OpSyntax {
+    input: Option<Modifier>,
+    gate: Option<Modifier>, // gates? -> ???
+    output: bool,
 }
 

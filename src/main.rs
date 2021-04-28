@@ -10,11 +10,11 @@ fn main() -> Result<()> {
     
     bot.debug(r#" SpecName #1.2: Abc, Def "#)?;
     
-    bot.debug(" Label is { type: 'Label', text: '0' }, show it.
+    bot.debug(" Label is { type: 'Label', text: '0', id: 1+1 }, show it.
                 Expect message at @http://domain/path, \
                 Request @database with query from content of the message, \
                 then write the sum of result to @screen://label/text \
-                and show 2 + 2 * 2 + ((2 + 2) * 2)
+                and show 2 + 2 * 2 and show (2 + 2 * 2)
     ")?;
 
     /*
