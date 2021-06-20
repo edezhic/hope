@@ -5,19 +5,20 @@ use crate::core::*;
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
-    V(Value),
-    T(Text),
+    Val(Value),
+    Term(Text),
     O(Op),
+    Cmd(Command),
     C(Case),
     F(Flow),
-    M(Modifier),
+    Mod(Modifier),
     S(Set),
     Being,
     This,
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Op {
+pub enum Command {
     Add,       // X T
     Divide,    // X B
     Multiply,  // X B
@@ -43,9 +44,17 @@ pub enum Op {
 
     Custom {
         term: Text, 
-        syntax: OpSyntax,
+        syntax: (), // ???
         // tokens/algorithm?
     },
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Op {
+    Plus,
+    Minus,
+    Multiplication,
+    Division,
 }
 
 #[derive(Debug, PartialEq)]
@@ -58,6 +67,8 @@ pub enum Case {
     Any,
     Each,
     Has,
+    Empty,
+    Where,
 }
 
 #[derive(Debug, PartialEq)]
@@ -80,6 +91,7 @@ pub enum Modifier {
     Binding,
     Selection,
     Targeting,
+    None,
 }
 
 #[derive(Debug, PartialEq)]

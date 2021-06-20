@@ -1,4 +1,12 @@
-#![allow(dead_code, unused_variables, unused_imports, unused_mut, unused_must_use, non_snake_case, unused_assignments)]
+#![allow(
+    dead_code,
+    unused_variables,
+    unused_imports,
+    unused_mut,
+    unused_must_use,
+    non_snake_case,
+    unused_assignments
+)]
 extern crate derive_more;
 
 mod core;
@@ -7,24 +15,19 @@ use crate::core::*;
 fn main() -> Result<()> {
     println!("\x1B[2J\x1B[1;1H Compilation ✓ =======================================");
     let mut bot = Bot::init()?;
-    
-    bot.debug(r#" SpecName #1.2: Abc, Def "#)?;
-    
-    bot.debug(" Label is { type: 'Label', text: '0', id: 1+1 }, show it.
-                Expect message at @http://domain/path, \
-                Request @database with query from content of the message, \
-                then write the sum of result to @screen://label/text \
-                and show 2 + 2 * 2 and show (2 + 2 * 2)
-    ")?;
 
-    /*
-    bot.debug(r#" OpName X with Y
-                Sum (X + 1) with Y and return result 
-    "#)?;
-     */
+    bot.debug("Label is { type: 'Label', text: '0', id: (2 + 2 * 2) }, show it")?;
+    // T = { T = V T = V T = ( V O V O V ) } Cmd _
 
-    //bot._do(r#"Define X as sum of (Y + Z)"#)?;
-    
+    bot.debug("Expect message at @http://domain/path, \
+    request @database with query from the content of the message.
+    If the sum of result is less than 100, then response is 'Not enough', \
+    else response is 'Enough'.
+    Send response to the sender of the message.")?;
+    // Cmd T t V Cmd V b T s T s T . F Cmd s _ = T T V F T = V F T = V . Cmd T t T s T .
+
+    bot.debug("CustomCommand X with Y. Return (X + Y)")?;
+    // T T b T . F ( T O T )
+
     Ok(())
 }
- 

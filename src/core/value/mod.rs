@@ -30,6 +30,7 @@ pub enum Value {
     Time(Time),
     Version(Version),
     // FIXME add Tensor? Categorical variables? Tables?
+    None,
 }
 
 impl Value {
@@ -61,6 +62,7 @@ impl fmt::Display for Value {
             Value::Text(text) => write!(f, "{}", text),
             Value::Time(time) => write!(f, "{}", time),
             Value::Version(version) => write!(f, "{}", version),
+            Value::None => write!(f, "None"),
         }
     }
 }

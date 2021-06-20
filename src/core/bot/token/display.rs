@@ -6,7 +6,7 @@ impl fmt::Display for Token {
         match self {
             Token::Being => write!(f, "="),
             Token::O(op) => write!(f, "O"),
-            Token::V(value) => write!(f, "V"),
+            Token::Val(value) => write!(f, "V"),
             Token::C(case) => write!(f, "C"),
             Token::F(flow) => match flow {
                 Flow::Break => write!(f, "."),
@@ -14,10 +14,11 @@ impl fmt::Display for Token {
                 Flow::ExpressionEnd => write!(f, ")"),
                 _ => write!(f, "F"),
             },
-            Token::M(modifier) => match modifier {
+            Token::Mod(modifier) => match modifier {
                 Modifier::Binding => write!(f, "b"),
                 Modifier::Selection => write!(f, "s"),
                 Modifier::Targeting => write!(f, "t"),
+                Modifier::None => write!(f, ""),
             },
             Token::S(set) => match set {
                 Set::StructStart => write!(f, "{{"),
@@ -25,8 +26,9 @@ impl fmt::Display for Token {
                 Set::ListStart => write!(f, "["),
                 Set::ListEnd => write!(f, "]"),
             },
-            Token::T(_) => write!(f, "T"),
+            Token::Term(_) => write!(f, "T"),
             Token::This => write!(f, "_"),
+            Token::Cmd(_) => write!(f, "Cmd"),
         }
     }
 }

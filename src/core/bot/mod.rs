@@ -1,13 +1,11 @@
 mod token;
 mod vocabulary;
-mod spec;
 
 use crate::core::*;
 pub use token::*;
 pub use vocabulary::*;
-pub use spec::*;
 
-use Token::{T, V};
+use Token::{Term, Val};
 
 pub struct Bot {
     vocab: Vocabulary,
@@ -35,12 +33,12 @@ impl Bot {
         let mut tokens = Tokens::new();
         while let Some(piece) = pieces.peek {
             if let Some(value) = self.vocab.match_value(piece, &mut pieces)? {
-                tokens.add(V(value));
+                tokens.add(Val(value));
             } else if let Some(token) = self.vocab.match_token(piece) {
                 tokens.add(token);
                 pieces.next();
             } else if self.vocab.valid_term(piece) {
-                tokens.add(T(Text::lowercase(piece)));
+                tokens.add(Term(Text::lowercase(piece)));
                 pieces.next();
             } else {
                 return Err(Error::ParsingError(format!(
