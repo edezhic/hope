@@ -28,10 +28,10 @@ pub enum Command {
     Collect,   // X B
     Read,      // X S
     Write,     // X T
-    Sum,       // X ?B??
-    Request,   // X ?S/?T
-    Sort,      // X ?B
-    Expect,    // X ?S
+    Sum,       // X 
+    Request,   // X S
+    Sort,      // X B
+    Expect,    // X S
     Mean,      // S
     Deviation, // S
     Sync,      // X B
@@ -40,7 +40,7 @@ pub enum Command {
     Sign,      // X ?B
     Check,     // X ?B/S
     Predict,   // X S
-    // + Split X B
+    Split,     // X B
 
     Custom {
         term: Text, 

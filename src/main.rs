@@ -26,8 +26,8 @@ fn main() -> Result<()> {
     Send response to the sender of the message.")?;
     // Cmd T t V Cmd V b T s T s T . F Cmd s _ = T T V F T = V F T = V . Cmd T t T s T .
 
-    bot.debug("CustomCommand X with Y. Return (X + Y)")?;
-    // T T b T . F ( T O T )
+    bot.debug("CustomCommand X by Y. Filter X by Y, add 1, multiply by 2, return the result")?;
+    // T T b T . Cmd T b T Cmd V Cmd b V F _
 
     Ok(())
 }
