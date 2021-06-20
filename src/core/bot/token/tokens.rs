@@ -7,21 +7,15 @@ pub struct Tokens {
     idx: usize,
 }
 impl Tokens {
-    pub fn new() -> Tokens {
-        Tokens {
-            tokens: vec![],
-            idx: 0,
-        }
-    }
     pub fn add(&mut self, token: Token) {
         if token != F(Flow::Break) || self.tokens.last().unwrap() != &F(Flow::Break) {
             self.tokens.push(token);
         }
     }
+}
 
-    pub fn print(&self) {
-        for token in &self.tokens {
-            print!("{} ", token);
-        }
+pub fn print_tokens(tokens: &Vec<Token>) {
+    for token in tokens {
+        print!("{} ", token);
     }
 }

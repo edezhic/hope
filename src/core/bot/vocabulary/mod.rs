@@ -122,6 +122,7 @@ impl Vocabulary {
             piece if self.case_has.is_match(piece) => Some(C(Case::Has)),
 
             piece if self.flow_if.is_match(piece) => Some(F(Flow::If)),
+            piece if self.flow_for.is_match(piece) => Some(F(Flow::For)),
             piece if self.flow_then.is_match(piece) => Some(F(Flow::Then)),
             piece if self.flow_else.is_match(piece) => Some(F(Flow::Else)),
             piece if self.flow_break.is_match(piece) => Some(F(Flow::Break)),
