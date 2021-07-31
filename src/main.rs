@@ -24,6 +24,11 @@ fn main() -> Result<()> {
     // T = [ V V ] T = [ [ V V ] [ V V ] ] . T = ( T O T ) . T = V . F T t T Cmd T t T . T = { T = V T = T } Cmd _ .
 
     bot.debug("\
+    CustomCommand X by Y.
+    Filter X by Y, add 1, multiply by 2, return the result")?;
+    // T T b T . Cmd T b T Cmd V Cmd b V F _
+
+    bot.debug("\
     Expect messages at @http://domain/path, for each message from messages \
     request @database with query from the content of the message. \
     If the sum of result is less than 100, then response is 'Not enough', \
@@ -31,10 +36,6 @@ fn main() -> Result<()> {
     Send response to the sender of the message.\
     ")?;
     // Cmd T t V Cmd V b T s T s T . F Cmd s _ = T T V F T = V F T = V . Cmd T t T s T .
-
-    bot.debug("\
-    CustomCommand X by Y.
-    Filter X by Y, add 1, multiply by 2, return the result")?;
-    // T T b T . Cmd T b T Cmd V Cmd b V F _
+    
     Ok(())
 }

@@ -5,7 +5,55 @@ use crate::core::*;
 pub use token::*;
 pub use vocabulary::*;
 
-use Token::{Term, Val};
+use Token::*;
+
+// Expect X at y ... where to end this block? 
+// Replace with "for each X at Y"? Any reasons to get inputs other way? Open/close channels?
+// Await? Gather? Collect?
+// "For each X at Y" is the best option for now?
+
+pub struct Algorithm {
+    //inputs: Vec<Input>, // { channel: Id, jump: &Listener }
+    code: Vec<Instruction>,
+}
+
+pub enum Instruction { // -> Block?
+    Command, // -> Instruction? { command, args }
+    Control, // -> Branch?
+    Case, // => control? -> Check?
+    Iterator,
+    Listener,
+    Expression,
+    Assignment,
+
+}
+
+impl Bot {
+    pub fn build(&self, tokens: Vec<Token>) -> Result<()> {
+        let mut iter = tokens.into_iter().peekable();
+        while let Some(token) = iter.next() {
+            match token {
+                Term(term) => { 
+                    // expect Being or selection?
+                }, 
+                Token::Cmd(command) => { 
+                    // Collect X and modifier+argument
+                }, 
+                Token::F(flow) => { 
+                    // Much stuff (if break and peek=break -> next)
+                }, 
+                Token::S(set) => { 
+                    // Collect and treat as Val
+                }, 
+                _ => return Err(Error::ParsingError(format!(
+                    r#"Unexpected token '{}'"#,
+                    token
+                )))
+            }
+        }
+        Ok(())
+    }
+}
 
 pub struct Bot {
     vocab: Vocabulary,
@@ -18,38 +66,13 @@ impl Bot {
         })
     }
 
-    pub fn link(&self, tokens: Vec<Token>) -> Result<()> {
-        let mut iter = tokens.iter().peekable();
-        while let Some(token) = iter.next() {
-            match token {
-                Val(_) => (), // Check if in Expr?
-                Term(_) => (), // expect Being?
-                Token::O(_) => (), // Check Expr?
-                Token::Cmd(_) => (), // Collect arguments
-                Token::C(_) => (), // And/Or? Others only after Fs?
-                Token::F(_) => (), // hmm... (if break and peek=break -> next)
-                Token::Mod(_) => (), // Nonstarter
-                Token::S(_) => (), // Collect and goto Val
-                Token::Being => (), // Is this legit? Nonstarter?
-                Token::This => (), // Same as Val
-                // Collect necessary stuff and push into graph/algorithm?
-                // Recursively repeat until end of script?
-
-                // Algorithm node types: command, assign, iterate, check, collect?, expr?, then?
-                // + all kinds of Fs
-                // Insides depending on node type? Nodes inside nodes?
-            }
-        }
-        Ok(())
-    }
-
     pub fn debug(&self, s: &str) -> Result<()> {
         println!("{} ", s);
         let tokens = self.translate(s)?;
         print!("-----: ");
         print_tokens(&tokens);
         println!("");
-        self.link(tokens);
+        self.build(tokens);
         Ok(())
     }
 

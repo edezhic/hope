@@ -20,7 +20,7 @@ impl Vocabulary {
             struct_end: R::new(r"^\}$")?,
             struct_start: R::new(r"^\{$")?,
 
-            flow_break: R::new(r"^(;|\.|\n|\p{Zl})$")?,
+            flow_break: R::new(r"^(\.|\n|\p{Zl})$")?,
             flow_if: R::new(r"^(?i)if$")?,
             flow_then: R::new(r"^(?i)then$")?,
             flow_else: R::new(r"^(?i)else$")?,
