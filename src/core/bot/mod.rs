@@ -8,9 +8,7 @@ pub use vocabulary::*;
 use Token::*;
 
 pub struct Algorithm {
-    // inputs?
-// code: Vec<Block>? Vec<Scope> where Scope: Vec<Block>?
-// Graph?
+    // Graph?
 }
 
 pub enum Node {
@@ -18,7 +16,7 @@ pub enum Node {
     Control,     // { cases }
     Iterator,    // { collection, item }
     Listener,    // { source, item }
-    Expression,  // AST?
+    Expression,  // AST? Convert to graph?
     Assignment,  // { term, ? }
 }
 
