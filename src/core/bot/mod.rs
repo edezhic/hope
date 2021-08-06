@@ -6,6 +6,7 @@ pub use token::*;
 pub use vocabulary::*;
 
 use Token::*;
+use Flow::*;
 
 pub struct Algorithm {
     // Graph?
@@ -33,7 +34,24 @@ impl Bot {
                     // Collect arguments
                 }
                 F(flow) => {
-                    // Much stuff (if break and peek=break -> next)
+                    match flow {
+                        Break => todo!(), // if break and peek=break -> next
+                        Do => todo!(), // Not now
+                        Else => todo!(), // ?
+                        End => todo!(), // ?
+                        For => todo!(), // Expect term + modifier + term/value
+                        If => todo!(), // cases
+                        Then => todo!(), // nothing outside if?
+                        While => todo!(), // Not now
+                        Return => todo!(), // ?
+                        ExpressionStart => todo!(), // Collect expression
+                        _ => {
+                            return Err(Error::ParsingError(format!(
+                                r#"Unexpected flow '{:#?}'"#,
+                                flow
+                            )))
+                        }
+                    }
                 }
                 _ => {
                     return Err(Error::ParsingError(format!(
