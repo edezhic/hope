@@ -29,9 +29,9 @@ fn main() -> Result<()> {
     // T T b T . Cmd T b T Cmd V Cmd b V F _
 
     bot.debug("\
-    Expect messages at @http://domain/path, for each message from messages \
-    request @database with query from the content of the message. \
-    If the sum of result is less than 100, then response is 'Not enough', \
+    For each message at @http://domain/path
+    request @database with query from the content of the message,
+    If the sum of result is less than 100, then response is 'Not enough',
     else response is 'Enough'.
     Send response to the sender of the message.\
     ")?;

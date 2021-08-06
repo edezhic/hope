@@ -28,7 +28,7 @@ pub enum Command {
     Sum,       // X 
     Request,   // X S
     Sort,      // X B
-    Expect,    // X S
+    Expect,    // X S => trash?
     Mean,      // => Op? S 
     Deviation, // => Op? S
     Sync,      // X B

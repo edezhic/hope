@@ -7,51 +7,45 @@ pub use vocabulary::*;
 
 use Token::*;
 
-// Expect X at y ... where to end this block? 
-// Replace with "for each X at Y"? Any reasons to get inputs other way? Open/close channels?
-// Await? Gather? Collect?
-// "For each X at Y" is the best option for now?
-
 pub struct Algorithm {
-    //inputs: Vec<Input>, // { channel: Id, jump: &Listener }
-    code: Vec<Instruction>,
+    // inputs?
+// code: Vec<Block>? Vec<Scope> where Scope: Vec<Block>?
+// Graph?
 }
 
-pub enum Instruction { // -> Block?
-    Command, // -> Instruction? { command, args }
-    Control, // -> Branch?
-    Case, // => control? -> Check?
-    Iterator,
-    Listener,
-    Expression,
-    Assignment,
-
+pub enum Node {
+    Instruction, // { command, args }
+    Control,     // { cases }
+    Iterator,    // { collection, item }
+    Listener,    // { source, item }
+    Expression,  // AST?
+    Assignment,  // { term, ? }
 }
 
 impl Bot {
-    pub fn build(&self, tokens: Vec<Token>) -> Result<()> {
+    pub fn build(&self, tokens: Vec<Token>) -> Result<Algorithm> {
         let mut iter = tokens.into_iter().peekable();
+        let mut algorithm = Algorithm {};
         while let Some(token) = iter.next() {
             match token {
-                Term(term) => { 
-                    // expect Being or selection?
-                }, 
-                Token::Cmd(command) => { 
-                    // Collect X and modifier+argument
-                }, 
-                Token::F(flow) => { 
+                Term(term) => {
+                    // Expect Being (or selection+term... and then Being)
+                }
+                Cmd(command) => {
+                    // Collect arguments
+                }
+                F(flow) => {
                     // Much stuff (if break and peek=break -> next)
-                }, 
-                Token::S(set) => { 
-                    // Collect and treat as Val
-                }, 
-                _ => return Err(Error::ParsingError(format!(
-                    r#"Unexpected token '{}'"#,
-                    token
-                )))
+                }
+                _ => {
+                    return Err(Error::ParsingError(format!(
+                        r#"Unexpected token '{}'"#,
+                        token
+                    )))
+                }
             }
         }
-        Ok(())
+        Ok(algorithm)
     }
 }
 
