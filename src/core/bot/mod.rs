@@ -33,26 +33,15 @@ impl Bot {
                 Cmd(command) => {
                     // Collect arguments
                 }
-                F(flow) => {
-                    match flow {
-                        Break => todo!(), // if break and peek=break -> next
-                        Do => todo!(), // Not now
-                        Else => todo!(), // ?
-                        End => todo!(), // ?
-                        For => todo!(), // Expect term + modifier + term/value
-                        If => todo!(), // cases
-                        Then => todo!(), // nothing outside if?
-                        While => todo!(), // Not now
-                        Return => todo!(), // ?
-                        ExpressionStart => todo!(), // Collect expression
-                        _ => {
-                            return Err(Error::ParsingError(format!(
-                                r#"Unexpected flow '{:#?}'"#,
-                                flow
-                            )))
-                        }
-                    }
-                }
+                F(Flow::Break) => {} // if break and peek=break -> next
+                F(Flow::End) => {} // ?
+                F(Flow::For) => {} // Expect term + modifier + term/value 
+                F(Flow::If) => {} // cases
+                F(Flow::Then) => {} // skip when outside "if"?
+                F(Flow::Return) => {} // ?
+                F(Flow::ExpressionStart) => {} // ?
+                C(Case::And) => {}
+                C(Case::Or) => {}
                 _ => {
                     return Err(Error::ParsingError(format!(
                         r#"Unexpected token '{}'"#,
