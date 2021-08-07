@@ -5,20 +5,20 @@ use crate::core::*;
 pub use token::*;
 pub use vocabulary::*;
 
-use Token::*;
 use Flow::*;
+use Token::*;
 
 pub struct Algorithm {
     // Graph?
 }
 
 pub enum Node {
+    Assignment,  // { term, ? }
     Instruction, // { command, args }
     Control,     // { cases }
     Iterator,    // { collection, item }
     Listener,    // { source, item }
-    Expression,  // AST? Convert to graph?
-    Assignment,  // { term, ? }
+    Expression,  // Convert them to instructions? Ops => Instructions?
 }
 
 impl Bot {
@@ -33,15 +33,31 @@ impl Bot {
                 Cmd(command) => {
                     // Collect arguments
                 }
-                F(Flow::Break) => {} // if break and peek=break -> next
-                F(Flow::End) => {} // ?
-                F(Flow::For) => {} // Expect term + modifier + term/value 
-                F(Flow::If) => {} // cases
-                F(Flow::Then) => {} // skip when outside "if"?
-                F(Flow::Return) => {} // ?
-                F(Flow::ExpressionStart) => {} // ?
-                C(Case::And) => {}
-                C(Case::Or) => {}
+                F(Flow::Break) => {
+                    // Ignore?
+                    // if break and peek=break -> next?
+                }
+                F(Flow::For) => {
+                    // Collect term, modifier and term/value
+                }
+                F(Flow::If) => {
+                    // Collect case by case
+                }
+                F(Flow::Then) => {
+                    // skip when outside "if"?
+                }
+                F(Flow::ExpressionStart) => {
+                    // Build AST-like subgraph graph?
+                }
+                C(Case::And) => {
+                    // skip when outside "if"?
+                }
+                S(Set::ListStart) => {
+                    // Collect
+                }
+                S(Set::StructStart) => {
+                    // Collect
+                }
                 _ => {
                     return Err(Error::ParsingError(format!(
                         r#"Unexpected token '{}'"#,

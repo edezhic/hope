@@ -86,7 +86,6 @@ pub enum Modifier {
     Binding,
     Selection,
     Targeting,
-    None,
 }
 
 #[derive(Debug, PartialEq)]
@@ -117,7 +116,6 @@ impl fmt::Display for Token {
                 Modifier::Binding => write!(f, "b"),
                 Modifier::Selection => write!(f, "s"),
                 Modifier::Targeting => write!(f, "t"),
-                Modifier::None => write!(f, ""),
             },
             Token::S(set) => match set {
                 Set::StructStart => write!(f, "{{"),
