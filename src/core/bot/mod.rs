@@ -6,6 +6,8 @@ pub use token::*;
 pub use vocabulary::*;
 
 use Flow::*;
+use Case::*;
+use Set::*;
 use Token::*;
 
 pub struct Algorithm {
@@ -13,12 +15,18 @@ pub struct Algorithm {
 }
 
 pub enum Node {
-    Assignment,  // { term, ? }
+    Assignment,  // { term }
     Instruction, // { command, args }
     Control,     // { cases }
     Iterator,    // { collection, item }
     Listener,    // { source, item }
-    Expression,  // Convert them to instructions? Ops => Instructions?
+    Formula,     // ???  
+}
+
+pub enum Edge {
+    // Default?
+    // Yes/No
+    // Value
 }
 
 impl Bot {
@@ -33,29 +41,28 @@ impl Bot {
                 Cmd(command) => {
                     // Collect arguments
                 }
-                F(Flow::Break) => {
-                    // Ignore?
-                    // if break and peek=break -> next?
+                F(Break) => {
+                    // Skip
                 }
-                F(Flow::For) => {
+                F(For) => {
                     // Collect term, modifier and term/value
                 }
-                F(Flow::If) => {
-                    // Collect case by case
+                F(If) => {
+                    // Collect case by case until Then, then until Break or Else
                 }
-                F(Flow::Then) => {
+                F(Then) => {
                     // skip when outside "if"?
                 }
-                F(Flow::ExpressionStart) => {
-                    // Build AST-like subgraph graph?
-                }
-                C(Case::And) => {
+                C(And) => {
                     // skip when outside "if"?
                 }
-                S(Set::ListStart) => {
+                F(FormulaStart) => {
+                    // Build AST inside graph?
+                }
+                S(ListStart) => {
                     // Collect
                 }
-                S(Set::StructStart) => {
+                S(StructStart) => {
                     // Collect
                 }
                 _ => {

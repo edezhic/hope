@@ -9,8 +9,8 @@ impl Vocabulary {
             be: R::new(r"^(?i)(:|=|is|are)$")?,
             term: R::new(r"^\p{Letter}+")?, // + {Number}?
             result: R::new(r"^(?i)(result|this|it|that)$")?,
-            expression_start: R::new(r"^\($")?,
-            expression_end: R::new(r"^\)$")?,
+            formula_start: R::new(r"^\($")?,
+            formula_end: R::new(r"^\)$")?,
             binding: R::new(r"^(?i)(with|by)$")?,
             selection: R::new(r"^(?i)(of|from)$")?,
             targeting: R::new(r"^(?i)(to|in|at|into)$")?,

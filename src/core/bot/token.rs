@@ -1,7 +1,7 @@
 use crate::core::*;
 
 #[derive(Debug, PartialEq)]
-pub enum Token {
+pub enum Token { // move every variant except commands and ops into Token?
     Val(Value),
     Term(Text),
     O(Op),
@@ -77,8 +77,8 @@ pub enum Flow {
     Then,
     While,
     Return,
-    ExpressionStart,
-    ExpressionEnd,
+    FormulaStart,
+    FormulaEnd,
 }
 
 #[derive(Debug, PartialEq)]
@@ -108,8 +108,8 @@ impl fmt::Display for Token {
             Token::C(case) => write!(f, "C"),
             Token::F(flow) => match flow {
                 Flow::Break => write!(f, "."),
-                Flow::ExpressionStart => write!(f, "("),
-                Flow::ExpressionEnd => write!(f, ")"),
+                Flow::FormulaStart => write!(f, "("),
+                Flow::FormulaEnd => write!(f, ")"),
                 _ => write!(f, "F"),
             },
             Token::Mod(modifier) => match modifier {
