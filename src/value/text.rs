@@ -1,6 +1,6 @@
 use super::*;
 use core::fmt;
-use crate::core::Result;
+use crate::Result;
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::{UWordBounds, UnicodeSegmentation};
 

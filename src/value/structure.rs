@@ -1,4 +1,4 @@
-use crate::core::*;
+use crate::*;
 use core::fmt;
 use std::{collections::HashMap, iter::FromIterator, ops::Index};
 type Key = Text;

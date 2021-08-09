@@ -1,7 +1,31 @@
-use crate::core::*;
+use crate::*;
+use std::{iter::Peekable, vec::IntoIter};
+
+pub struct Tokens<'a> {
+    iter: Peekable<IntoIter<Token>>,
+    pub peek: Option<&'a Token> 
+}
+impl<'a> Tokens<'a> {
+    pub fn init(vec: Vec<Token>) -> Tokens<'a> {
+        let mut iter = vec.into_iter().peekable();
+        let mut tokens = Tokens {
+            iter,
+            peek: None
+        };
+        tokens.peek = tokens.iter.peek();
+        //tokens.update_peek();
+        tokens
+    }
+
+    pub fn next(&'a mut self) -> Option<&'a Token> {
+        self.iter.next();
+        self.peek
+    }
+
+}
 
 #[derive(Debug, PartialEq)]
-pub enum Token { // move every variant except commands and ops into Token?
+pub enum Token {
     Val(Value),
     Term(Text),
     O(Op),
@@ -9,9 +33,16 @@ pub enum Token { // move every variant except commands and ops into Token?
     C(Case),
     F(Flow),
     Mod(Modifier),
-    S(Set),
+    And,
+    Or,
     Being,
     This,
+    FormulaStart,
+    FormulaEnd,
+    StructStart,
+    StructEnd,
+    ListStart,
+    ListEnd,
 }
 
 #[derive(Debug, PartialEq)]
@@ -28,19 +59,16 @@ pub enum Command {
     Sum,       // X 
     Request,   // X S
     Sort,      // X B
-    Mean,      // => Op? S 
-    Deviation, // => Op? S
-    Show,      // X ?T
-    Plot,      // X ?
-    Sign,      // X ?B
+    Show,      // X T
+    Plot,      // X
+    Sign,      // X B
     Check,     // X ?B/S
     Predict,   // X S
     Split,     // X B
 
     Custom {
-        term: Text, 
-        arg: Option<Modifier>, // ???
-        // tokens/algorithm?
+        name: Text, 
+        arg: Option<Modifier>,
     },
 }
 
@@ -50,15 +78,15 @@ pub enum Op {
     Minus,
     Multiplication,
     Division,
+    Mean,
+    Deviation,
 }
 
 #[derive(Debug, PartialEq)]
 pub enum Case {
-    And,
     More,
     Less,
     Not,
-    Or,
     Any,
     Each,
     Has,
@@ -77,8 +105,7 @@ pub enum Flow {
     Then,
     While,
     Return,
-    FormulaStart,
-    FormulaEnd,
+    
 }
 
 #[derive(Debug, PartialEq)]
@@ -88,17 +115,8 @@ pub enum Modifier {
     Targeting,
 }
 
-#[derive(Debug, PartialEq)]
-pub enum Set {
-    StructStart,
-    StructEnd,
-    ListStart,
-    ListEnd,
-}
-
 
 use core::fmt;
-
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -108,8 +126,6 @@ impl fmt::Display for Token {
             Token::C(case) => write!(f, "C"),
             Token::F(flow) => match flow {
                 Flow::Break => write!(f, "."),
-                Flow::FormulaStart => write!(f, "("),
-                Flow::FormulaEnd => write!(f, ")"),
                 _ => write!(f, "F"),
             },
             Token::Mod(modifier) => match modifier {
@@ -117,15 +133,17 @@ impl fmt::Display for Token {
                 Modifier::Selection => write!(f, "s"),
                 Modifier::Targeting => write!(f, "t"),
             },
-            Token::S(set) => match set {
-                Set::StructStart => write!(f, "{{"),
-                Set::StructEnd => write!(f, "}}"),
-                Set::ListStart => write!(f, "["),
-                Set::ListEnd => write!(f, "]"),
-            },
             Token::Term(_) => write!(f, "T"),
             Token::This => write!(f, "_"),
             Token::Cmd(_) => write!(f, "Cmd"),
+            Token::FormulaStart => write!(f, "("),
+            Token::FormulaEnd => write!(f, ")"),
+            Token::StructStart => write!(f, "{{"),
+            Token::StructEnd => write!(f, "}}"),
+            Token::ListStart => write!(f, "["),
+            Token::ListEnd => write!(f, "]"),
+            Token::And => write!(f, "&&"),
+            Token::Or => write!(f, "||"),
         }
     }
 }

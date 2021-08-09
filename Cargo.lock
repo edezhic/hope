@@ -8,6 +8,7 @@ version = "0.0.1"
 dependencies = [
  "chrono",
  "derive_more",
+ "lazy_static",
  "regex",
  "rust_decimal",
  "serde",

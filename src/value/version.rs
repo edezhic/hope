@@ -1,4 +1,4 @@
-use crate::core::*;
+use crate::*;
 use core::fmt;
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub struct Version {
