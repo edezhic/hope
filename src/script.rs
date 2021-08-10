@@ -16,16 +16,17 @@ pub enum Node {
 
 pub enum Edge {
     // Default?
-// Yes/No
-// Value
+    // Yes/No
+    // Value
 }
 
 pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
-    let mut tokens = Tokens::init(vec);
+    let mut tokens = Tokens::init(&vec);
     let mut algorithm = Algorithm {};
     while let Some(token) = tokens.peek {
         match token {
             Term(term) => {
+                
                 match tokens.next() {
                     Some(Being) => {
                         // Assigment
@@ -37,6 +38,7 @@ pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
                     }
                     _ => {}
                 }
+                
             }
             Cmd(command) => {
                 // Collect arguments

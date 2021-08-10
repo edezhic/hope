@@ -1,31 +1,43 @@
 use crate::*;
 use std::{iter::Peekable, vec::IntoIter};
+use core::slice::Iter;
 
 pub struct Tokens<'a> {
-    iter: Peekable<IntoIter<Token>>,
+    iter: Peekable<Iter<'a, Token>>,
     pub peek: Option<&'a Token> 
 }
 impl<'a> Tokens<'a> {
-    pub fn init(vec: Vec<Token>) -> Tokens<'a> {
-        let mut iter = vec.into_iter().peekable();
+    pub fn init(vec: &'a Vec<Token>) -> Tokens<'a> {
+        let mut iter = vec.iter().peekable();
         let mut tokens = Tokens {
             iter,
             peek: None
         };
-        tokens.peek = tokens.iter.peek();
-        //tokens.update_peek();
+        tokens.update_peek();
         tokens
     }
 
-    pub fn next(&'a mut self) -> Option<&'a Token> {
+    pub fn next(&mut self) -> Option<&'a Token> {
         self.iter.next();
         self.peek
+    }
+    fn update_peek(&mut self) {
+        if let Some(token) = self.iter.peek() {
+            self.peek = Some(token)
+        } else {
+            self.peek = None
+        }
     }
 
 }
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
+    Being,
+    This,
+    And,
+    Or,
+
     Val(Value),
     Term(Text),
     O(Op),
@@ -33,10 +45,7 @@ pub enum Token {
     C(Case),
     F(Flow),
     Mod(Modifier),
-    And,
-    Or,
-    Being,
-    This,
+
     FormulaStart,
     FormulaEnd,
     StructStart,
