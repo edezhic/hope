@@ -3,6 +3,11 @@ use crate::{Case::*, Flow::*, Modifier::*, Token::*};
 
 // Script { Algorithm { Graph } }?
 // Script { Graph }?
+
+// Eval cases? Case => Cmd/Op/???
+// Cases are somewhere between Cmds and Ops
+
+// Add X to each of Y?
 pub struct Algorithm {}
 
 pub enum Node {

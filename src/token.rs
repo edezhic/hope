@@ -57,26 +57,26 @@ pub enum Token {
 #[derive(Debug, PartialEq)]
 pub enum Command {
     Add,       // X T
-    Divide,    // X B
-    Multiply,  // X B
+    Divide,    // X B => Trashbin? => Split?
+    Multiply,  // X B => Trashbin?
     Substract, // X S
-    Send,      // X T
-    Filter,    // X B
-    Collect,   // X B
-    Read,      // X S
-    Write,     // X T
+    Send,      // X T 
+    Filter,    // X B?
+    Collect,   // X B ??? Append? Add?
+    Read,      // X S => Request?
+    Write,     // X T => Send?
     Sum,       // X 
     Request,   // X S
     Sort,      // X B
     Show,      // X T
-    Plot,      // X
+    Plot,      // X => Trashbin?
     Sign,      // X B
-    Check,     // X ?B/S
-    Predict,   // X S
-    Split,     // X B
+    Check,     // X ?B/S ??? => Trashbin?
+    Predict,   // X S => Trashbin?
+    Split,     // X B ??? => Trashbin?
 
     Custom {
-        name: Text, 
+        id: Id, 
         arg: Option<Modifier>,
     },
 }
