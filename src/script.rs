@@ -1,23 +1,17 @@
 use crate::*;
 use crate::{Case::*, Flow::*, Modifier::*, Token::*};
 
-pub struct Algorithm {
-    // Graph?
-}
+// Script { Algorithm { Graph } }?
+// Script { Graph }?
+pub struct Algorithm {}
 
 pub enum Node {
-    Assignment,  // { term }
-    Instruction, // { command, args }
-    Control,     // { cases }
-    Iterator,    // { collection, item }
-    Listener,    // { source, item }
-    Formula,     // ???
-}
-
-pub enum Edge {
-    // Default?
-    // Yes/No
-    // Value
+    Assignment,  // { Id }
+    Instruction, // { command, eval-edges? }
+    Control,     // { cases that include evals? Eval all cases? }
+    Iterator,    // { collection, item-term-id? }
+    Listener,    // { source, item-term-id? }
+    Formula,     // ??? Ast?
 }
 
 pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
@@ -26,46 +20,34 @@ pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
     while let Some(token) = tokens.peek {
         match token {
             Term(term) => {
-                
-                match tokens.next() {
-                    Some(Being) => {
-                        // Assigment
-                    }
-                    Some(Mod(Selection)) => {
-                        // Term (Value?)
-                        // repeat
-                        // Being
-                    }
-                    _ => {}
+                // Collect full Id/Ref
+                if let Some(Being) = tokens.peek {
+                    // Assigment (after evaluation of next)
+                } else {
+                    // Error
                 }
-                
             }
             Cmd(command) => {
-                // Collect arguments
+                // Collect evaluations of arguments according to command.syntax()
             }
-            F(Break) => {
-                // Skip
+            F(If) => {
+                // Collect cases until Then, then until Break or Else
+                // If stops on break, check if Else is next
             }
             F(For) => {
                 // Collect term, modifier and term/value
             }
-            F(If) => {
-                // Collect case by case until Then, then until Break or Else
+            ListStart => {
+                // Collect evals until ListEnd
             }
-            F(Then) => {
-                // skip when outside "if"?
+            StructStart => {
+                // Collect either term+being+eval or plain terms
             }
-            And => {
-                // skip when outside "if"?
+            F(Break) | F(Then) | And => {
+                // Skip when outside flow/case blocks
             }
             FormulaStart => {
                 // Build AST inside graph?
-            }
-            ListStart => {
-                // Collect
-            }
-            StructStart => {
-                // Collect
             }
             _ => {
                 return Err(Error::ParsingError(format!(
