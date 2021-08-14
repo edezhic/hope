@@ -1,34 +1,38 @@
-use crate::*;
-use std::{iter::Peekable, vec::IntoIter};
+use crate::{Token::*, *};
 use core::slice::Iter;
+use std::{iter::Peekable, vec::IntoIter};
 
 pub struct Tokens<'a> {
-    iter: Peekable<Iter<'a, Token>>,
-    pub peek: Option<&'a Token> 
+    iter: Peekable<IntoIter<Token>>,
+    pub peek: Option<&'a Token>,
 }
 impl<'a> Tokens<'a> {
-    pub fn init(vec: &'a Vec<Token>) -> Tokens<'a> {
-        let mut iter = vec.iter().peekable();
-        let mut tokens = Tokens {
-            iter,
-            peek: None
-        };
-        tokens.update_peek();
-        tokens
+    pub fn init(s: &'a str) -> Result<Tokens<'a>> {
+        let text = Text::from_str(s);
+        let mut pieces = Pieces::split(&text);
+        let mut vec = vec![];
+        while let Some(piece) = pieces.peek {
+            vec.push(match_token(&mut pieces)?);
+        }
+
+        print!("-----: ");
+        print_tokens(&vec);
+        println!("");
+
+        let mut iter = vec.into_iter().peekable();
+        let mut tokens = Tokens { iter, peek: None };
+        //tokens.update_peek();
+        Ok(tokens)
     }
 
-    pub fn next(&mut self) -> Option<&'a Token> {
+    pub fn next(&'a mut self) -> Option<&'a Token> {
         self.iter.next();
         self.peek
     }
-    fn update_peek(&mut self) {
-        if let Some(token) = self.iter.peek() {
-            self.peek = Some(token)
-        } else {
-            self.peek = None
-        }
+    fn update_peek(&'a mut self) {
+        self.peek = self.iter.peek();
+        
     }
-
 }
 
 #[derive(Debug, PartialEq)]
@@ -38,14 +42,13 @@ pub enum Token {
     And,
     Or,
 
-    Val(Value),
-    Term(Text),
+    V(Value),
+    T(Text),
     O(Op),
-    Cmd(Command),
-    C(Case),
+    C(Command),
     F(Flow),
-    Mod(Modifier),
-
+    S(Specifier),
+    // T(Type) Number/Text/Id/...?
     FormulaStart,
     FormulaEnd,
     StructStart,
@@ -56,51 +59,34 @@ pub enum Token {
 
 #[derive(Debug, PartialEq)]
 pub enum Command {
+    Init,      //
     Add,       // X T
-    Divide,    // X B => Trashbin? => Split?
-    Multiply,  // X B => Trashbin?
     Substract, // X S
-    Send,      // X T 
+    Send,      // X T
     Filter,    // X B?
-    Collect,   // X B ??? Append? Add?
-    Read,      // X S => Request?
-    Write,     // X T => Send?
-    Sum,       // X 
+    Sum,       // X
     Request,   // X S
     Sort,      // X B
     Show,      // X T
-    Plot,      // X => Trashbin?
     Sign,      // X B
-    Check,     // X ?B/S ??? => Trashbin?
-    Predict,   // X S => Trashbin?
-    Split,     // X B ??? => Trashbin?
+    Split,     // X B?
 
-    Custom {
-        id: Id, 
-        arg: Option<Modifier>,
-    },
+    Custom { id: Id, arg: Option<Specifier> },
 }
 
 #[derive(Debug, PartialEq)]
 pub enum Op {
+    More,
+    Less,
+    Not,
+    Empty,
+
     Plus,
     Minus,
     Multiplication,
     Division,
     Mean,
     Deviation,
-}
-
-#[derive(Debug, PartialEq)]
-pub enum Case {
-    More,
-    Less,
-    Not,
-    Any,
-    Each,
-    Has,
-    Empty,
-    Where,
 }
 
 #[derive(Debug, PartialEq)]
@@ -114,16 +100,16 @@ pub enum Flow {
     Then,
     While,
     Return,
-    
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Modifier {
+pub enum Specifier {
+    Any,
+    Each,
     Binding,
     Selection,
     Targeting,
 }
-
 
 use core::fmt;
 impl fmt::Display for Token {
@@ -131,20 +117,14 @@ impl fmt::Display for Token {
         match self {
             Token::Being => write!(f, "="),
             Token::O(op) => write!(f, "O"),
-            Token::Val(value) => write!(f, "V"),
-            Token::C(case) => write!(f, "C"),
+            Token::V(_) => write!(f, "V"),
             Token::F(flow) => match flow {
                 Flow::Break => write!(f, "."),
                 _ => write!(f, "F"),
             },
-            Token::Mod(modifier) => match modifier {
-                Modifier::Binding => write!(f, "b"),
-                Modifier::Selection => write!(f, "s"),
-                Modifier::Targeting => write!(f, "t"),
-            },
-            Token::Term(_) => write!(f, "T"),
+            Token::T(_) => write!(f, "T"),
             Token::This => write!(f, "_"),
-            Token::Cmd(_) => write!(f, "Cmd"),
+            Token::C(_) => write!(f, "C"),
             Token::FormulaStart => write!(f, "("),
             Token::FormulaEnd => write!(f, ")"),
             Token::StructStart => write!(f, "{{"),
@@ -153,6 +133,7 @@ impl fmt::Display for Token {
             Token::ListEnd => write!(f, "]"),
             Token::And => write!(f, "&&"),
             Token::Or => write!(f, "||"),
+            _ => write!(f, "???"),
         }
     }
 }

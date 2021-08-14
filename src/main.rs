@@ -13,21 +13,19 @@ extern crate derive_more;
 
 mod error;
 mod pieces;
-mod script;
-mod token;
+mod algorithm;
+mod tokens;
 mod value;
-mod vocabulary;
 pub use error::{Error, Result};
-pub use pieces::Pieces;
-pub use script::*;
-pub use token::*;
+pub use algorithm::*;
+pub use tokens::*;
 pub use value::*;
-pub use vocabulary::*;
+pub use pieces::*;
 
 fn main() -> Result<()> {
     println!("\x1B[2J\x1B[1;1H Compilation ✓ =======================================");
 
-    debug(
+    build(
         "X is 0.5, y is 1.5. Add x to y, show result.",
     )?;
 

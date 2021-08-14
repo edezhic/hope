@@ -1,13 +1,10 @@
 use crate::*;
-use crate::{Case::*, Flow::*, Modifier::*, Token::*};
+use crate::{Flow::*, Specifier::*, Token::*};
 
-// Script { Algorithm { Graph } }?
-// Script { Graph }?
+// Edge types: Value, Yes/No, ...?
 
-// Eval cases? Case => Cmd/Op/???
-// Cases are somewhere between Cmds and Ops
+// Term -> ? Word? Name?
 
-// Add X to each of Y?
 pub struct Algorithm {}
 
 pub enum Node {
@@ -19,12 +16,12 @@ pub enum Node {
     Formula,     // ??? Ast?
 }
 
-pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
-    let mut tokens = Tokens::init(&vec);
+pub fn build(s: &str) -> Result<Algorithm> {
+    let mut tokens = Tokens::init(s)?;
     let mut algorithm = Algorithm {};
     while let Some(token) = tokens.peek {
         match token {
-            Term(term) => {
+            T(term) => {
                 // Collect full Id/Ref
                 if let Some(Being) = tokens.peek {
                     // Assigment (after evaluation of next)
@@ -32,7 +29,7 @@ pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
                     // Error
                 }
             }
-            Cmd(command) => {
+            C(command) => {
                 // Collect evaluations of arguments according to command.syntax()
             }
             F(If) => {
@@ -63,37 +60,4 @@ pub fn build(vec: Vec<Token>) -> Result<Algorithm> {
         }
     }
     Ok(algorithm)
-}
-
-pub fn debug(s: &str) -> Result<()> {
-    println!("{} ", s);
-    let tokens = translate(s)?;
-    print!("-----: ");
-    print_tokens(&tokens);
-    println!("");
-    let algorithm = build(tokens)?;
-    Ok(())
-}
-
-pub fn translate(s: &str) -> Result<Vec<Token>> {
-    let text = Text::from_str(s);
-    let mut pieces = Pieces::split(&text);
-    let mut tokens = vec![];
-    while let Some(piece) = pieces.peek {
-        if let Some(value) = match_value(piece, &mut pieces)? {
-            tokens.push(Val(value));
-        } else if let Some(token) = match_token(piece) {
-            tokens.push(token);
-            pieces.next();
-        } else if valid_term(piece) {
-            tokens.push(Term(Text::lowercase(piece)));
-            pieces.next();
-        } else {
-            return Err(Error::ParsingError(format!(
-                r#"I don't know how to translate '{}'"#,
-                piece
-            )));
-        }
-    }
-    Ok(tokens)
 }
