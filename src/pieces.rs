@@ -9,14 +9,30 @@ pub struct Pieces<'a> {
     pub peek: Option<&'a str>,
 }
 impl<'a> Pieces<'a> {
-    pub fn split(text: &'a Text) -> Pieces<'a> {
+    pub fn translate(s: &'a str) -> Result<Vec<Token>> {
+        let text = Text::from_str(s);
         let mut iter = text.split_by_word_bounds().peekable();
         let mut pieces = Pieces { iter, peek: None };
-        pieces.skim();
         pieces.update_peek();
-        pieces
+        let mut vec = vec![];
+        while let Some(piece) = pieces.peek {
+            if let Some(value) = match_value(piece, &mut pieces)? {
+                vec.push(value);
+            } else if let Some(keyword) = match_keyword(piece, &mut pieces) {
+                vec.push(keyword);
+            } else if let Some(term) = match_term(piece, &mut pieces) {
+                vec.push(term);
+            } else {
+                return Err(Error::ParsingError(format!(
+                    r#"I don't know how to translate '{}'"#,
+                    piece
+                )));
+            }
+        }
+        Ok(vec)
     }
     fn update_peek(&mut self) {
+        self.skim();
         if let Some(piece) = self.iter.peek() {
             self.peek = Some(*piece)
         } else {
@@ -25,11 +41,10 @@ impl<'a> Pieces<'a> {
     }
     pub fn next(&mut self) -> Option<&'a str> {
         self.iter.next();
-        self.skim();
         self.update_peek();
         self.peek
     }
-    pub fn collect_until(&mut self, pattern: &regex::Regex, skim: bool) -> Text {
+    pub fn collect_until(&mut self, pattern: &regex::Regex, skip: bool) -> Text {
         self.iter.next();
         let mut text = Text::empty();
         while let Some(piece) = self.iter.next() {
@@ -39,10 +54,9 @@ impl<'a> Pieces<'a> {
                 text.add(piece);
             }
         }
-        if skim {
+        if skip {
             self.iter.next();
         }
-        self.skim();
         self.update_peek();
         text
     }
@@ -57,22 +71,6 @@ impl<'a> Pieces<'a> {
                 break;
             }
         }
-    }
-}
-
-pub fn match_token(pieces: &mut Pieces) -> Result<Token> {
-    let piece = pieces.peek.unwrap();
-    if let Some(value) = match_value(piece, pieces)? {
-        Ok(value)
-    } else if let Some(keyword) = match_keyword(piece, pieces) {
-        Ok(keyword)
-    } else if let Some(term) = match_term(piece, pieces) {
-        Ok(term)
-    } else {
-        Err(Error::ParsingError(format!(
-            r#"I don't know how to translate '{}'"#,
-            piece
-        )))
     }
 }
 

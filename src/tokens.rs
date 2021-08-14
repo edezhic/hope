@@ -8,18 +8,8 @@ pub struct Tokens<'a> {
 }
 impl<'a> Tokens<'a> {
     pub fn init(s: &'a str) -> Result<Tokens<'a>> {
-        let text = Text::from_str(s);
-        let mut pieces = Pieces::split(&text);
-        let mut vec = vec![];
-        while let Some(piece) = pieces.peek {
-            vec.push(match_token(&mut pieces)?);
-        }
-
-        print!("-----: ");
-        print_tokens(&vec);
-        println!("");
-
-        let mut iter = vec.into_iter().peekable();
+        print_tokens(&Pieces::translate(s)?);
+        let mut iter = Pieces::translate(s)?.into_iter().peekable();
         let mut tokens = Tokens { iter, peek: None };
         //tokens.update_peek();
         Ok(tokens)
@@ -139,7 +129,9 @@ impl fmt::Display for Token {
 }
 
 pub fn print_tokens(tokens: &Vec<Token>) {
+    print!("-----: ");
     for token in tokens {
         print!("{} ", token);
     }
+    println!("");
 }
