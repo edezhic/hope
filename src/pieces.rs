@@ -16,11 +16,11 @@ impl<'a> Pieces<'a> {
         pieces.update_peek();
         let mut vec = vec![];
         while let Some(piece) = pieces.peek {
-            if let Some(value) = match_value(piece, &mut pieces)? {
+            if let Some(value) = pieces.match_value(piece)? {
                 vec.push(value);
-            } else if let Some(keyword) = match_keyword(piece, &mut pieces) {
+            } else if let Some(keyword) = pieces.match_keyword(piece) {
                 vec.push(keyword);
-            } else if let Some(term) = match_term(piece, &mut pieces) {
+            } else if let Some(term) = pieces.match_term(piece) {
                 vec.push(term);
             } else {
                 return Err(Error::ParsingError(format!(
@@ -72,89 +72,92 @@ impl<'a> Pieces<'a> {
             }
         }
     }
-}
 
-pub fn match_value(piece: &str, pieces: &mut Pieces) -> Result<Option<Token>> {
-    let value = match piece {
-        piece if TRUE.is_match(piece) => {
-            pieces.next();
-            Value::truth()
-        }
-        piece if FALSE.is_match(piece) => {
-            pieces.next();
-            Value::falsehood()
-        }
-        piece if NUMBER.is_match(piece) => {
-            let num = piece.replacen(",", ".", 1);
-            pieces.next();
-            Value::Number(Number::from_string(num)?)
-        }
-        piece if TEXT.is_match(piece) => Value::Text(pieces.collect_until(&TEXT, true)),
-        piece if ID.is_match(piece) => Value::Id(Id::from_text(pieces.collect_literal())?),
-        piece if SEAL.is_match(piece) => Value::Seal(Seal::from_text(pieces.collect_literal())?),
-        piece if TIME.is_match(piece) => Value::Time(Time::from_text(pieces.collect_literal())?),
-        piece if VERSION.is_match(piece) => {
-            Value::Version(Version::from_text(pieces.collect_literal())?)
-        }
-        _ => return Ok(None),
-    };
-    Ok(Some(V(value)))
-}
-pub fn match_keyword(piece: &str, pieces: &mut Pieces) -> Option<Token> {
-    let piece = pieces.peek.unwrap();
-    let token = match piece {
-        piece if BE.is_match(piece) => Being,
-        piece if RESULT.is_match(piece) => This,
-        piece if AND.is_match(piece) => And,
-        piece if OR.is_match(piece) => Or,
-
-        piece if FORMULA_START.is_match(piece) => FormulaStart,
-        piece if FORMULA_END.is_match(piece) => FormulaEnd,
-        piece if STRUCT_START.is_match(piece) => StructStart,
-        piece if STRUCT_END.is_match(piece) => StructEnd,
-        piece if LIST_START.is_match(piece) => ListStart,
-        piece if LIST_END.is_match(piece) => ListEnd,
-
-        piece if BINDING.is_match(piece) => S(Binding),
-        piece if SELECTION.is_match(piece) => S(Selection),
-        piece if TARGETING.is_match(piece) => S(Targeting),
-
-        piece if ANY.is_match(piece) => S(Any),
-        piece if EACH.is_match(piece) => S(Each),
-
-        piece if IF.is_match(piece) => F(If),
-        piece if FOR.is_match(piece) => F(For),
-        piece if THEN.is_match(piece) => F(Then),
-        piece if ELSE.is_match(piece) => F(Else),
-        piece if BREAK.is_match(piece) => F(Break),
-        piece if RETURN.is_match(piece) => F(Return),
-
-        piece if ADD.is_match(piece) => C(Add),
-        piece if SEND.is_match(piece) => C(Send),
-        piece if SHOW.is_match(piece) => C(Show),
-        piece if SUBSTRACT.is_match(piece) => C(Substract),
-        piece if SUM.is_match(piece) => C(Sum),
-        piece if FILTER.is_match(piece) => C(Filter),
-        piece if REQUEST.is_match(piece) => C(Request),
-        piece if SORT.is_match(piece) => C(Sort),
-        piece if SIGN.is_match(piece) => C(Sign),
-        piece if PLUS.is_match(piece) => O(Plus),
-        piece if MINUS.is_match(piece) => O(Minus),
-        piece if MULTIPLICATION.is_match(piece) => O(Multiplication),
-        piece if DIVISION.is_match(piece) => O(Division),
-        _ => return None,
-    };
-    pieces.next();
-    Some(token)
-}
-
-pub fn match_term(piece: &str, pieces: &mut Pieces) -> Option<Token> {
-    if TERM.is_match(piece) {
-        let term = T(Text::lowercase(piece));
-        pieces.next();
-        return Some(term)
+    pub fn match_value(&mut self, piece: &str) -> Result<Option<Token>> {
+        let value = match piece {
+            piece if TRUE.is_match(piece) => {
+                self.next();
+                Value::truth()
+            }
+            piece if FALSE.is_match(piece) => {
+                self.next();
+                Value::falsehood()
+            }
+            piece if NUMBER.is_match(piece) => {
+                let num = piece.replacen(",", ".", 1);
+                self.next();
+                Value::Number(Number::from_string(num)?)
+            }
+            piece if TEXT.is_match(piece) => Value::Text(self.collect_until(&TEXT, true)),
+            piece if ID.is_match(piece) => Value::Id(Id::from_text(self.collect_literal())?),
+            piece if SEAL.is_match(piece) => {
+                Value::Seal(Seal::from_text(self.collect_literal())?)
+            }
+            piece if TIME.is_match(piece) => {
+                Value::Time(Time::from_text(self.collect_literal())?)
+            }
+            piece if VERSION.is_match(piece) => {
+                Value::Version(Version::from_text(self.collect_literal())?)
+            }
+            _ => return Ok(None),
+        };
+        Ok(Some(V(value)))
     }
-    None
+    pub fn match_keyword(&mut self, piece: &str) -> Option<Token> {
+        let token = match piece {
+            piece if BE.is_match(piece) => Being,
+            piece if RESULT.is_match(piece) => This,
+            piece if AND.is_match(piece) => And,
+            piece if OR.is_match(piece) => Or,
+
+            piece if FORMULA_START.is_match(piece) => FormulaStart,
+            piece if FORMULA_END.is_match(piece) => FormulaEnd,
+            piece if STRUCT_START.is_match(piece) => StructStart,
+            piece if STRUCT_END.is_match(piece) => StructEnd,
+            piece if LIST_START.is_match(piece) => ListStart,
+            piece if LIST_END.is_match(piece) => ListEnd,
+
+            piece if BINDING.is_match(piece) => S(Binding),
+            piece if SELECTION.is_match(piece) => S(Selection),
+            piece if TARGETING.is_match(piece) => S(Targeting),
+
+            piece if ANY.is_match(piece) => S(Any),
+            piece if EACH.is_match(piece) => S(Each),
+
+            piece if IF.is_match(piece) => F(If),
+            piece if FOR.is_match(piece) => F(For),
+            piece if THEN.is_match(piece) => F(Then),
+            piece if ELSE.is_match(piece) => F(Else),
+            piece if BREAK.is_match(piece) => F(Break),
+            piece if RETURN.is_match(piece) => F(Return),
+
+            piece if ADD.is_match(piece) => C(Add),
+            piece if SEND.is_match(piece) => C(Send),
+            piece if SHOW.is_match(piece) => C(Show),
+            piece if SUBSTRACT.is_match(piece) => C(Substract),
+            piece if SUM.is_match(piece) => C(Sum),
+            piece if FILTER.is_match(piece) => C(Filter),
+            piece if REQUEST.is_match(piece) => C(Request),
+            piece if SORT.is_match(piece) => C(Sort),
+            piece if SIGN.is_match(piece) => C(Sign),
+            piece if PLUS.is_match(piece) => O(Plus),
+            piece if MINUS.is_match(piece) => O(Minus),
+            piece if MULTIPLICATION.is_match(piece) => O(Multiplication),
+            piece if DIVISION.is_match(piece) => O(Division),
+            _ => return None,
+        };
+        self.next();
+        Some(token)
+    }
+
+    pub fn match_term(&mut self, piece: &str) -> Option<Token> {
+        if TERM.is_match(piece) {
+            let term = T(Text::lowercase(piece));
+            self.next();
+            return Some(term);
+        }
+        None
+    }
 }
 
 lazy_static! {
