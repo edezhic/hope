@@ -1,27 +1,28 @@
 use crate::*;
 use crate::{Flow::*, Specifier::*, Token::*};
 
-// Edge types: Value, Yes/No, ...?
-
-// Term -> ? Word? Name?
 
 pub struct Algorithm {}
 
 pub enum Node {
-    Assignment,  // { Id }
-    Instruction, // { command, eval-edges? }
-    Control,     // { cases that include evals? Eval all cases? }
-    Iterator,    // { collection, item-term-id? }
-    Listener,    // { source, item-term-id? }
+    Assignment,  // { Id } + input edge
+    Instruction, // { command (Id?) } + input edges (with specifiers?)
+    Control,     // => Edges?
+    Iterator,    // { collection: Id, item: Id } merge?
+    Listener,    // { source: Id, item: Id }; merge these ^^^ ?
     Formula,     // ??? Ast?
 }
+// Edge types: Value, Yes/No, ...?
+
 
 pub fn build(s: &str) -> Result<Algorithm> {
-    let mut tokens = Tokens::init(s)?;
+    print_tokens(&Pieces::translate(s)?);
+    let mut vec = Pieces::translate(s)?;
+    let mut tokens = Tokens::init(&vec)?;
     let mut algorithm = Algorithm {};
     while let Some(token) = tokens.peek {
         match token {
-            T(term) => {
+            N(name) => {
                 // Collect full Id/Ref
                 if let Some(Being) = tokens.peek {
                     // Assigment (after evaluation of next)
@@ -37,13 +38,13 @@ pub fn build(s: &str) -> Result<Algorithm> {
                 // If stops on break, check if Else is next
             }
             F(For) => {
-                // Collect term, modifier and term/value
+                // Collect name, modifier and name/value
             }
             ListStart => {
                 // Collect evals until ListEnd
             }
             StructStart => {
-                // Collect either term+being+eval or plain terms
+                // Collect either name+being+eval or plain names
             }
             F(Break) | F(Then) | And => {
                 // Skip when outside flow/case blocks

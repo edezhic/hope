@@ -77,16 +77,16 @@ impl Id {
         Ok(Id::from_str(t.as_str())?)
     }
 
-    pub fn get_term(&self) -> Result<Text> {
+    pub fn get_name(&self) -> Result<Text> {
         if !self.path.empty() {
             // check Scheme::Hopes = self.scheme?
             if self.path.single() {
                 Ok(self.path.first_selector())
             } else {
-                Err(Error::Error("Invalid term"))
+                Err(Error::Error("Invalid name"))
             }
         } else {
-            Err(Error::Error("Not a term"))
+            Err(Error::Error("Not a name"))
         }
     }
 

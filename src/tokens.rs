@@ -3,25 +3,29 @@ use core::slice::Iter;
 use std::{iter::Peekable, vec::IntoIter};
 
 pub struct Tokens<'a> {
-    iter: Peekable<IntoIter<Token>>,
+    iter: Peekable<Iter<'a, Token>>,
     pub peek: Option<&'a Token>,
 }
 impl<'a> Tokens<'a> {
-    pub fn init(s: &'a str) -> Result<Tokens<'a>> {
-        print_tokens(&Pieces::translate(s)?);
-        let mut iter = Pieces::translate(s)?.into_iter().peekable();
+    pub fn init(vec: &'a Vec<Token>) -> Result<Tokens> {
+        let mut iter = vec.iter().peekable();
         let mut tokens = Tokens { iter, peek: None };
-        //tokens.update_peek();
+        tokens.update_peek();
         Ok(tokens)
     }
 
-    pub fn next(&'a mut self) -> Option<&'a Token> {
+    pub fn next(&mut self) -> Option<&Token> {
         self.iter.next();
+        self.update_peek();
         self.peek
     }
-    fn update_peek(&'a mut self) {
-        self.peek = self.iter.peek();
-        
+
+    fn update_peek(&mut self) {
+        if let Some(token) = self.iter.peek() {
+            self.peek = Some(*token)
+        } else {
+            self.peek = None
+        }
     }
 }
 
@@ -33,7 +37,7 @@ pub enum Token {
     Or,
 
     V(Value),
-    T(Text),
+    N(Text),
     O(Op),
     C(Command),
     F(Flow),
@@ -112,7 +116,7 @@ impl fmt::Display for Token {
                 Flow::Break => write!(f, "."),
                 _ => write!(f, "F"),
             },
-            Token::T(_) => write!(f, "T"),
+            Token::N(_) => write!(f, "T"),
             Token::This => write!(f, "_"),
             Token::C(_) => write!(f, "C"),
             Token::FormulaStart => write!(f, "("),

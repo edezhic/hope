@@ -20,8 +20,8 @@ impl<'a> Pieces<'a> {
                 vec.push(value);
             } else if let Some(keyword) = pieces.match_keyword(piece) {
                 vec.push(keyword);
-            } else if let Some(term) = pieces.match_term(piece) {
-                vec.push(term);
+            } else if let Some(name) = pieces.match_name(piece) {
+                vec.push(name);
             } else {
                 return Err(Error::ParsingError(format!(
                     r#"I don't know how to translate '{}'"#,
@@ -150,11 +150,11 @@ impl<'a> Pieces<'a> {
         Some(token)
     }
 
-    pub fn match_term(&mut self, piece: &str) -> Option<Token> {
+    pub fn match_name(&mut self, piece: &str) -> Option<Token> {
         if TERM.is_match(piece) {
-            let term = T(Text::lowercase(piece));
+            let name = N(Text::lowercase(piece));
             self.next();
-            return Some(term);
+            return Some(name);
         }
         None
     }
