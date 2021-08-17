@@ -100,9 +100,13 @@ pub enum Flow {
 pub enum Specifier {
     Any,
     Each,
-    Binding,
-    Selection,
-    Targeting,
+    With,
+    By,
+    Of,
+    From,
+    To,
+    In,
+    At,
 }
 
 use core::fmt;
@@ -110,15 +114,16 @@ impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Token::Being => write!(f, "="),
-            Token::O(op) => write!(f, "O"),
-            Token::V(_) => write!(f, "V"),
+            Token::O(op) => write!(f, "{:#?}", op),
+            Token::V(v) => write!(f, "{}", v),
             Token::F(flow) => match flow {
                 Flow::Break => write!(f, "."),
-                _ => write!(f, "F"),
+                _ => write!(f, "{:#?}", flow),
             },
-            Token::N(_) => write!(f, "T"),
-            Token::This => write!(f, "_"),
-            Token::C(_) => write!(f, "C"),
+            Token::N(n) => write!(f, "{}", n),
+            Token::This => write!(f, "this"),
+            Token::C(c) => write!(f, "{:#?}", c),
+            Token::S(s) => write!(f, "{:#?}", s),
             Token::FormulaStart => write!(f, "("),
             Token::FormulaEnd => write!(f, ")"),
             Token::StructStart => write!(f, "{{"),
@@ -127,7 +132,7 @@ impl fmt::Display for Token {
             Token::ListEnd => write!(f, "]"),
             Token::And => write!(f, "&&"),
             Token::Or => write!(f, "||"),
-            _ => write!(f, "???"),
+            //_ => write!(f, "???"),
         }
     }
 }

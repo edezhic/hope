@@ -117,10 +117,14 @@ impl<'a> Pieces<'a> {
             piece if LIST_START.is_match(piece) => ListStart,
             piece if LIST_END.is_match(piece) => ListEnd,
 
-            piece if BINDING.is_match(piece) => S(Binding),
-            piece if SELECTION.is_match(piece) => S(Selection),
-            piece if TARGETING.is_match(piece) => S(Targeting),
-
+            piece if WITH.is_match(piece) => S(With),
+            piece if BY.is_match(piece) => S(By),
+            piece if OF.is_match(piece) => S(Of),
+            piece if FROM.is_match(piece) => S(From),
+            piece if TO.is_match(piece) => S(To),
+            piece if IN.is_match(piece) => S(In),
+            piece if AT.is_match(piece) => S(At),
+            
             piece if ANY.is_match(piece) => S(Any),
             piece if EACH.is_match(piece) => S(Each),
 
@@ -175,9 +179,14 @@ lazy_static! {
     static ref STRUCT_START: R = R::new(r"^\{$").unwrap();
     static ref STRUCT_END: R = R::new(r"^\}$").unwrap();
 
-    static ref BINDING: R = R::new(r"^(?i)(with|by)$").unwrap();
-    static ref SELECTION: R = R::new(r"^(?i)(of|from)$").unwrap();
-    static ref TARGETING: R = R::new(r"^(?i)(to|in|at|into)$").unwrap();
+    static ref WITH: R = R::new(r"^(?i)with$").unwrap();
+    static ref BY: R = R::new(r"^(?i)by$").unwrap();
+    static ref OF: R = R::new(r"^(?i)of$").unwrap();
+    static ref FROM: R = R::new(r"^(?i)from$").unwrap();
+    static ref TO: R = R::new(r"^(?i)to$").unwrap();
+    static ref IN: R = R::new(r"^(?i)in$").unwrap();
+    static ref AT: R = R::new(r"^(?i)at$").unwrap();
+
 
     static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl})$").unwrap();
     static ref IF: R = R::new(r"^(?i)if$").unwrap();

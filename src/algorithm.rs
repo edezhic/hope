@@ -1,7 +1,6 @@
 use crate::*;
 use crate::{Flow::*, Specifier::*, Token::*};
 
-
 pub struct Algorithm {}
 
 pub enum Node {
@@ -23,34 +22,34 @@ pub fn build(s: &str) -> Result<Algorithm> {
     while let Some(token) = tokens.peek {
         match token {
             N(name) => {
-                // Collect full Id/Ref
+                // Collect full Ref(Id): N (of N (of N (of...)))
                 if let Some(Being) = tokens.peek {
-                    // Assigment (after evaluation of next)
+                    // Put assigment node after collecting expr
                 } else {
-                    // Error
+                    // Unexpected token
                 }
             }
             C(command) => {
-                // Collect evaluations of arguments according to command.syntax()
+                // Collect arguments' exprs according to command.syntax()
             }
             F(If) => {
-                // Collect cases until Then, then until Break or Else
-                // If stops on break, check if Else is next
+                // Collect expr until Then, then statement until Break or Else
+                // If stops on break, check if Else is next?
             }
             F(For) => {
-                // Collect name, modifier and name/value
+                // Collect item name, specifier and expr, then statement
             }
             ListStart => {
-                // Collect evals until ListEnd
+                // Collect exprs until ListEnd
             }
             StructStart => {
-                // Collect either name+being+eval or plain names
+                // Collect either name+being+expr or refs
             }
             F(Break) | F(Then) | And => {
-                // Skip when outside flow/case blocks
+                // Skip when outside flow/case blocks?
             }
             FormulaStart => {
-                // Build AST inside graph?
+                // Build AST node inside graph?
             }
             _ => {
                 return Err(Error::ParsingError(format!(
