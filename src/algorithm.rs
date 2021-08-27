@@ -1,18 +1,14 @@
-use crate::*;
-use crate::{Flow::*, Specifier::*, Token::*};
+use crate::{*, Token::*};
 
 pub struct Algorithm {}
 
 pub enum Node {
-    Assignment,  // { Id } + input edge
-    Instruction, // { command (Id?) } + input edges (with specifiers?)
-    Control,     // => Edges?
-    Iterator,    // { collection: Id, item: Id } merge?
-    Listener,    // { source: Id, item: Id }; merge these ^^^ ?
+    Assignment,  // { Id } (+ one input edge)
+    Instruction, // { command } + inputs edges
+    Iterator,    // { collection: Id, item: Id }
     Formula,     // ??? Ast?
 }
 // Edge types: Value, Yes/No, ...?
-
 
 pub fn build(s: &str) -> Result<Algorithm> {
     print_tokens(&Pieces::translate(s)?);
@@ -20,11 +16,27 @@ pub fn build(s: &str) -> Result<Algorithm> {
     let mut tokens = Tokens::init(&vec)?;
     let mut algorithm = Algorithm {};
     while let Some(token) = tokens.peek {
+        // Get token.syntax() for each token, even N or If, and go with it?
+        let syntax = token.syntax();
+        /*
         match token {
             N(name) => {
-                // Collect full Ref(Id): N (of N (of N (of...)))
+                // check if script? If not, ...
+                // collect_ref { 
+                let mut path = vec![name.clone()];
+                tokens.next();
+                while let Some(Of) = tokens.peek {
+                    if let Some(N(name)) = tokens.next() {
+                        path.push(name.clone());
+                        tokens.next();
+                    } else {
+                        // Unexpected token
+                    }
+                }
+                // }
                 if let Some(Being) = tokens.peek {
-                    // Put assigment node after collecting expr
+                    // collect expression
+                    // assign ref to expr
                 } else {
                     // Unexpected token
                 }
@@ -32,11 +44,11 @@ pub fn build(s: &str) -> Result<Algorithm> {
             C(command) => {
                 // Collect arguments' exprs according to command.syntax()
             }
-            F(If) => {
+            If => {
                 // Collect expr until Then, then statement until Break or Else
                 // If stops on break, check if Else is next?
             }
-            F(For) => {
+            For => {
                 // Collect item name, specifier and expr, then statement
             }
             ListStart => {
@@ -45,7 +57,7 @@ pub fn build(s: &str) -> Result<Algorithm> {
             StructStart => {
                 // Collect either name+being+expr or refs
             }
-            F(Break) | F(Then) | And => {
+            Break | Then | And => {
                 // Skip when outside flow/case blocks?
             }
             FormulaStart => {
@@ -53,11 +65,12 @@ pub fn build(s: &str) -> Result<Algorithm> {
             }
             _ => {
                 return Err(Error::ParsingError(format!(
-                    r#"Unexpected token '{}'"#,
+                    r#"Unexpected token '{:#?}'"#,
                     token
                 )))
             }
         }
+         */
     }
     Ok(algorithm)
 }

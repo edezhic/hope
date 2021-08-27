@@ -29,7 +29,7 @@ pub enum Value {
     Text(Text),
     Time(Time),
     Version(Version),
-    // FIXME add Tensor? Categorical variables? Tables?
+    // TODO add Tensor? Categorical variables? Tables?
     None,
 }
 
@@ -40,6 +40,7 @@ impl Value {
     pub fn falsehood() -> Value {
         Value::Fact(Fact::falsehood())
     }
+    /*
     pub fn unsafe_set(&self, value: Value) {
         // forgive me god and rust compiler for mutating the immutable
         unsafe {
@@ -48,6 +49,7 @@ impl Value {
             *mut_self = value;
         }
     }
+     */
 }
 
 impl fmt::Display for Value {

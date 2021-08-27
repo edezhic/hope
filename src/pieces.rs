@@ -1,5 +1,4 @@
-use crate::*;
-use crate::{Command::*, Flow::*, Op::*, Specifier::*, Token::*};
+use crate::{*, Command::*, Op::*, Token::*};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBounds;
@@ -117,23 +116,23 @@ impl<'a> Pieces<'a> {
             piece if LIST_START.is_match(piece) => ListStart,
             piece if LIST_END.is_match(piece) => ListEnd,
 
-            piece if WITH.is_match(piece) => S(With),
-            piece if BY.is_match(piece) => S(By),
-            piece if OF.is_match(piece) => S(Of),
-            piece if FROM.is_match(piece) => S(From),
-            piece if TO.is_match(piece) => S(To),
-            piece if IN.is_match(piece) => S(In),
-            piece if AT.is_match(piece) => S(At),
+            piece if WITH.is_match(piece) => With,
+            piece if BY.is_match(piece) => By,
+            piece if OF.is_match(piece) => Of,
+            piece if FROM.is_match(piece) => From,
+            piece if TO.is_match(piece) => To,
+            piece if IN.is_match(piece) => In,
+            piece if AT.is_match(piece) => At,
             
-            piece if ANY.is_match(piece) => S(Any),
-            piece if EACH.is_match(piece) => S(Each),
+            piece if ANY.is_match(piece) => Any,
+            piece if EACH.is_match(piece) => Each,
 
-            piece if IF.is_match(piece) => F(If),
-            piece if FOR.is_match(piece) => F(For),
-            piece if THEN.is_match(piece) => F(Then),
-            piece if ELSE.is_match(piece) => F(Else),
-            piece if BREAK.is_match(piece) => F(Break),
-            piece if RETURN.is_match(piece) => F(Return),
+            piece if IF.is_match(piece) => If,
+            piece if FOR.is_match(piece) => For,
+            piece if THEN.is_match(piece) => Then,
+            piece if ELSE.is_match(piece) => Else,
+            piece if BREAK.is_match(piece) => Break,
+            piece if RETURN.is_match(piece) => Return,
 
             piece if ADD.is_match(piece) => C(Add),
             piece if SEND.is_match(piece) => C(Send),
@@ -156,15 +155,15 @@ impl<'a> Pieces<'a> {
 
     pub fn match_name(&mut self, piece: &str) -> Option<Token> {
         if TERM.is_match(piece) {
-            let name = N(Text::lowercase(piece));
             self.next();
-            return Some(name);
+            Some(N(Text::lowercase(piece)))
+        } else {
+            None
         }
-        None
     }
 }
 
-lazy_static! {
+lazy_static! { // ASCII-only?
     static ref SKIP: R = R::new(r"^(a|(?i)(the|let|,|\p{Zs}|\t|\?|!))+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
     static ref TERM: R = R::new(r"^\p{Letter}+").unwrap(); // + {Number}?
