@@ -35,6 +35,7 @@ pub enum Token {
     O(Op),
     C(Command),
     // T(Type) Number/Text/Id/...?
+    // S(Script)/Ref?
     
     Being,
     This,
@@ -59,7 +60,7 @@ pub enum Token {
     Any,
     Each,
     
-    With,
+    With, // => Back to Modifier?
     By,
     Of,
     From,
@@ -80,50 +81,6 @@ pub enum Command {
     Show,      // X T
     Sign,      // X B
     Split,     // X B?
-}
-
-pub struct Syntax {
-    // Vec<Token> ?
-    // required and optional stuff
-    // args as V(None), exprs and statements as ???
-}
-impl Token {
-    pub fn syntax(&self) -> Syntax {
-        match self {
-            N(_) => Syntax {
-                // (Of N (Of N (Of N (...)))) Being Expr
-                // No output?
-            },
-            C(Command::Add) => Syntax {
-                // Expr1 (To Expr2) // (To Each Expr2?)
-                // Output Expr2
-                // 
-            },
-            C(Command::Show) => Syntax {
-                // Expr
-                // No output?
-            },
-            If => Syntax {
-                // Expr (And/Or Expr(And/Or Expr (...))) Then Statement (Else Statement)
-                // Then/Else statements might have outputs
-            },
-            For => Syntax {
-                // Each N In Expr Statement
-            },
-            ListStart => Syntax {
-                // Expr (Expr (Expr (...))) ListEnd
-                // Output list (Collect Exprs?)
-            },
-            StructStart => Syntax {
-                // N (Being Expr) (N (Being Expr) ...) StructEnd
-                // Output struct
-            },
-            FormulaStart => Syntax {
-                // hmm...
-            },
-            _ => todo!(),
-        }
-    }
 }
 
 #[derive(Debug, PartialEq)]
