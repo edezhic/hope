@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "export": "next export -o docs/",
+    "pub": "next build && next export -o docs/",
     "start": "next start",
     "lint": "next lint"
   },
