@@ -9,7 +9,7 @@ const {
 } = require('path');
 
 module.exports = {
-  //basePath: '/Hope',
+  basePath: '/Hope',
   webpack(config) {
     // Ensures that web workers can import scripts.
     config.output.publicPath = '/_next/';
