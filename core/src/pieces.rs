@@ -1,26 +1,26 @@
-use crate::{*, Command::*, Op::*, Token::*};
+use crate::{*, Command::*, Op::*, Modifier::*, Token::*};
 use regex::Regex as R;
 use std::iter::Peekable;
-use unicode_segmentation::UWordBounds;
+use unicode_segmentation::UWordBoundIndices;
 
 pub struct Pieces<'a> {
-    iter: Peekable<UWordBounds<'a>>,
-    pub peek: Option<&'a str>,
+    iter: Peekable<UWordBoundIndices<'a>>,
+    pub peek: Option<(usize, &'a str)>,
 }
 impl<'a> Pieces<'a> {
-    pub fn translate(s: &'a str) -> Result<Vec<Token>> {
+    pub fn translate(s: &'a str) -> Result<Vec<(usize, Token)>> {
         let text = Text::from_str(s);
         let mut iter = text.split_by_word_bounds().peekable();
         let mut pieces = Pieces { iter, peek: None };
         pieces.update_peek();
         let mut vec = vec![];
-        while let Some(piece) = pieces.peek {
+        while let Some((index, piece)) = pieces.peek {
             if let Some(value) = pieces.match_value(piece)? {
-                vec.push(value);
+                vec.push((index, value));
             } else if let Some(keyword) = pieces.match_keyword(piece) {
-                vec.push(keyword);
+                vec.push((index, keyword));
             } else if let Some(name) = pieces.match_name(piece) {
-                vec.push(name);
+                vec.push((index, name));
             } else {
                 return Err(Error::ParsingError(format!(
                     r#"I don't know how to translate '{}'"#,
@@ -38,7 +38,7 @@ impl<'a> Pieces<'a> {
             self.peek = None
         }
     }
-    pub fn next(&mut self) -> Option<&'a str> {
+    pub fn next(&mut self) -> Option<(usize, &'a str)> {
         self.iter.next();
         self.update_peek();
         self.peek
@@ -47,10 +47,10 @@ impl<'a> Pieces<'a> {
         self.iter.next();
         let mut text = Text::empty();
         while let Some(piece) = self.iter.next() {
-            if pattern.is_match(piece) {
+            if pattern.is_match(piece.1) {
                 break;
             } else {
-                text.add(piece);
+                text.add(piece.1);
             }
         }
         if skip {
@@ -64,7 +64,7 @@ impl<'a> Pieces<'a> {
     }
     pub fn skim(&mut self) {
         while let Some(piece) = self.iter.peek() {
-            if SKIP.is_match(piece) {
+            if SKIP.is_match(piece.1) {
                 self.iter.next();
             } else {
                 break;
@@ -116,13 +116,13 @@ impl<'a> Pieces<'a> {
             piece if LIST_START.is_match(piece) => ListStart,
             piece if LIST_END.is_match(piece) => ListEnd,
 
-            piece if WITH.is_match(piece) => With,
-            piece if BY.is_match(piece) => By,
-            piece if OF.is_match(piece) => Of,
-            piece if FROM.is_match(piece) => From,
-            piece if TO.is_match(piece) => To,
-            piece if IN.is_match(piece) => In,
-            piece if AT.is_match(piece) => At,
+            piece if WITH.is_match(piece) => M(With),
+            piece if BY.is_match(piece) => M(By),
+            piece if OF.is_match(piece) => M(Of),
+            piece if FROM.is_match(piece) => M(From),
+            piece if TO.is_match(piece) => M(To),
+            piece if IN.is_match(piece) => M(In),
+            piece if AT.is_match(piece) => M(At),
             
             piece if ANY.is_match(piece) => Any,
             piece if EACH.is_match(piece) => Each,
@@ -163,7 +163,7 @@ impl<'a> Pieces<'a> {
     }
 }
 
-lazy_static! { // ASCII-only?
+lazy_static! {
     static ref SKIP: R = R::new(r"^(a|(?i)(the|let|,|\p{Zs}|\t|\?|!))+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
     static ref TERM: R = R::new(r"^\p{Letter}+").unwrap(); // + {Number}?

@@ -2,18 +2,18 @@ use crate::{*, Token::*};
 use core::{slice::Iter, iter::Peekable};
 
 pub struct Tokens<'a> {
-    iter: Peekable<Iter<'a, Token>>,
-    pub peek: Option<&'a Token>,
+    iter: Peekable<Iter<'a, (usize, Token)>>,
+    pub peek: Option<&'a (usize, Token)>,
 }
 impl<'a> Tokens<'a> {
-    pub fn init(vec: &'a Vec<Token>) -> Result<Tokens> {
+    pub fn init(vec: &'a Vec<(usize, Token)>) -> Result<Tokens> {
         let mut iter = vec.into_iter().peekable();
         let mut tokens = Tokens { iter, peek: None };
         tokens.update_peek();
         Ok(tokens)
     }
 
-    pub fn next(&mut self) -> Option<&Token> {
+    pub fn next(&mut self) -> Option<&(usize, Token)> {
         self.iter.next();
         self.update_peek();
         self.peek
@@ -28,25 +28,21 @@ impl<'a> Tokens<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Token {
     V(Value),
     N(Text),
     O(Op),
-    C(Command),
+    C(Command), // -> S(Script) and Custom variant?
+    M(Modifier),
     // T(Type) Number/Text/Id/...?
-    // S(Script)/Ref?
     
     Being,
     This,
     And,
     Or,
-    FormulaStart,
-    FormulaEnd,
-    StructStart,
-    StructEnd,
-    ListStart,
-    ListEnd,
+    Any,
+    Each,
 
     Break,
     Do,
@@ -57,33 +53,31 @@ pub enum Token {
     Then,
     While,
     Return,
-    Any,
-    Each,
-    
-    With, // => Back to Modifier?
-    By,
-    Of,
-    From,
-    To,
-    In,
-    At,
+
+    ListStart,
+    ListEnd,
+    StructStart,
+    StructEnd,
+    FormulaStart,
+    FormulaEnd,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Command {
-    Add,       // X T
-    Substract, // X S; -> Remove/Delete?
-    Send,      // X T
-    Filter,    // X B?
-    Sum,       // X
-    Request,   // X S
-    Sort,      // X B
-    Show,      // X T
-    Sign,      // X B
-    Split,     // X B?
+    Add,       // X To
+    Substract, // X From -> Remove/Delete?
+    Send,      // X To
+    Filter,    // X ?
+    Sum,       // X ?
+    Request,   // X From
+    Sort,      // X By
+    Show,      // X ?
+    Sign,      // X With(As?)
+    Split,     // X By
+    Custom(),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Op {
     Plus,
     Minus,
@@ -93,14 +87,26 @@ pub enum Op {
     Deviation,
 }
 
-pub fn print_tokens(tokens: &Vec<Token>) {
-    print!("-----: ");
-    for token in tokens {
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+pub enum Modifier { // -> Argument?
+    With,
+    By,
+    Of,
+    From,
+    To,
+    In,
+    At,
+}
+
+pub fn print_tokens(tokens: &Vec<(usize, Token)>) {
+    print!("|||||||: ");
+    for (index, token) in tokens {
         match token {
             O(op) => print!("{:#?}", op),
             V(v) => print!("{}", v),
             N(n) => print!("{}", n),
             C(c) => print!("{:#?}", c),
+            M(m) => print!("{:#?}", m),
             Break => print!("."),
             FormulaStart => print!("("),
             FormulaEnd => print!(")"),

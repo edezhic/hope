@@ -1,22 +1,26 @@
 use crate::{Token::*, *};
 
-// Graph of tokens? Some simple graph-like structure?
 // Edge types: Default flow, Yes/No, iteration?
 
-pub struct Syntax {
-    //tokens: [Token] required (and optional ones? how to optional ones?)
-// args(expressions) as V(None)? This for X?
-// corresponding nodes also here?
-}
-impl Token {
-    pub fn syntax(&self) -> Syntax {
-        match self {
-            N(_) => Syntax {
+type Syntax = [Modifier];
+
+pub fn build(s: &str) -> Result<()> {
+    print_tokens(&Pieces::translate(s)?);
+    let mut vec = Pieces::translate(s)?;
+    let mut tokens = Tokens::init(&vec)?;
+    // Run some recursive function?
+    while let Some((index, token)) = tokens.peek {
+        match token {
+            N(_) => {
+                // NAMESPACES, check if script (or variable?)
+                // Script X of Y: Script1 of a of Script2 of c of d 
+
                 // (Of N (Of N (Of N (...)))) Being Expr
-                // No output?
+                // No output? Everything produces an output?
+                // CASES. X is more than Y or w/e
 
                 /*
-                // check if script? If not, ...
+                // ? If not, ...
                 // collect_ref {
                     let mut path = vec![name.clone()];
                     tokens.next();
@@ -37,16 +41,16 @@ impl Token {
                     }
                      */
             },
-            C(Command::Add) => Syntax {
+            C(Command::Add) => {
                 // Expr1 (To Expr2) | (To Each Expr2?)
                 // Output Expr2
                 // 
             },
-            C(Command::Show) => Syntax {
+            C(Command::Show) => {
                 // Expr
                 // No output?
             },
-            If => Syntax {
+            If => {
                 // Expr (And/Or Expr(And/Or Expr (...))) Then Statement (Else Statement)
                 // Then/Else statements might have outputs
 
@@ -54,33 +58,24 @@ impl Token {
                 // If stops on break, check if Else is next?
 
             },
-            For => Syntax {
+            For => {
                 // Each N In Expr Statement
 
                  // Collect item name????, specifier and expr, then statement
             },
-            ListStart => Syntax {
+            ListStart => {
                 // Expr (Expr (Expr (...))) ListEnd
                 // Output list (Collect Exprs?)
             },
-            StructStart => Syntax {
+            StructStart => {
                 // N (Being Expr) (N (Being Expr) ...) StructEnd
                 // Output struct
             },
-            FormulaStart => Syntax {
+            FormulaStart => {
                 // hmm...
             },
             _ => todo!(),
         }
-    }
-}
-
-pub fn build(s: &str) -> Result<()> {
-    print_tokens(&Pieces::translate(s)?);
-    let mut vec = Pieces::translate(s)?;
-    let mut tokens = Tokens::init(&vec)?;
-    while let Some(token) = tokens.peek {
-        let syntax = token.syntax();
         tokens.next();
     }
     Ok(())

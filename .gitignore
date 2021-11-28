@@ -1,1 +1,6 @@
-/target
+/core/target
+/node_modules
+/.next
+pkg
+package-lock.json
+Cargo.lock

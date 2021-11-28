@@ -1,11 +1,10 @@
 # Hope
 Human-oriented programming environment
 
-Currently this project is about making an interpretable 'programming language' with intuitive syntax to make it human-readable for anyone, not just software engineers. Working name for this 'language' - Hopes (Hope Specification). An example: 
+Currently this project is about making an interpretable 'programming language' with intuitive syntax to make it human-readable for anyone, not just software engineers. An example: 
 ```
 Column as [1.333, 2, 3,5], structure as {column, flag: yes}. Sum column of structure, show the result and send to @scheme:authority/path/.
 ```
-Parsing is done following unicode standards and using decoupled language-specific vocabulary, so it can be easily extended to other input languages as well. However, interpreter is not the end goal and just the base for the broader project, whose long-term goals are not yet clear and up for discussion.
 
 Current targets: interpreter, networking, dummy cryptography and browser-based IDE(simple jupyter-like UI with hope as a wasm module).
 

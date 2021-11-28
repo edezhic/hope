@@ -2,7 +2,7 @@ use super::*;
 use core::fmt;
 use crate::Result;
 use unicode_normalization::UnicodeNormalization;
-use unicode_segmentation::{UWordBounds, UnicodeSegmentation};
+use unicode_segmentation::{UWordBoundIndices, UnicodeSegmentation};
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Text(String);
@@ -33,8 +33,8 @@ impl Text {
         Text::new(Some(&s.to_lowercase()))
     }
     
-    pub fn split_by_word_bounds(&self) -> UWordBounds {
-        UnicodeSegmentation::split_word_bounds(self.as_str())
+    pub fn split_by_word_bounds(&self) -> UWordBoundIndices {
+        UnicodeSegmentation::split_word_bound_indices(self.as_str())
     }
     
     fn norm(s: String) -> String {
