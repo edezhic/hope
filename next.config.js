@@ -12,7 +12,7 @@ module.exports = {
   basePath: '/Hope',
   webpack(config) {
     // Ensures that web workers can import scripts.
-    config.output.publicPath = '/next/';
+    config.output.publicPath = '/_next/';
 
     // From https://github.com/rustwasm/wasm-pack/issues/835#issuecomment-772591665
     config.experiments = {
