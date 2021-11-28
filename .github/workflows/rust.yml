@@ -19,10 +19,10 @@ jobs:
     - name: into rust
       run: cd core
     - name: Go nightly
-      run: rustup default nightly
+      run: cd core && rustup default nightly
     - name: Build
-      run: cargo +nightly build --verbose
+      run: cd core && cargo +nightly build --verbose
     - name: Add wasm target
-      run: rustup +nightly target add wasm32-unknown-unknown
+      run: cd core && rustup +nightly target add wasm32-unknown-unknown
     - name: Build WASM
-      run: cargo +nightly build --target wasm32-unknown-unknown --release
+      run: cd core && cargo +nightly build --target wasm32-unknown-unknown --release
