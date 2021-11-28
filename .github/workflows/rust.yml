@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: into rust
+      run: cd core
     - name: Go nightly
       run: rustup default nightly
     - name: Build
