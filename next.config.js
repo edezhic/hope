@@ -29,7 +29,7 @@ module.exports = {
     config.plugins.push(
       new WasmPackPlugin({
         crateDirectory: resolve('./core'),
-        args: '--log-level warn',
+        args: '--log-level error',
       })
     );
 

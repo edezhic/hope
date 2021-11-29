@@ -1,7 +1,5 @@
 /core/target
 /node_modules
-/.next
-/out
 pkg
 package-lock.json
 Cargo.lock
