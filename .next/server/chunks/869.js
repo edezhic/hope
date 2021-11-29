@@ -10,11 +10,9 @@ const ctx = self;
 async function translate(script) {
   const {
     tokenize
-  } = await __webpack_require__.e(/* import() */ 734).then(__webpack_require__.bind(__webpack_require__, 734)); //const test_script = 'X is 0.5, y is 1.5. Add x to y, show result.';
-
+  } = await __webpack_require__.e(/* import() */ 734).then(__webpack_require__.bind(__webpack_require__, 734));
   ctx.postMessage({
     type: 'translation',
-    //script: test_script,
     tokens: tokenize(script)
   });
 }
