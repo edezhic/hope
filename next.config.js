@@ -7,12 +7,67 @@ const {
   resolve,
   join,
 } = require('path');
+const withPlugins = require('next-compose-plugins');
+const optimizedImages = require('next-optimized-images');
+module.exports = withPlugins([
+  [optimizedImages, {
+    mozjpeg: {
+      quality: 80,
+    },
+    pngquant: {
+      speed: 3,
+      strip: true,
+      verbose: true,
+    },
+    imagesPublicPath: '/Hope/_next/static/images/',
+  }],
+  {
+    basePath: '/Hope',
+    assetPrefix: '/Hope/',
+    webpack(config) {
+      // Ensures that web workers can import scripts.
+      config.output.publicPath = '/_next/';
+  
+      // From https://github.com/rustwasm/wasm-pack/issues/835#issuecomment-772591665
+      config.experiments = {
+        syncWebAssembly: true,
+      };
+  
+      config.module.rules.push({
+        test: /\.wasm$/,
+        type: 'webassembly/sync',
+      });
+  
+      // From https://github.com/wasm-tool/wasm-pack-plugin
+      config.plugins.push(
+        new WasmPackPlugin({
+          crateDirectory: resolve('./core'),
+          args: '--log-level error',
+        })
+      );
+  
+      // From https://github.com/vercel/next.js/issues/22581#issuecomment-864476385
+      const ssrPlugin = config.plugins.find(
+        (plugin) => plugin instanceof SSRPlugin
+      );
+  
+      if (ssrPlugin) {
+        patchSsrPlugin(ssrPlugin);
+      }
+  
+      return config;
+    },
+  },
+]);
 
+/* 
 module.exports = {
+  basePath: '/Hope',
+  assetPrefix: '/Hope/',
+  env,
   webpack(config) {
     // Ensures that web workers can import scripts.
     config.output.publicPath = '/_next/';
-    config.optimization.splitChunks = false;
 
     // From https://github.com/rustwasm/wasm-pack/issues/835#issuecomment-772591665
     config.experiments = {
@@ -43,7 +98,7 @@ module.exports = {
 
     return config;
   },
-};
+}; */
 
 // Patch the NextJsSSRImport plugin to not throw with WASM generated chunks.
 function patchSsrPlugin(plugin) {
