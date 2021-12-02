@@ -1,1 +1,0 @@
-{"version":3,"pages404":true,"basePath":"/Hope","redirects":[{"source":"/Hope/","destination":"/Hope","basePath":false,"internal":true,"statusCode":308,"regex":"^/Hope/$"},{"source":"/:path+/","destination":"/:path+","internal":true,"statusCode":308,"regex":"^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"}],"headers":[],"dynamicRoutes":[],"dataRoutes":[],"rewrites":[]}

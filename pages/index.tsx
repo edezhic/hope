@@ -6,7 +6,6 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 
 function Tokens({ list }: any) {
-  console.log(list);
   return (
     <div className="tokens">
       {
@@ -21,7 +20,6 @@ function Tokens({ list }: any) {
                 return (
                   <Chip key={token[0]} sx={{ border: 'none' }} size="small" variant="outlined" label={label}></Chip>);
               default:
-                console.log(token[1]);
                 if ('N' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label={token[1].N}></Chip>);
                 if ('C' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightgreen' }} size="small" label={token[1].C}></Chip>);
                 if ('M' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'pink' }} size="small" label={token[1].M}></Chip>);
@@ -45,8 +43,7 @@ export default function Home() {
     workerRef.current = new Worker(
       new URL('../src/worker.ts', import.meta.url)
     );
-    workerRef.current.addEventListener('message', (evt) => {
-      console.log(evt.data.tokens);
+    workerRef.current.addEventListener('message', (evt: { data: { tokens: any; }; }) => {
       setTokens(evt.data.tokens);
     });
     workerRef.current.postMessage({ type: 'translate', script: inputValue });
@@ -66,8 +63,7 @@ export default function Home() {
           multiline
           rows={4}
           fullWidth
-          defaultValue="Default Value"
-          onChange={(event) => {
+          onChange={(event: { target: { value: any; }; }) => {
             setInputValue(event.target.value);
           }}
           value={inputValue}
