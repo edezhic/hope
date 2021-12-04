@@ -12,11 +12,9 @@ module.exports = {
   basePath: '/Hope',
   assetPrefix: '/Hope/',
   webpack: (config) => {
-    // Ensures that web workers can import scripts.
     config.output.publicPath = '/Hope/_next/';
     //config.output.publicPath = '/_next/';
 
-    // From https://github.com/rustwasm/wasm-pack/issues/835#issuecomment-772591665
     config.experiments = {
       syncWebAssembly: true,
     };
@@ -26,7 +24,6 @@ module.exports = {
       type: 'webassembly/sync',
     });
 
-    // From https://github.com/wasm-tool/wasm-pack-plugin
     config.plugins.push(
       new WasmPackPlugin({
         crateDirectory: resolve('./core'),
@@ -34,7 +31,6 @@ module.exports = {
       })
     );
 
-    // From https://github.com/vercel/next.js/issues/22581#issuecomment-864476385
     const ssrPlugin = config.plugins.find(
       (plugin) => plugin instanceof SSRPlugin
     );

@@ -34,11 +34,9 @@ function Tokens({ list }: any) {
 }
 
 export default function Home() {
-
-  const [inputValue, setInputValue] = useState("X is 0.5, y is 1.5. Add x to y, show result.");
+  const [script, setScript] = useState("X is 0.5, y is 1.5. Add x to y, show result.");
   const [tokens, setTokens] = useState([]);
   const workerRef = useRef<Worker>();
-
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../src/worker.ts', import.meta.url)
@@ -46,8 +44,14 @@ export default function Home() {
     workerRef.current.addEventListener('message', (evt: { data: { tokens: any; }; }) => {
       setTokens(evt.data.tokens);
     });
-    workerRef.current.postMessage({ type: 'translate', script: inputValue });
-  }, [inputValue]);
+    workerRef.current.postMessage({ type: 'translate', script: script });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (workerRef.current) {
+      workerRef.current.postMessage({ type: 'translate', script: script });
+    }
+  }, [script]);
 
   return (
     <Container maxWidth="md">
@@ -64,9 +68,9 @@ export default function Home() {
           rows={4}
           fullWidth
           onChange={(event: { target: { value: any; }; }) => {
-            setInputValue(event.target.value);
+            setScript(event.target.value);
           }}
-          value={inputValue}
+          value={script}
         />
       </Box>
       <Divider sx={{ marginBottom: 2, marginTop: 4 }}>Tokens</Divider>
