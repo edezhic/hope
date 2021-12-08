@@ -14,16 +14,36 @@ function Tokens({ list }: any) {
             switch (typeof token[1]) {
               case "string":
                 let label = token[1];
-                if (label === 'Being') label = '=';
-                if (label === 'Break') label = '.';
-                if (label === 'This') return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label='it'></Chip>);
-                return (
-                  <Chip key={token[0]} sx={{ border: 'none' }} size="small" variant="outlined" label={label}></Chip>);
+                if (label === 'Being') return (<Chip key={token[0]} sx={{ border: 'none' }} size="small" variant="outlined" label="="></Chip>);
+                else if (label === 'Break') return (<Divider sx={{ opacity: 0.2, marginBottom: '0.5em' }} />);
+                else if (label === 'This') return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label="it"></Chip>);
+                else if (label === 'ListEnd') return (<Chip key={token[0]} size="small" label="]"></Chip>);
+                else if (label === 'ListStart') return (<Chip key={token[0]} size="small" label="["></Chip>);
+                else if (label === 'StructEnd') return (<Chip key={token[0]} size="small" label="}"></Chip>);
+                else if (label === 'StructStart') return (<Chip key={token[0]} size="small" label="{"></Chip>);
+                else return (<Chip key={token[0]} sx={{ border: 'none' }} size="small" variant="outlined" label={label.toLowerCase()}></Chip>);
               default:
-                if ('N' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label={token[1].N}></Chip>);
-                if ('C' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightgreen' }} size="small" label={token[1].C}></Chip>);
-                if ('M' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'pink' }} size="small" label={token[1].M}></Chip>);
-                if ('V' in token[1]) return (<Chip key={token[0]} size="small" label={JSON.stringify(token[1].V, null, 0)}></Chip>);
+                if ('N' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label={token[1].N.toLowerCase()}></Chip>);
+                if ('C' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightgreen' }} size="small" label={token[1].C.toLowerCase()}></Chip>);
+                if ('M' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'pink' }} size="small" label={token[1].M.toLowerCase()}></Chip>);
+                if ('V' in token[1]) {
+                  let type = Object.keys(token[1].V)[0];
+                  switch (type) {
+                    case "Number":
+                      return (<Chip key={token[0]} size="small" label={token[1].V.Number.value}></Chip>);
+                    case "Id":
+                      return (<Chip key={token[0]} size="small" label={token[1].V.Id.scheme.Custom}></Chip>);
+                    case "Text":
+                      return (<Chip key={token[0]} size="small" label={token[1].V.Text}></Chip>);
+                    case "Fact":
+                      if (token[1].V.Fact == true)
+                        return (<Chip key={token[0]} size="small" label="true"></Chip>);
+                      else
+                        return (<Chip key={token[0]} size="small" label="false"></Chip>);
+
+                  }
+                  return (<Chip key={token[0]} size="small" label={JSON.stringify(token[1].V, null, 0)}></Chip>);
+                }
                 return (
                   <Chip key={token[0]} size="small" label={JSON.stringify(token[1], null, 0)}></Chip>);
             }
@@ -34,7 +54,7 @@ function Tokens({ list }: any) {
 }
 
 export default function Home() {
-  const [script, setScript] = useState("X is 0.5, y is 1.5. Add x to y, show result.");
+  const [script, setScript] = useState('Column is [1.333, 2, 3,5], structure is {column, flag: yes}. Sort column of structure, sum it, show it and send to @scheme://authority/path/. If the code of the result is "200", then sign the structure with key and store it at @structures/bestOne');
   const [tokens, setTokens] = useState([]);
   const workerRef = useRef<Worker>();
   useEffect(() => {
