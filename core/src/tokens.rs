@@ -33,9 +33,8 @@ pub enum Token {
     V(Value),
     N(Text),
     O(Op),
-    C(Command), // -> S(Script) and Custom variant?
+    S(Script),
     M(Modifier),
-    // T(Type) Number/Text/Id/...?
     
     Being,
     This,
@@ -63,18 +62,19 @@ pub enum Token {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Command {
+pub enum Script {
     Add,       // X To
     Substract, // X From -> Remove/Delete?
     Send,      // X To
     Filter,    // X ?
     Sum,       // X ?
+    Save,
     Request,   // X From
     Sort,      // X By
     Show,      // X ?
     Sign,      // X With(As?)
     Split,     // X By
-    Custom(),
+    Custom { name: Text, syntax: () },
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
@@ -88,7 +88,7 @@ pub enum Op {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Modifier { // -> Argument?
+pub enum Modifier {
     With,
     By,
     Of,
@@ -105,7 +105,7 @@ pub fn print_tokens(tokens: &Vec<(usize, Token)>) {
             O(op) => print!("{:#?}", op),
             V(v) => print!("{}", v),
             N(n) => print!("{}", n),
-            C(c) => print!("{:#?}", c),
+            S(s) => print!("{:#?}", s),
             M(m) => print!("{:#?}", m),
             Break => print!("."),
             FormulaStart => print!("("),

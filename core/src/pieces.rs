@@ -1,4 +1,4 @@
-use crate::{*, Command::*, Op::*, Modifier::*, Token::*};
+use crate::{*, Script::*, Op::*, Modifier::*, Token::*};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBoundIndices;
@@ -23,8 +23,8 @@ impl<'a> Pieces<'a> {
                 vec.push((index, name));
             } else {
                 return Err(Error::ParsingError(format!(
-                    r#"I don't know how to translate '{}'"#,
-                    piece
+                    r#"I don't know how to translate '{:?}'"#,
+                    piece.as_bytes()
                 )));
             }
         }
@@ -47,7 +47,7 @@ impl<'a> Pieces<'a> {
         self.iter.next();
         let mut text = Text::empty();
         while let Some(piece) = self.iter.next() {
-            if pattern.is_match(piece.1) {
+            if pattern.is_match(piece.1) || BREAK.is_match(piece.1) {
                 break;
             } else {
                 text.add(piece.1);
@@ -134,15 +134,16 @@ impl<'a> Pieces<'a> {
             piece if BREAK.is_match(piece) => Break,
             piece if RETURN.is_match(piece) => Return,
 
-            piece if ADD.is_match(piece) => C(Add),
-            piece if SEND.is_match(piece) => C(Send),
-            piece if SHOW.is_match(piece) => C(Show),
-            piece if SUBSTRACT.is_match(piece) => C(Substract),
-            piece if SUM.is_match(piece) => C(Sum),
-            piece if FILTER.is_match(piece) => C(Filter),
-            piece if REQUEST.is_match(piece) => C(Request),
-            piece if SORT.is_match(piece) => C(Sort),
-            piece if SIGN.is_match(piece) => C(Sign),
+            piece if ADD.is_match(piece) => S(Add),
+            piece if SAVE.is_match(piece) => S(Save),
+            piece if SEND.is_match(piece) => S(Send),
+            piece if SHOW.is_match(piece) => S(Show),
+            piece if SUBSTRACT.is_match(piece) => S(Substract),
+            piece if SUM.is_match(piece) => S(Sum),
+            piece if FILTER.is_match(piece) => S(Filter),
+            piece if REQUEST.is_match(piece) => S(Request),
+            piece if SORT.is_match(piece) => S(Sort),
+            piece if SIGN.is_match(piece) => S(Sign),
             piece if PLUS.is_match(piece) => O(Plus),
             piece if MINUS.is_match(piece) => O(Minus),
             piece if MULTIPLICATION.is_match(piece) => O(Multiplication),
@@ -164,7 +165,7 @@ impl<'a> Pieces<'a> {
 }
 
 lazy_static! {
-    static ref SKIP: R = R::new(r"^(a|(?i)(the|let|,|\p{Zs}|\t|\?|!))+$").unwrap();
+    static ref SKIP: R = R::new(r"^(a|(?i)(the|let|,|\t| |\?|!))+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
     static ref TERM: R = R::new(r"^\p{Letter}+").unwrap(); // + {Number}?
     static ref RESULT: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();
@@ -199,6 +200,7 @@ lazy_static! {
 
     static ref ADD: R = R::new(r"^(?i)add$").unwrap();
     static ref SUBSTRACT: R = R::new(r"^(?i)substract$").unwrap();
+    static ref SAVE: R = R::new(r"^(?i)save$").unwrap();
     static ref SEND: R = R::new(r"^(?i)send$").unwrap();
     static ref SHOW: R = R::new(r"^(?i)show$").unwrap();
     static ref SUM: R = R::new(r"^(?i)sum$").unwrap();

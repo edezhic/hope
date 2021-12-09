@@ -12,7 +12,7 @@ pub fn build(s: &str) -> Result<()> {
     while let Some((index, token)) = tokens.peek {
         match token {
             N(_) => {
-                // NAMESPACES, check if script (or variable?)
+                // NAMESPACE, check if script (or variable?)
                 // Script X of Y: Script1 of a of Script2 of c of d 
 
                 // (Of N (Of N (Of N (...)))) Being Expr
@@ -41,12 +41,12 @@ pub fn build(s: &str) -> Result<()> {
                     }
                      */
             },
-            C(Command::Add) => {
+            S(Script::Add) => {
                 // Expr1 (To Expr2) | (To Each Expr2?)
                 // Output Expr2
                 // 
             },
-            C(Command::Show) => {
+            S(Script::Show) => {
                 // Expr
                 // No output?
             },

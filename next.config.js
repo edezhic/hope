@@ -8,12 +8,21 @@ const {
   join,
 } = require('path');
 
+let basePath = '/Hope';
+let assetPrefix = '/Hope';
+let publicPath = '/Hope/_next/';
+
+if (process.env.NODE_ENV === 'development') {
+  basePath = '';
+  assetPrefix = '';
+  publicPath = '/_next/';
+}
+
 module.exports = {
-  basePath: '/Hope',
-  assetPrefix: '/Hope/',
+  basePath,
+  assetPrefix,
   webpack: (config) => {
-    config.output.publicPath = '/Hope/_next/';
-    //config.output.publicPath = '/_next/';
+    config.output.publicPath = publicPath;
 
     config.experiments = {
       syncWebAssembly: true,
