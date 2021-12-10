@@ -5,55 +5,7 @@ import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 
-function Tokens({ list }: any) {
-  return (
-    <div className="tokens">
-      {
-        list.map((token: any) => {
-          switch (typeof token[1]) {
-            case "string":
-              let label = token[1];
-              if (label === 'Being') return (<Chip key={token[0]} sx={{ border: 'none' }} size="small" variant="outlined" label="="></Chip>);
-              else if (label === 'Break') return (<Divider sx={{margin: '0.1em 0 0.5em 0' }} />);
-              else if (label === 'This') return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label="result"></Chip>);
-              else if (label === 'ListEnd') return (<Chip key={token[0]} sx={{ backgroundColor: '#fff' }} size="small" label="]"></Chip>);
-              else if (label === 'ListStart') return (<Chip key={token[0]} sx={{ backgroundColor: '#fff' }} size="small" label="["></Chip>);
-              else if (label === 'StructEnd') return (<Chip key={token[0]} sx={{ backgroundColor: '#fff' }} size="small" label="}"></Chip>);
-              else if (label === 'StructStart') return (<Chip key={token[0]} sx={{ backgroundColor: '#fff' }} size="small" label="{"></Chip>);
-              else return (<Chip key={token[0]} sx={{ backgroundColor: '#fff' }} size="small" label={label.toLowerCase()}></Chip>);
-            default:
-              if ('N' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightblue' }} size="small" label={token[1].N.toLowerCase()}></Chip>);
-              if ('S' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'lightgreen' }} size="small" label={token[1].S.toLowerCase()}></Chip>);
-              if ('M' in token[1]) return (<Chip key={token[0]} sx={{ backgroundColor: 'pink' }} size="small" label={token[1].M.toLowerCase()}></Chip>);
-              if ('V' in token[1]) {
-                let type = Object.keys(token[1].V)[0];
-                switch (type) {
-                  case "Number":
-                    return (<Chip key={token[0]} size="small" label={token[1].V.Number.value}></Chip>);
-                  case "Id":
-                    return (<Chip key={token[0]} size="small" label={token[1].V.Id.scheme.Custom}></Chip>);
-                  case "Text":
-                    return (<Chip key={token[0]} size="small" label={token[1].V.Text}></Chip>);
-                  case "Fact":
-                    if (token[1].V.Fact == true)
-                      return (<Chip key={token[0]} size="small" label="true"></Chip>);
-                    else
-                      return (<Chip key={token[0]} size="small" label="false"></Chip>);
-
-                }
-                return (<Chip key={token[0]} size="small" label={JSON.stringify(token[1].V, null, 0)}></Chip>);
-              }
-              return (
-                <Chip key={token[0]} size="small" label={JSON.stringify(token[1], null, 0)}></Chip>);
-          }
-        })
-      }
-      <Divider sx={{margin: '0.1em 0 0.5em 0' }} />
-    </div>
-  );
-}
-
-export default function Home() {
+export default function Playground() {
   const [script, setScript] = useState('Column is [1.333, 2, 3,5], structure is {column, flag: yes}. Sort column of structure, sum it, show and send to @scheme://authority/path/ . If the code of the result is "200", then sign the structure with key and save it at @structures/bestOne');
   const [tokens, setTokens] = useState([]);
   const workerRef = useRef<Worker>();
@@ -64,7 +16,6 @@ export default function Home() {
     workerRef.current.addEventListener('message', (evt: { data: { tokens: any; }; }) => {
       setTokens(evt.data.tokens);
     });
-    workerRef.current.postMessage({ type: 'translate', script: script });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
@@ -93,8 +44,37 @@ export default function Home() {
           value={script}
         />
       </Box>
-      <Divider sx={{ marginBottom: 2, marginTop: 4 }}>Tokens</Divider>
-      <Tokens list={tokens} />
+      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Tokens</Divider>
+      <div className="tokens">
+        {
+          tokens.map((item: any) => {
+            let key = item[0];
+            let token = item[1];
+            let className: "default" | "N" | "V" | "S" | "M" = "default";
+            let label = "";
+            if (token === "Break") return (<Divider key={key} sx={{ margin: '0.1em 0 0.5em 0' }} />);
+            else if (token === "Being") label = "=";
+            else if (token === 'This') { label = "result"; className = "N"; }
+            else if (token === 'ListEnd') label = "]";
+            else if (token === 'ListStart') label = "[";
+            else if (token === 'StructEnd') label = "}";
+            else if (token === 'StructStart') label = "{";
+            else if (typeof token === "string") label = token.toLowerCase();
+            else if ('N' in token) { label = token.N.toLowerCase(); className = "N"; }
+            else if ('S' in token) { label = token.S.toLowerCase(); className = "S"; }
+            else if ('M' in token) { label = token.M.toLowerCase(); className = "M"; }
+            else if ('V' in token) {
+              className = "V";
+              if ("Number" in token.V) label = token.V.Number.value;
+              if ("Id" in token.V) label = token.V.Id.scheme.Custom;
+              if ("Text" in token.V) label = token.V.Text;
+              if ("Fact" in token.V) label = token.V.Fact.toString();
+            }
+            return (<Chip key={key} size={"small"} className={className} label={label}></Chip>);
+          })
+        }
+        <Divider sx={{ margin: '0.1em 0 0.5em 0' }} />
+      </div>
     </Container>
   );
 }
