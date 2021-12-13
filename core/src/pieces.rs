@@ -1,4 +1,4 @@
-use crate::{*, Script::*, Op::*, Modifier::*, Token::*};
+use crate::{Modifier::*, Op::*, Script::*, Token::*, *};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBoundIndices;
@@ -24,7 +24,7 @@ impl<'a> Pieces<'a> {
             } else {
                 return Err(Error::ParsingError(format!(
                     r#"I don't know how to translate '{:?}'"#,
-                    piece.as_bytes()
+                    piece
                 )));
             }
         }
@@ -43,17 +43,18 @@ impl<'a> Pieces<'a> {
         self.update_peek();
         self.peek
     }
-    pub fn collect_until(&mut self, pattern: &regex::Regex, skip: bool) -> Text {
+    pub fn collect_until(&mut self, pattern: &regex::Regex, skip_after: bool) -> Text {
         self.iter.next();
         let mut text = Text::empty();
-        while let Some(piece) = self.iter.next() {
-            if pattern.is_match(piece.1) || BREAK.is_match(piece.1) {
+        while let Some((index, piece)) = self.iter.peek() {
+            if pattern.is_match(piece) || BREAK.is_match(piece) {
                 break;
             } else {
-                text.add(piece.1);
+                text.add(piece);
+                self.iter.next();
             }
         }
-        if skip {
+        if skip_after {
             self.iter.next();
         }
         self.update_peek();
@@ -63,8 +64,8 @@ impl<'a> Pieces<'a> {
         self.collect_until(&SKIP, false)
     }
     pub fn skim(&mut self) {
-        while let Some(piece) = self.iter.peek() {
-            if SKIP.is_match(piece.1) {
+        while let Some((index, piece)) = self.iter.peek() {
+            if SKIP.is_match(piece) {
                 self.iter.next();
             } else {
                 break;
@@ -89,12 +90,8 @@ impl<'a> Pieces<'a> {
             }
             piece if TEXT.is_match(piece) => Value::Text(self.collect_until(&TEXT, true)),
             piece if ID.is_match(piece) => Value::Id(Id::from_text(self.collect_literal())?),
-            piece if SEAL.is_match(piece) => {
-                Value::Seal(Seal::from_text(self.collect_literal())?)
-            }
-            piece if TIME.is_match(piece) => {
-                Value::Time(Time::from_text(self.collect_literal())?)
-            }
+            piece if SEAL.is_match(piece) => Value::Seal(Seal::from_text(self.collect_literal())?),
+            piece if TIME.is_match(piece) => Value::Time(Time::from_text(self.collect_literal())?),
             piece if VERSION.is_match(piece) => {
                 Value::Version(Version::from_text(self.collect_literal())?)
             }
@@ -123,7 +120,7 @@ impl<'a> Pieces<'a> {
             piece if TO.is_match(piece) => M(To),
             piece if IN.is_match(piece) => M(In),
             piece if AT.is_match(piece) => M(At),
-            
+
             piece if ANY.is_match(piece) => Any,
             piece if EACH.is_match(piece) => Each,
 
@@ -165,7 +162,7 @@ impl<'a> Pieces<'a> {
 }
 
 lazy_static! {
-    static ref SKIP: R = R::new(r"^(a|(?i)(the|let|,|\t| |\?|!))+$").unwrap();
+    static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| )+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
     static ref TERM: R = R::new(r"^\p{Letter}+").unwrap(); // + {Number}?
     static ref RESULT: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();
@@ -188,7 +185,7 @@ lazy_static! {
     static ref AT: R = R::new(r"^(?i)at$").unwrap();
 
 
-    static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl})$").unwrap();
+    static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl}|\p{Zs})$").unwrap();
     static ref IF: R = R::new(r"^(?i)if$").unwrap();
     static ref THEN: R = R::new(r"^(?i)then$").unwrap();
     static ref ELSE: R = R::new(r"^(?i)else$").unwrap();
