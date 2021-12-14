@@ -185,7 +185,7 @@ lazy_static! {
     static ref AT: R = R::new(r"^(?i)at$").unwrap();
 
 
-    static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl}|\p{Zs})$").unwrap();
+    static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl})$").unwrap();
     static ref IF: R = R::new(r"^(?i)if$").unwrap();
     static ref THEN: R = R::new(r"^(?i)then$").unwrap();
     static ref ELSE: R = R::new(r"^(?i)else$").unwrap();
