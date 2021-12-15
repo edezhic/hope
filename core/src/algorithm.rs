@@ -41,12 +41,12 @@ pub fn build(s: &str) -> Result<()> {
                     }
                      */
             },
-            S(Script::Add) => {
+            C(Command::Add) => {
                 // Expr1 (To Expr2) | (To Each Expr2?)
                 // Output Expr2
                 // 
             },
-            S(Script::Show) => {
+            C(Command::Show) => {
                 // Expr
                 // No output?
             },

@@ -6,15 +6,13 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 
 const defaultScript =
-`If any X, then show "with an argument"
+`If any X, then show "running with an argument"
 List is [1.333, 2, 3,5], structure is {list, flag: yes}
 Sort list of structure, sum it, show and send to @scheme://domain/path/
 If any from the list is less than 1 or flag of the structure is yes, then show "Ok"
 Script1 X1 of command1 of X2 of X3 with Script2 of X4 
 (2 + 2 * (2 + 2))
-Send vs CustomSend
-User, account, key, auth, login
-Storage, save, retrieve etc`
+User, account, key, auth, login, storage, etc`
 
 export default function Playground() {
   const [script, setScript] = useState(defaultScript);
@@ -69,7 +67,7 @@ export default function Playground() {
           tokens.map((item: any) => {
             let key = item[0];
             let token = item[1];
-            let className: "default" | "N" | "V" | "S" | "M" | "O" = "default";
+            let className: "default" | "N" | "V" | "C" | "M" | "O" = "default";
             let label = "";
             if (token === "Break") return (<Divider key={key} sx={{ margin: '0.1em 0 0.5em 0' }} />);
             else if (token === "Being") label = "=";
@@ -82,7 +80,7 @@ export default function Playground() {
             else if (token === 'FormulaStart') label = "(";
             else if (typeof token === "string") label = token.toLowerCase();
             else if ('N' in token) { label = token.N.toLowerCase(); className = "N"; }
-            else if ('S' in token) { label = token.S.toLowerCase(); className = "S"; }
+            else if ('C' in token) { label = token.C.toLowerCase(); className = "C"; }
             else if ('M' in token) { label = token.M.toLowerCase(); className = "M"; }
             else if ('O' in token) { 
               className = "O";

@@ -1,4 +1,4 @@
-use crate::{Modifier::*, Op::*, Script::*, Token::*, *};
+use crate::{Modifier::*, Op::*, Command::*, Token::*, *};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBoundIndices;
@@ -123,6 +123,9 @@ impl<'a> Pieces<'a> {
 
             piece if ANY.is_match(piece) => Any,
             piece if EACH.is_match(piece) => Each,
+            piece if LESS.is_match(piece) => Less,
+            piece if MORE.is_match(piece) => More,
+            piece if THAN.is_match(piece) => Than,
 
             piece if IF.is_match(piece) => If,
             piece if FOR.is_match(piece) => For,
@@ -131,16 +134,16 @@ impl<'a> Pieces<'a> {
             piece if BREAK.is_match(piece) => Break,
             piece if RETURN.is_match(piece) => Return,
 
-            piece if ADD.is_match(piece) => S(Add),
-            piece if SAVE.is_match(piece) => S(Save),
-            piece if SEND.is_match(piece) => S(Send),
-            piece if SHOW.is_match(piece) => S(Show),
-            piece if SUBSTRACT.is_match(piece) => S(Substract),
-            piece if SUM.is_match(piece) => S(Sum),
-            piece if FILTER.is_match(piece) => S(Filter),
-            piece if REQUEST.is_match(piece) => S(Request),
-            piece if SORT.is_match(piece) => S(Sort),
-            piece if SIGN.is_match(piece) => S(Sign),
+            piece if ADD.is_match(piece) => C(Add),
+            piece if SAVE.is_match(piece) => C(Save),
+            piece if SEND.is_match(piece) => C(Send),
+            piece if SHOW.is_match(piece) => C(Show),
+            piece if SUBSTRACT.is_match(piece) => C(Substract),
+            piece if SUM.is_match(piece) => C(Sum),
+            piece if FILTER.is_match(piece) => C(Filter),
+            piece if REQUEST.is_match(piece) => C(Request),
+            piece if SORT.is_match(piece) => C(Sort),
+            piece if SIGN.is_match(piece) => C(Sign),
             piece if PLUS.is_match(piece) => O(Plus),
             piece if MINUS.is_match(piece) => O(Minus),
             piece if MULTIPLICATION.is_match(piece) => O(Multiplication),
@@ -194,6 +197,9 @@ lazy_static! {
 
     static ref ANY: R = R::new(r"^(?i)any$").unwrap();
     static ref EACH: R = R::new(r"^(?i)each$").unwrap();
+    static ref LESS: R = R::new(r"^(?i)less$").unwrap();
+    static ref MORE: R = R::new(r"^(?i)more$").unwrap();
+    static ref THAN: R = R::new(r"^(?i)than$").unwrap();
 
     static ref ADD: R = R::new(r"^(?i)add$").unwrap();
     static ref SUBSTRACT: R = R::new(r"^(?i)substract$").unwrap();

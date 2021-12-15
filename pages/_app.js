@@ -7,6 +7,7 @@ import "../globals.css";
 
 let theme = createTheme({
   palette: {
+    mode: 'dark',
     primary: deepPurple,
     secondary: amber,
   },

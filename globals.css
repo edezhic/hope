@@ -10,32 +10,40 @@ body {
   margin-top: 1.5em !important;
 }
 
+.tokens > div {
+  background: none;
+}
+
 .tokens > hr {
   opacity: 0.5;
 }
 
-.tokens .default {
-  background-color: #f6f6f6;
+.tokens .default > span {
+  color: #dacc29;
 }
 
-.tokens .N {
-  background-color: #bdefff;
+.tokens .N > span {
+  color: #41afd2;
 }
 
-.tokens .M {
-  background-color: #ffd6d6;
+.tokens .M > span {
+  color: #ff8383;
 }
 
-.tokens .S {
-  background-color: #b1ffb1;
+.tokens .C > span {
+  color: #42d842;
 }
 
-.tokens .O {
-  background-color: #e2bcff;
+.tokens .O > span {
+  color: #ff00e0;
 }
 
 .tokens .V {
-  background-color: #fffca0;
+  background-color: #222;
+}
+
+.tokens .V > span {
+  color: #ddd;
 }
 
 @media only screen and (min-width: 768px) {
