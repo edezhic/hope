@@ -10,7 +10,7 @@ pub struct Pieces<'a> {
 impl<'a> Pieces<'a> {
     pub fn translate(s: &'a str) -> Result<Vec<(usize, Token)>> {
         let text = Text::from_str(s);
-        let mut iter = text.split_by_word_bounds().peekable();
+        let iter = text.split_by_word_bounds().peekable();
         let mut pieces = Pieces { iter, peek: None };
         pieces.update_peek();
         let mut vec = vec![];
@@ -19,8 +19,8 @@ impl<'a> Pieces<'a> {
                 vec.push((index, value));
             } else if let Some(keyword) = pieces.match_keyword(piece) {
                 vec.push((index, keyword));
-            } else if let Some(name) = pieces.match_name(piece) {
-                vec.push((index, name));
+            } else if let Some(term) = pieces.match_term(piece) {
+                vec.push((index, term));
             } else {
                 return Err(Error::ParsingError(format!(
                     r#"I don't know how to translate '{:?}'"#,
@@ -46,7 +46,7 @@ impl<'a> Pieces<'a> {
     pub fn collect_until(&mut self, pattern: &regex::Regex, skip_after: bool) -> Text {
         self.iter.next();
         let mut text = Text::empty();
-        while let Some((index, piece)) = self.iter.peek() {
+        while let Some((_, piece)) = self.iter.peek() {
             if pattern.is_match(piece) || BREAK.is_match(piece) {
                 break;
             } else {
@@ -64,7 +64,7 @@ impl<'a> Pieces<'a> {
         self.collect_until(&SKIP, false)
     }
     pub fn skim(&mut self) {
-        while let Some((index, piece)) = self.iter.peek() {
+        while let Some((_, piece)) = self.iter.peek() {
             if SKIP.is_match(piece) {
                 self.iter.next();
             } else {
@@ -154,7 +154,7 @@ impl<'a> Pieces<'a> {
         Some(token)
     }
 
-    pub fn match_name(&mut self, piece: &str) -> Option<Token> {
+    pub fn match_term(&mut self, piece: &str) -> Option<Token> {
         if TERM.is_match(piece) {
             self.next();
             Some(N(Text::lowercase(piece)))
@@ -167,7 +167,7 @@ impl<'a> Pieces<'a> {
 lazy_static! {
     static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| )+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
-    static ref TERM: R = R::new(r"^\p{Letter}+").unwrap(); // + {Number}?
+    static ref TERM: R = R::new(r"^\p{Letter}+").unwrap();
     static ref RESULT: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();
     static ref AND: R = R::new(r"^(?i)and$").unwrap();
     static ref OR: R = R::new(r"^(?i)or$").unwrap();

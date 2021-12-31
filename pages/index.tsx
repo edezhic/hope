@@ -10,8 +10,8 @@ const defaultScript =
 List is [1.333, 2, 3,5], structure is {list, flag: yes}
 Sort list of structure, sum it, show and send to @scheme://domain/path/
 If any from the list is less than 1 or flag of the structure is yes, then show "Ok"
-Script1 X1 of command1 of X2 of X3 with Script2 of X4 
 (2 + 2 * (2 + 2))
+Script1 X1 of command1 of X2 of X3 with Script2 of X4 
 User, account, key, auth, login, storage, etc`
 
 export default function Playground() {

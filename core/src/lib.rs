@@ -11,20 +11,19 @@
 extern crate lazy_static;
 extern crate console_error_panic_hook;
 extern crate derive_more;
-use std::panic;
 use wasm_bindgen::prelude::*;
-use web_sys::console::*;
 
-mod algorithm;
 mod error;
 mod pieces;
 mod tokens;
 mod value;
-pub use algorithm::*;
 pub use error::{Error, Result};
 pub use pieces::*;
 pub use tokens::{*, Token::*};
 pub use value::*;
+
+mod scripts;
+pub use scripts::*;
 
 #[wasm_bindgen]
 pub fn tokenize(script: &str) -> JsValue {
