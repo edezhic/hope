@@ -14,20 +14,46 @@ extern crate derive_more;
 use wasm_bindgen::prelude::*;
 
 mod error;
-mod pieces;
-mod tokens;
+mod parser;
+mod token;
 mod value;
 pub use error::{Error, Result};
-pub use pieces::*;
-pub use tokens::{*, Token::*};
+pub use parser::Parser;
+pub use token::{Token::*, *};
 pub use value::*;
 
-mod scripts;
-pub use scripts::*;
-
 #[wasm_bindgen]
-pub fn tokenize(script: &str) -> JsValue {
+pub fn build(title: &str, body: &str) -> JsValue {
     console_error_panic_hook::set_once();
-    let tokens = Pieces::translate(script).unwrap();
+    let mut tokens = Parser::convert(title).unwrap();
+    tokens.push((42, Break));
+    tokens.extend(Parser::convert(body).unwrap());
     JsValue::from_serde(&tokens).unwrap()
 }
+
+#[wasm_bindgen]
+pub fn get_tests() -> JsValue {
+    console_error_panic_hook::set_once();
+    JsValue::from_serde(&TESTS).unwrap()
+}
+
+pub const TESTS: [(&'static str, &'static str); 9] = [
+    ("Termscript", "X is 1, Y is 2"),
+    ("Listscript", "X is 1, list is [1.333, 2, 3,5, x]"),
+    ("Structscript", "X is 1, structure is {x, flag: yes}"),
+    ("Commandscript", "X is 1, substract 1 from x and show"),
+    ("Ifscript", "X is 1, if x is less than 2 then show 'Ok' "),
+    ("Formulascript", "X is 2, (2 + 2 * (x + 2))"),
+    (
+        "Argscript X",
+        "If any X, then show 'running with an argument'",
+    ),
+    (
+        "Chainscript",
+        "Script1 X1 of command1 of X2 of X3 with Script2 of X4",
+    ),
+    (
+        "Otherscript",
+        "User, account, key, auth, login, storage, etc",
+    ),
+];

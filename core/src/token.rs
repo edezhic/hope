@@ -1,4 +1,4 @@
-use crate::{Value, Text};
+use crate::*;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Token {
@@ -37,7 +37,7 @@ pub enum Token {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Command {
+pub enum Command { // FIX
     Add,       // X To
     Substract, // X From -> Remove/Delete?
     Send,      // X To

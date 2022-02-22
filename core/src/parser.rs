@@ -1,25 +1,25 @@
-use crate::{Modifier::*, Op::*, Command::*, Token::*, *};
+use crate::{*, Modifier::*, Op::*, Command::*};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBoundIndices;
 
-pub struct Pieces<'a> {
+pub struct Parser<'a> {
     iter: Peekable<UWordBoundIndices<'a>>,
     pub peek: Option<(usize, &'a str)>,
 }
-impl<'a> Pieces<'a> {
-    pub fn translate(s: &'a str) -> Result<Vec<(usize, Token)>> {
+impl<'a> Parser<'a> {
+    pub fn convert(s: &'a str) -> Result<Vec<(usize, Token)>> {
         let text = Text::from_str(s);
         let iter = text.split_by_word_bounds().peekable();
-        let mut pieces = Pieces { iter, peek: None };
-        pieces.update_peek();
+        let mut parser = Parser { iter, peek: None };
+        parser.update_peek();
         let mut vec = vec![];
-        while let Some((index, piece)) = pieces.peek {
-            if let Some(value) = pieces.match_value(piece)? {
+        while let Some((index, piece)) = parser.peek {
+            if let Some(value) = parser.match_value(piece)? {
                 vec.push((index, value));
-            } else if let Some(keyword) = pieces.match_keyword(piece) {
+            } else if let Some(keyword) = parser.match_keyword(piece) {
                 vec.push((index, keyword));
-            } else if let Some(term) = pieces.match_term(piece) {
+            } else if let Some(term) = parser.match_term(piece) {
                 vec.push((index, term));
             } else {
                 return Err(Error::ParsingError(format!(
@@ -225,5 +225,5 @@ lazy_static! {
     static ref SEAL: R = R::new(r"^\&$").unwrap();
     static ref TEXT: R = R::new(r#"^("|')$"#).unwrap();
     static ref TIME: R = R::new(r"^~$").unwrap();
-    static ref VERSION: R = R::new(r"^#$").unwrap();
+    static ref VERSION: R = R::new(r"^#$").unwrap(); // FIX change literal to "v{VERSION}"?
 }
