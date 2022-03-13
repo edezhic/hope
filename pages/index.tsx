@@ -6,7 +6,9 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Graph from "react-graph-vis";
 
-const GRAPH_STYLE = { height: "250px" };
+const GRAPH_STYLE = { height: "350px" };
+
+const SCRIPTBODYROWS = 1;
 
 const options = {
   clickToUse: true,
@@ -127,7 +129,7 @@ export default function IDE() {
       >
         <TextField
           id="standard-basic"
-          label="Script title"
+          label="Title"
           fullWidth
           className="script-title"
           variant="standard"
@@ -136,22 +138,23 @@ export default function IDE() {
         />
         <TextField
           id="multiline-static"
-          label="Script body"
+          label="Body"
           sx={{ marginBottom: 2, marginTop: 4 }}
           multiline
-          rows={5}
+          rows={SCRIPTBODYROWS}
           fullWidth
           onChange={(event: any ) => setScript([script[0], event.target.value]) }
           value={script[1]}
         />
       </Box>
-      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
-      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
+      
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Tokens</Divider>
       <div className="tokens">
         { tokens?.map((item: any) => <Token key={JSON.stringify(item)} item={item} />) }
         <Divider sx={{ margin: '0.1em 0 0.5em 0' }} />
       </div>
+      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
+      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
       
     </Container>
   );
