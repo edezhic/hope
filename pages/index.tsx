@@ -1,13 +1,87 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Container from "@mui/material/Container";
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
+import Graph from "react-graph-vis";
 
-const DEFAULT_TEST = 0;
+const options = {
+  clickToUse: true,
+  layout: {
+    hierarchical: {
+      enabled: true,
+      direction: "LR",
+    }
+  },
+  nodes: {
+    borderWidth: 5,
+    font: {
+      color: "#ddd"
+    },
+  },
+  edges: {
+    color: "#FFFFFF",
+    physics: false,
+    //length: 1,
+  }
+};
+
+const DEFAULT_TEST = 4;
 
 export default function IDE() {
+  /*
+  const createNode = (x: any, y: any) => {
+    const color = "#BBBBBB";
+    setState(({ graph: { nodes, edges }, counter, ...rest }) => {
+      const id = counter + 1;
+      const from = Math.floor(Math.random() * (counter - 1)) + 1;
+      return {
+        graph: {
+          nodes: [
+            ...nodes,
+            { id, label: `Node ${id}`, color, x, y }
+          ],
+          edges: [
+            ...edges,
+            { from, to: id }
+          ]
+        },
+        counter: id,
+        ...rest
+      }
+    });
+  }
+  */
+  const [state, setState] = useState({
+    counter: 5,
+    graph: {
+      nodes: [
+        { id: 1, label: "termscript", color: "#50003b" },
+        { id: 2, label: "x", color: "#001b3e" },
+        { id: 3, label: "1", color: "#444" },
+        { id: 4, label: "if", color: "#403b00" },
+        { id: 5, label: "x", color: "#001b3e" },
+        { id: 6, label: "is", color: "#403b00" },
+        { id: 7, label: "less", color: "#403b00" },
+        { id: 8, label: "2", color: "#444" },
+        { id: 9, label: "show", color: "#444" },
+        { id: 10, label: "Ok", color: "#444" },
+      ],
+      edges: [
+        { from: 1, to: 2 },
+        { from: 2, to: 4 },
+        { from: 3, to: 2, color: "#dacc29" },
+        { from: 4, to: 5, color: "#dacc29" },
+        { from: 5, to: 6, color: "#dacc29" },
+        { from: 6, to: 7, color: "#dacc29" },
+        { from: 7, to: 8, color: "#dacc29" },
+        { from: 8, to: 9 },
+        { from: 10, to: 9, color: "#dacc29" },
+      ]
+    }
+  })
+  const { graph } = state;
   const [script, setScript] = useState(["", ""]);
   const [tokens, setTokens] = useState([]);
   const [currentTest, setCurrentTest] = useState(DEFAULT_TEST);
@@ -63,11 +137,14 @@ export default function IDE() {
           value={script[1]}
         />
       </Box>
+      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
+      <Graph graph={graph} options={options} style={{ height: "300px" }} />
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Tokens</Divider>
       <div className="tokens">
         { tokens?.map((item: any) => <Token key={JSON.stringify(item)} item={item} />) }
         <Divider sx={{ margin: '0.1em 0 0.5em 0' }} />
       </div>
+      
     </Container>
   );
 }
