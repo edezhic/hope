@@ -6,6 +6,8 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Graph from "react-graph-vis";
 
+const GRAPH_STYLE = { height: "160px" };
+
 const options = {
   clickToUse: true,
   layout: {
@@ -15,15 +17,22 @@ const options = {
     }
   },
   nodes: {
-    borderWidth: 5,
+    borderWidth: 6,
     font: {
-      color: "#ddd"
+      color: "#eee",
+      size: 24,
     },
   },
   edges: {
     color: "#FFFFFF",
     physics: false,
-    //length: 1,
+  },
+  physics: {
+    hierarchicalRepulsion: {
+      nodeDistance: 1,
+      centralGravity: 1,
+      springLength: 1,
+    }
   }
 };
 
@@ -62,10 +71,9 @@ export default function IDE() {
         { id: 3, label: "1", color: "#444" },
         { id: 4, label: "if", color: "#403b00" },
         { id: 5, label: "x", color: "#001b3e" },
-        { id: 6, label: "is", color: "#403b00" },
         { id: 7, label: "less", color: "#403b00" },
         { id: 8, label: "2", color: "#444" },
-        { id: 9, label: "show", color: "#444" },
+        { id: 9, label: "show", color: "#002e00" },
         { id: 10, label: "Ok", color: "#444" },
       ],
       edges: [
@@ -73,8 +81,7 @@ export default function IDE() {
         { from: 2, to: 4 },
         { from: 3, to: 2, color: "#dacc29" },
         { from: 4, to: 5, color: "#dacc29" },
-        { from: 5, to: 6, color: "#dacc29" },
-        { from: 6, to: 7, color: "#dacc29" },
+        { from: 5, to: 7, color: "#dacc29" },
         { from: 7, to: 8, color: "#dacc29" },
         { from: 8, to: 9 },
         { from: 10, to: 9, color: "#dacc29" },
@@ -138,7 +145,7 @@ export default function IDE() {
         />
       </Box>
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
-      <Graph graph={graph} options={options} style={{ height: "300px" }} />
+      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Tokens</Divider>
       <div className="tokens">
         { tokens?.map((item: any) => <Token key={JSON.stringify(item)} item={item} />) }
