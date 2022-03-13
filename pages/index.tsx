@@ -6,7 +6,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Graph from "react-graph-vis";
 
-const GRAPH_STYLE = { height: "160px" };
+const GRAPH_STYLE = { height: "250px" };
 
 const options = {
   clickToUse: true,
@@ -17,10 +17,11 @@ const options = {
     }
   },
   nodes: {
-    borderWidth: 6,
+    borderWidth: 0,
+    color: '#121212',
     font: {
       color: "#eee",
-      size: 24,
+      size: 22,
     },
   },
   edges: {
@@ -66,25 +67,25 @@ export default function IDE() {
     counter: 5,
     graph: {
       nodes: [
-        { id: 1, label: "termscript", color: "#50003b" },
-        { id: 2, label: "x", color: "#001b3e" },
-        { id: 3, label: "1", color: "#444" },
-        { id: 4, label: "if", color: "#403b00" },
-        { id: 5, label: "x", color: "#001b3e" },
-        { id: 7, label: "less", color: "#403b00" },
-        { id: 8, label: "2", color: "#444" },
-        { id: 9, label: "show", color: "#002e00" },
-        { id: 10, label: "Ok", color: "#444" },
+        { id: 1, label: "ifscript", font: { color: "#41afd2" } },
+        { id: 2, label: "x", font: { color: "#41afd2" } },
+        { id: 3, label: "1", font: { color: "#ddd" } },
+        { id: 4, label: "if", font: { color: "#dacc29" } },
+        { id: 5, label: "x", font: { color: "#41afd2" } },
+        { id: 7, label: "less", font: { color: "#dacc29" } },
+        { id: 8, label: "2", font: { color: "#ddd" } },
+        { id: 9, label: "show", font: { color: "#42d842" } },
+        { id: 10, label: "Ok", font: { color: "#ddd" } },
       ],
       edges: [
         { from: 1, to: 2 },
         { from: 2, to: 4 },
-        { from: 3, to: 2, color: "#dacc29" },
-        { from: 4, to: 5, color: "#dacc29" },
-        { from: 5, to: 7, color: "#dacc29" },
-        { from: 7, to: 8, color: "#dacc29" },
-        { from: 8, to: 9 },
-        { from: 10, to: 9, color: "#dacc29" },
+        { from: 3, to: 2, dashes: true },
+        { from: 4, to: 7, color: "#dacc29" },
+        { from: 5, to: 7, dashes: true },
+        { from: 8, to: 7, dashes: true },
+        { from: 7, to: 9 },
+        { from: 10, to: 9, dashes: true },
       ]
     }
   })
