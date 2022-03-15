@@ -6,17 +6,14 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Graph from "react-graph-vis";
 
-const GRAPH_STYLE = { height: "350px" };
+const GRAPH_STYLE = { height: "600px" };
 
-const SCRIPTBODYROWS = 1;
+const SCRIPTBODYROWS = 2;
 
 const options = {
   clickToUse: true,
-  layout: {
-    hierarchical: {
-      enabled: true,
-      direction: "LR",
-    }
+  interaction: {
+    zoomView: false
   },
   nodes: {
     borderWidth: 0,
@@ -27,67 +24,57 @@ const options = {
     },
   },
   edges: {
-    color: "#FFFFFF",
-    physics: false,
+    color: "#eee",
   },
-  physics: {
-    hierarchicalRepulsion: {
-      nodeDistance: 1,
-      centralGravity: 1,
-      springLength: 1,
-    }
-  }
+  
 };
 
-const DEFAULT_TEST = 4;
+const DEFAULT_TEST = 0;
 
 export default function IDE() {
-  /*
-  const createNode = (x: any, y: any) => {
-    const color = "#BBBBBB";
-    setState(({ graph: { nodes, edges }, counter, ...rest }) => {
-      const id = counter + 1;
-      const from = Math.floor(Math.random() * (counter - 1)) + 1;
-      return {
-        graph: {
-          nodes: [
-            ...nodes,
-            { id, label: `Node ${id}`, color, x, y }
-          ],
-          edges: [
-            ...edges,
-            { from, to: id }
-          ]
-        },
-        counter: id,
-        ...rest
-      }
-    });
-  }
-  */
+  
   const [state, setState] = useState({
     counter: 5,
     graph: {
       nodes: [
-        { id: 1, label: "ifscript", font: { color: "#41afd2" } },
-        { id: 2, label: "x", font: { color: "#41afd2" } },
-        { id: 3, label: "1", font: { color: "#ddd" } },
-        { id: 4, label: "if", font: { color: "#dacc29" } },
-        { id: 5, label: "x", font: { color: "#41afd2" } },
-        { id: 7, label: "less", font: { color: "#dacc29" } },
-        { id: 8, label: "2", font: { color: "#ddd" } },
-        { id: 9, label: "show", font: { color: "#42d842" } },
-        { id: 10, label: "Ok", font: { color: "#ddd" } },
+        { id: "graphscript", label: "graphscript", font: { color: "#42d842" }, mass: 4 },
+        { id: "x1", label: "x", font: { color: "#41afd2" } },
+        { id: "y1", label: "y", font: { color: "#41afd2" } },
+        { id: "z1", label: "z", font: { color: "#41afd2" } },
+        { id: "x2", label: "x", font: { color: "#41afd2" } },
+        { id: "y2", label: "y", font: { color: "#41afd2" } },
+        { id: "z2", label: "z", font: { color: "#41afd2" } },
+        { id: "x3", label: "x", font: { color: "#41afd2" } },
+        { id: "y3", label: "y", font: { color: "#41afd2" } },
+        { id: "z3", label: "z", font: { color: "#41afd2" } },
+        { id: "it1", label: "it", font: { color: "#41afd2" } },
+        { id: "assign_z", label: "assign", font: { color: "#42d842" }, mass: 4 },
+        { id: 1, label: "1", font: { color: "#ddd" } },
+        { id: "xyz", label: "xyz", font: { color: "#41afd2" } },
+        { id: "assign_xyz", label: "assign", font: { color: "#42d842" }, mass: 4 },
+        { id: "s", label: "s", font: { color: "#41afd2" } },
+        { id: "assign_s", label: "assign", font: { color: "#42d842" }, mass: 4 },
+        { id: "eval_s", label: "eval", font: { color: "#42d842" }, mass: 4 },
       ],
-      edges: [
-        { from: 1, to: 2 },
-        { from: 2, to: 4 },
-        { from: 3, to: 2, dashes: true },
-        { from: 4, to: 7, color: "#dacc29" },
-        { from: 5, to: 7, dashes: true },
-        { from: 8, to: 7, dashes: true },
-        { from: 7, to: 9 },
-        { from: 10, to: 9, dashes: true },
+      edges: [ // control: color: "#dacc29"
+        { from: "graphscript", to: "x1", dashes: true },
+        { from: "graphscript", to: "y1", dashes: true, label: "of" },
+        { from: "graphscript", to: "assign_z", shadow: { enabled: true, color: "#fff"}, color: "#dacc29" },
+        { from: 1, to: "assign_z", dashes: true },
+        { from: "assign_z", to: "z1", dashes: true },
+        { from: "assign_z", to: "assign_xyz", shadow: { enabled: true, color: "#fff"}, color: "#dacc29" },
+        { from: "x2", to: "assign_xyz", dashes: true },
+        { from: "y2", to: "assign_xyz", dashes: true },
+        { from: "z2", to: "assign_xyz", dashes: true },
+        { from: "assign_xyz", to: "xyz", dashes: true },
+        { from: "assign_xyz", to: "eval_s", shadow: { enabled: true, color: "#fff"}, color: "#dacc29" },
+        { from: "x3", to: "eval_s", dashes: true },
+        { from: "y3", to: "eval_s", dashes: true },
+        { from: "z3", to: "eval_s", dashes: true },
+        { from: "eval_s", to: "it1", dashes: true },
+        { from: "it1", to: "assign_s", dashes: true },
+        { from: "eval_s", to: "assign_s", shadow: { enabled: true, color: "#fff"}, color: "#dacc29" },
+        { from: "assign_s", to: "s", dashes: true },
       ]
     }
   })
@@ -147,15 +134,13 @@ export default function IDE() {
           value={script[1]}
         />
       </Box>
-      
+      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
+      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Tokens</Divider>
       <div className="tokens">
         { tokens?.map((item: any) => <Token key={JSON.stringify(item)} item={item} />) }
         <Divider sx={{ margin: '0.1em 0 0.5em 0' }} />
       </div>
-      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
-      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
-      
     </Container>
   );
 }
@@ -167,7 +152,7 @@ function Token(props: any) {
   let className: "default" | "N" | "V" | "C" | "M" | "O" = "default";
   let label = "";
   if (token === "Break") return (<Divider key={key} sx={{ margin: '0.1em 0 0.5em 0' }} />);
-  else if (token === "Being") label = "=";
+  else if (token === "Being") label = "be";
   else if (token === 'This') { label = "result"; className = "N"; }
   else if (token === 'ListEnd') label = "]";
   else if (token === 'ListStart') label = "[";
@@ -192,3 +177,27 @@ function Token(props: any) {
   }
   return (<Chip key={key} size={"small"} className={className} label={label}></Chip>);
 }
+
+/*
+  const createNode = (x: any, y: any) => {
+    const color = "#BBBBBB";
+    setState(({ graph: { nodes, edges }, counter, ...rest }) => {
+      const id = counter + 1;
+      const from = Math.floor(Math.random() * (counter - 1)) + 1;
+      return {
+        graph: {
+          nodes: [
+            ...nodes,
+            { id, label: `Node ${id}`, color, x, y }
+          ],
+          edges: [
+            ...edges,
+            { from, to: id }
+          ]
+        },
+        counter: id,
+        ...rest
+      }
+    });
+  }
+  */

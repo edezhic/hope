@@ -37,7 +37,8 @@ pub fn get_tests() -> JsValue {
     JsValue::from_serde(&TESTS).unwrap()
 }
 
-pub const TESTS: [(&'static str, &'static str); 9] = [
+pub const TESTS: [(&'static str, &'static str); 10] = [
+    ("Graphscript X of Y", "Z is 1, xyz is [x, y, z], s is (x + y + z). Sum and show xyz, show s. If x is less than 2 and y is more than 1 then show {x, y, z, xyz, s}. When x is less than 1 - show x "),
     ("Termscript", "X is 1, Y is 2"),
     ("Listscript", "X is 1, list is [1.333, 2, 3,5, x]"),
     ("Structscript", "X is 1, structure is {x, flag: yes}"),
