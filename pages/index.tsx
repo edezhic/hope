@@ -6,7 +6,7 @@ import Chip from '@mui/material/Chip';
 import Divider from '@mui/material/Divider';
 import Graph from "react-graph-vis";
 
-const GRAPH_STYLE = { height: "700px" };
+const GRAPH_STYLE = { height: "650px" };
 
 const SCRIPTBODYROWS = 2;
 
@@ -18,15 +18,16 @@ const options = {
   nodes: {
     borderWidth: 0,
     color: '#121212',
+    mass: 0.3,
     font: {
       color: "#42d842",
       size: 22,
     },
   },
   edges: {
-    color: "#eee",
+    color: "#888",
     font: {
-      size: 30
+      size: 16
     }
   },
   
@@ -41,20 +42,21 @@ export default function IDE() {
     graph: {
       nodes: [
         { id: "graphscript", label: "graphscript", font: { color: "#00a163", size: 30 }, mass: 4 },
-        { id: "assign_z", label: "assign", mass: 4 },
-        { id: "assign_xyz", label: "assign", mass: 4 },
-        { id: "formula", label: "formula", mass: 4 },
-        { id: "assign_s", label: "assign", mass: 4 },
+        { id: "assign_z", label: "assign", mass: 4, font: { color: "#dacc29" } },
+        { id: "assign_xyz", label: "assign", mass: 4, font: { color: "#dacc29" } }, 
+        { id: "formula", label: "x + y + z", mass: 4, font: { color: "#ff00e0" } },
+        { id: "assign_s", label: "assign", mass: 4, font: { color: "#dacc29" } },
         { id: "show1", label: "show", mass: 4 },
         { id: "sum", label: "sum", mass: 4 },
         { id: "show2", label: "show", mass: 4 },
-        { id: "if", label: "if", mass: 4 },
-        { id: "less", label: "less", mass: 4 },
-        { id: "more", label: "more", mass: 4 },
+        { id: "if", label: "if", mass: 4, font: { color: "#dacc29" } }, 
+        { id: "less", label: "less", mass: 4, font: { color: "#dacc29" } },
+        { id: "more", label: "more", mass: 4, font: { color: "#dacc29" } },
         { id: "show3", label: "show", mass: 4 },
-        { id: "struct", label: "struct", mass: 4 },
+        { id: "struct", label: "struct", mass: 4, font: { color: "#dacc29" } },
+        { id: "when", label: "when", mass: 4, font: { color: "#dacc29" } },
         { id: "x1", label: "x", font: { color: "#41afd2" } },
-        { id: "y1", label: "y", font: { color: "#41afd2" } },
+        { id: "y1", label: "(of) y", font: { color: "#41afd2" } },
         { id: "z1", label: "z", font: { color: "#41afd2" } },
         { id: "x2", label: "x", font: { color: "#41afd2" } },
         { id: "y2", label: "y", font: { color: "#41afd2" } },
@@ -67,58 +69,68 @@ export default function IDE() {
         { id: "x5", label: "x", font: { color: "#41afd2" } },
         { id: "y5", label: "y", font: { color: "#41afd2" } },
         { id: "z5", label: "z", font: { color: "#41afd2" } },
-        { id: "it1", label: "it", font: { color: "#41afd2" } },
-        { id: "it2", label: "it", font: { color: "#41afd2" } },
         { id: "s1", label: "s", font: { color: "#41afd2" } },
         { id: "s2", label: "s", font: { color: "#41afd2" } },
         { id: "s3", label: "s", font: { color: "#41afd2" } },
         { id: "xyz1", label: "xyz", font: { color: "#41afd2" } },
         { id: "xyz2", label: "xyz", font: { color: "#41afd2" } },
         { id: "xyz3", label: "xyz", font: { color: "#41afd2" } },
-        { id: 1, label: "1", font: { color: "#ddd" } },
-        { id: 2, label: "2", font: { color: "#ddd" } },
-        { id: 3, label: "3", font: { color: "#ddd" } },
+        { id: "it1", label: "it", font: { color: "#41afd2" } },
+        { id: "it2", label: "it", font: { color: "#41afd2" } },
+        { id: "it3", label: "it", font: { color: "#41afd2" } },
+        { id: "it4", label: "it", font: { color: "#41afd2" } },
+        { id: "it5", label: "it", font: { color: "#41afd2" } },
+        { id: "it6", label: "it", font: { color: "#41afd2" } },
+        { id: 1, label: "1", font: { color: "#bbb" } },
+        { id: 2, label: "2", font: { color: "#bbb" } },
+        { id: 3, label: "3", font: { color: "#bbb" } },
         
       ],
       edges: [ // control: color: "#dacc29"
-        { from: "graphscript", to: "x1", dashes: true },
-        { from: "graphscript", to: "y1", dashes: true, label: "of" },
-        { from: "graphscript", to: "assign_z", color: "#dacc29" },
-        { from: 1, to: "assign_z", dashes: true },
-        { from: "assign_z", to: "z1", dashes: true },
-        { from: "assign_z", to: "assign_xyz", color: "#dacc29" },
-        { from: "x2", to: "assign_xyz", dashes: true },
-        { from: "y2", to: "assign_xyz", dashes: true },
-        { from: "z2", to: "assign_xyz", dashes: true },
-        { from: "assign_xyz", to: "xyz1", dashes: true },
-        { from: "assign_xyz", to: "formula", color: "#dacc29" },
-        { from: "x3", to: "formula", dashes: true },
-        { from: "y3", to: "formula", dashes: true },
-        { from: "z3", to: "formula", dashes: true },
-        { from: "formula", to: "it1", dashes: true },
-        { from: "it2", to: "assign_s", dashes: true },
-        { from: "formula", to: "assign_s", color: "#dacc29" },
-        { from: "assign_s", to: "s1", dashes: true },
-        { from: "assign_s", to: "show1", shadow: { enabled: true, color: "#fff"}, color: "#dacc29" },
-        { from: "s2", to: "show1", dashes: true },
-        { from: "show1", to: "sum", color: "#dacc29" },
-        { from: "xyz2", to: "sum", dashes: true },
-        { from: "sum", to: "show2", color: "#dacc29", dashes: true, label: "it" },
-        { from: "show2", to: "if", shadow: { enabled: true, color: "#fff"}, color: "#dacc29" },
-        { from: "if", to: "less", color: "#dacc29" },
-        { from: "x4", to: "less", dashes: true },
-        { from: 2, to: "less", dashes: true },
-        { from: "less", to: "more", color: "#dacc29" },
-        { from: "y4", to: "more", dashes: true },
-        { from: 3, to: "more", dashes: true },
-        { from: "more", to: "if", color: "#dacc29" },
-        { from: "if", to: "struct", color: "#dacc29" },
+        { from: "graphscript", to: "x1", color: "#fff" },
+        { from: "graphscript", to: "y1", color: "#fff" },
+        { from: "graphscript", to: "assign_z", color: "#dacc29", dashes: true },
+        { from: 1, to: "assign_z" },
+        { from: "assign_z", to: "z1", color: "#fff" },
+        { from: "assign_z", to: "assign_xyz", color: "#dacc29", dashes: true },
+        { from: "x2", to: "assign_xyz" },
+        { from: "y2", to: "assign_xyz" },
+        { from: "z2", to: "assign_xyz" },
+        { from: "assign_xyz", to: "xyz1", color: "#fff" },
+        { from: "assign_xyz", to: "formula", color: "#dacc29", dashes: true },
+        { from: "x3", to: "formula" },
+        { from: "y3", to: "formula" },
+        { from: "z3", to: "formula" },
+        { from: "formula", to: "it1", color: "#fff" },
+        { from: "it2", to: "assign_s" },
+        { from: "formula", to: "assign_s", color: "#dacc29", dashes: true },
+        { from: "assign_s", to: "s1", color: "#fff" },
+        { from: "assign_s", to: "show1", color: "#dacc29" },
+        { from: "s2", to: "show1" },
+        { from: "show1", to: "sum", color: "#dacc29", dashes: true },
+        { from: "xyz2", to: "sum" },
+        { from: "sum", to: "show2", color: "#dacc29", dashes: true },
+        { from: "sum", to: "it3", color: "#fff" },
+        { from: "it4", to: "show2" },
+        { from: "show2", to: "if", color: "#dacc29" },
+        { from: "if", to: "less", color: "#dacc29", dashes: true },
+        { from: "x4", to: "less" },
+        { from: 2, to: "less" },
+        { from: "less", to: "more", color: "#dacc29", dashes: true },
+        { from: "y4", to: "more" },
+        { from: 3, to: "more" },
+        { from: "more", to: "struct", color: "#dacc29", dashes: true },
+        { from: "show", to: "if", color: "#dacc29", dashes: true },
+        { from: "if", to: "when", color: "#dacc29", dashes: true },
         { from: "struct", to: "show3", color: "#dacc29", dashes: true },
-        { from: "x5", to: "struct", dashes: true },
-        { from: "y5", to: "struct", dashes: true },
-        { from: "z5", to: "struct", dashes: true },
-        { from: "s3", to: "struct", dashes: true },
-        { from: "xyz3", to: "struct", dashes: true },
+        { from: "struct", to: "it5", color: "#fff" },
+        { from: "it6", to: "show3" },
+        { from: "x5", to: "struct" },
+        { from: "y5", to: "struct" },
+        { from: "z5", to: "struct" },
+        { from: "s3", to: "struct" },
+        { from: "xyz3", to: "struct" },
+        { from: "show3", to: "if", color: "#dacc29" },
       ]
     }
   })
@@ -152,6 +164,8 @@ export default function IDE() {
 
   return (
     <Container maxWidth="md">
+      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
+      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
       <Box
         component="form"
         noValidate
@@ -178,8 +192,7 @@ export default function IDE() {
           value={script[1]}
         />
       </Box>
-      <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
-      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
+      
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Tokens</Divider>
       <div className="tokens">
         { tokens?.map((item: any) => <Token key={JSON.stringify(item)} item={item} />) }
