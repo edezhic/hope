@@ -27,7 +27,7 @@ body {
 }
 
 .tokens .M > span {
-  color: #ff8383;
+  color: #005772;
 }
 
 .tokens .C > span {
@@ -35,7 +35,7 @@ body {
 }
 
 .tokens .O > span {
-  color: #ff00e0;
+  color: #88ff00;
 }
 
 .tokens .V {
