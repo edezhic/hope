@@ -27,7 +27,17 @@ const options = {
   edges: {
     color: "#888",
     font: {
-      size: 16
+      size: 18,
+      color: "#0f0",
+      strokeWidth: 0,
+    },
+    smooth: true,
+    width: 1,
+    arrows: {
+      to: {
+        enabled: true,
+        scaleFactor: 0.6
+      }
     }
   },
   
@@ -122,10 +132,10 @@ export default function IDE() {
         { from: "if", to: "less", color: "#dacc29", dashes: true },
         { from: "x4", to: "less" },
         { from: 2, to: "less" },
-        { from: "less", to: "more", color: "#dacc29", dashes: true },
+        { from: "less", to: "more", color: "#0f0", dashes: true, label: 'yes' },
         { from: "y4", to: "more" },
         { from: 3, to: "more" },
-        { from: "more", to: "struct", color: "#dacc29", dashes: true },
+        { from: "more", to: "struct", color: "#0f0", dashes: true, label: 'yes' },
         { from: "show", to: "if", color: "#dacc29", dashes: true },
         { from: "if", to: "when", color: "#dacc29", dashes: true },
         { from: "struct", to: "show3", color: "#dacc29", dashes: true },
@@ -171,7 +181,7 @@ export default function IDE() {
   return (
     <Container maxWidth="md">
       <Divider sx={{ margin: '1em 0 0.5em 0' }}>Graph</Divider>
-      <Graph graph={graph} options={options} style={GRAPH_STYLE} />
+      <Graph graph={graph as any} options={options} style={GRAPH_STYLE} />
       <Box
         component="form"
         noValidate
