@@ -3,7 +3,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { deepPurple, amber } from "@mui/material/colors";
-import "../globals.css";
 
 let theme = createTheme({
   palette: {
