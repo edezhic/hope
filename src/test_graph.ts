@@ -1,6 +1,6 @@
 import * as STYLES from './styles'
 
-const SCRIPT_NODE = { mass: 4, font: { color: STYLES.WHITE, size: 30 } }
+const SCRIPT_NODE = { x: 0, y: 0, fixed: { x: true, y: true }, mass: 10, font: { color: STYLES.WHITISH, size: 30 } }
 const ASSIGNMENT_NODE = { mass: 4, font: { color: STYLES.WHITISH } }
 const COMMAND_NODE = { mass: 4, font: { color: STYLES.COMMAND_COLOR } }
 const COLLECTION_NODE = { mass: 4, font: { color: STYLES.COLLECTION_COLOR } }
