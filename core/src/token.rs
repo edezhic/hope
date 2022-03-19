@@ -2,16 +2,18 @@ use crate::*;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Token {
-    V(Value),
-    N(Text),
-    O(Op),
-    C(Command),
-    M(Modifier),
+    Value(Value),
+    Term(Text),
+    Op(Operation),
+    Cmd(Command),
+    Mod(Modifier),
     
     Being,
     This,
+
     And,
     Or,
+    
     Any,
     Each,
     Less,
@@ -52,7 +54,7 @@ pub enum Command { // FIX
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Op {
+pub enum Operation {
     Plus,
     Minus,
     Multiplication,

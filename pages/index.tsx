@@ -3,7 +3,7 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider'
 import Graph from 'react-graph-vis'
 import { GRAPH_DATA, GRAPH_OPTIONS } from '../src/test_graph'
-import * as S from '../src/styles'
+import * as STYLES from '../src/styles'
 import Token from '../src/token'
 import ScriptForm from '../src/script_form'
 
@@ -33,14 +33,14 @@ export default function IDE() {
 
   return (
     <Container maxWidth='md'>
-      <Divider sx={S.DIVIDER}>Script</Divider>
+      <Divider sx={STYLES.DIVIDER}>Tokens</Divider>
+      {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item)} i={i}/>)}
+
+      <Divider sx={STYLES.DIVIDER}>Graph</Divider>
+      <Graph graph={graphState.graph as any} options={GRAPH_OPTIONS} style={STYLES.GRAPH_STYLE} />
+
+      <Divider sx={STYLES.DIVIDER}>Script</Divider>
       <ScriptForm script={script} setScript={setScript} />
-
-      <Divider sx={S.DIVIDER}>Tokens</Divider>
-      {tokens?.map((item: any) => <Token item={item} key={JSON.stringify(item)} />)}
-
-      <Divider sx={S.DIVIDER}>Graph</Divider>
-      <Graph graph={graphState.graph as any} options={GRAPH_OPTIONS} style={S.GRAPH_STYLE} />
     </Container>
   );
 }

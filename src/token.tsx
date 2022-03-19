@@ -1,35 +1,36 @@
 import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
-import * as S from './styles'
+import * as STYLES from './styles'
 
 export default function Token (props: any) {
     let [key, token] = props.item; 
-    let color = S.FLOW_COLOR;
+    let color = STYLES.FLOW_COLOR;
     let label = '';
-    
-    if (token === 'Break') return (<Divider key={key} sx={S.INVISIBLE_DIVIDER} />);
-    else if (token === 'Being') label = 'be';
-    else if (token === 'This') { label = 'result'; color = S.TERM_COLOR; }
-    else if (token === 'ListEnd') label = ']';
-    else if (token === 'ListStart') label = '[';
-    else if (token === 'StructEnd') label = '}';
-    else if (token === 'StructStart') label = '{';
-    else if (token === 'FormulaEnd') label = ')';
-    else if (token === 'FormulaStart') label = '(';
+    if (token === 'Break') return (<Divider key={key} sx={STYLES.INVISIBLE_DIVIDER} />)
+    else if (token === 'Being') { label = 'be'; color = STYLES.GREYISH }
+    else if (token === 'This') { label = 'result'; color = STYLES.TERM_COLOR }
+    else if (token === 'ListEnd') { label = ']'; color = STYLES.COLLECTION_COLOR }
+    else if (token === 'ListStart') { label = '['; color = STYLES.COLLECTION_COLOR }
+    else if (token === 'StructEnd') { label = '}'; color = STYLES.COLLECTION_COLOR }
+    else if (token === 'StructStart') { label = '{'; color = STYLES.COLLECTION_COLOR }
+    else if (token === 'FormulaEnd') { label = ')'; color = STYLES.FORMULA_COLOR }
+    else if (token === 'FormulaStart') { label = '('; color = STYLES.FORMULA_COLOR }
     else if (typeof token === 'string') label = token.toLowerCase();
-    else if ('N' in token) { label = token.N.toLowerCase(); color = S.TERM_COLOR; }
-    else if ('C' in token) { label = token.C.toLowerCase(); color = S.CASE_COLOR; }
-    else if ('M' in token) { label = token.M.toLowerCase(); color = S.MOD_COLOR; }
-    else if ('O' in token) {
-      color = S.FORMULA_COLOR;
-      label = token.O.toLowerCase().replace('plus', '+').replace('multiplication', '*');
+    else if ('Term' in token) { label = token.Term.toLowerCase(); color = STYLES.TERM_COLOR; }
+    else if ('Cmd' in token) { label = token.Cmd.toLowerCase(); color = STYLES.COMMAND_COLOR; }
+    else if ('Mod' in token) { label = token.Mod.toLowerCase(); color = STYLES.MOD_COLOR; }
+    else if ('Op' in token) {
+      color = STYLES.FORMULA_COLOR;
+      label = token.Op.toLowerCase().replace('plus', '+').replace('multiplication', '*');
     }
-    else if ('V' in token) {
-      color = S.VALUE_COLOR;
-      if ('Number' in token.V) label = token.V.Number.value;
-      if ('Id' in token.V) label = token.V.Id.scheme.Custom;
-      if ('Text' in token.V) label = token.V.Text;
-      if ('Fact' in token.V) label = token.V.Fact.toString();
+    else if ('Value' in token) {
+      const value = token.Value
+      color = STYLES.VALUE_COLOR;
+      if ('Number' in value) label = value.Number.value;
+      if ('Id' in value) label = value.Id.scheme.Custom;
+      if ('Text' in value) label = value.Text;
+      if ('Fact' in value) label = value.Fact.toString();
     }
-    return (<Chip key={key} size={'small'} label={label} sx={{ background: 'none', color }}></Chip>);
+    if (props.i == 0) { color = STYLES.WHITISH } // for script name
+    return (<Chip key={key} size={'small'} label={label} sx={{ background: 'none', color }}/>);
   }

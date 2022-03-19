@@ -1,4 +1,4 @@
-use crate::{*, Modifier::*, Op::*, Command::*};
+use crate::{*, Modifier::*, Operation::*, Command::*};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBoundIndices;
@@ -31,7 +31,7 @@ impl<'a> Parser<'a> {
         Ok(vec)
     }
     fn update_peek(&mut self) {
-        self.skim();
+        self.skiMod();
         if let Some(piece) = self.iter.peek() {
             self.peek = Some(*piece)
         } else {
@@ -63,7 +63,7 @@ impl<'a> Parser<'a> {
     pub fn collect_literal(&mut self) -> Text {
         self.collect_until(&SKIP, false)
     }
-    pub fn skim(&mut self) {
+    pub fn skiMod(&mut self) {
         while let Some((_, piece)) = self.iter.peek() {
             if SKIP.is_match(piece) {
                 self.iter.next();
@@ -97,7 +97,7 @@ impl<'a> Parser<'a> {
             }
             _ => return Ok(None),
         };
-        Ok(Some(V(value)))
+        Ok(Some(Value(value)))
     }
     pub fn match_keyword(&mut self, piece: &str) -> Option<Token> {
         let token = match piece {
@@ -113,13 +113,13 @@ impl<'a> Parser<'a> {
             piece if LIST_START.is_match(piece) => ListStart,
             piece if LIST_END.is_match(piece) => ListEnd,
 
-            piece if WITH.is_match(piece) => M(With),
-            piece if BY.is_match(piece) => M(By),
-            piece if OF.is_match(piece) => M(Of),
-            piece if FROM.is_match(piece) => M(From),
-            piece if TO.is_match(piece) => M(To),
-            piece if IN.is_match(piece) => M(In),
-            piece if AT.is_match(piece) => M(At),
+            piece if WITH.is_match(piece) => Mod(With),
+            piece if BY.is_match(piece) => Mod(By),
+            piece if OF.is_match(piece) => Mod(Of),
+            piece if FROM.is_match(piece) => Mod(From),
+            piece if TO.is_match(piece) => Mod(To),
+            piece if IN.is_match(piece) => Mod(In),
+            piece if AT.is_match(piece) => Mod(At),
 
             piece if ANY.is_match(piece) => Any,
             piece if EACH.is_match(piece) => Each,
@@ -134,20 +134,20 @@ impl<'a> Parser<'a> {
             piece if BREAK.is_match(piece) => Break,
             piece if RETURN.is_match(piece) => Return,
 
-            piece if ADD.is_match(piece) => C(Add),
-            piece if SAVE.is_match(piece) => C(Save),
-            piece if SEND.is_match(piece) => C(Send),
-            piece if SHOW.is_match(piece) => C(Show),
-            piece if SUBSTRACT.is_match(piece) => C(Substract),
-            piece if SUM.is_match(piece) => C(Sum),
-            piece if FILTER.is_match(piece) => C(Filter),
-            piece if REQUEST.is_match(piece) => C(Request),
-            piece if SORT.is_match(piece) => C(Sort),
-            piece if SIGN.is_match(piece) => C(Sign),
-            piece if PLUS.is_match(piece) => O(Plus),
-            piece if MINUS.is_match(piece) => O(Minus),
-            piece if MULTIPLICATION.is_match(piece) => O(Multiplication),
-            piece if DIVISION.is_match(piece) => O(Division),
+            piece if ADD.is_match(piece) => Cmd(Add),
+            piece if SAVE.is_match(piece) => Cmd(Save),
+            piece if SEND.is_match(piece) => Cmd(Send),
+            piece if SHOW.is_match(piece) => Cmd(Show),
+            piece if SUBSTRACT.is_match(piece) => Cmd(Substract),
+            piece if SUM.is_match(piece) => Cmd(Sum),
+            piece if FILTER.is_match(piece) => Cmd(Filter),
+            piece if REQUEST.is_match(piece) => Cmd(Request),
+            piece if SORT.is_match(piece) => Cmd(Sort),
+            piece if SIGN.is_match(piece) => Cmd(Sign),
+            piece if PLUS.is_match(piece) => Op(Plus),
+            piece if MINUS.is_match(piece) => Op(Minus),
+            piece if MULTIPLICATION.is_match(piece) => Op(Multiplication),
+            piece if DIVISION.is_match(piece) => Op(Division),
             _ => return None,
         };
         self.next();
@@ -157,7 +157,7 @@ impl<'a> Parser<'a> {
     pub fn match_term(&mut self, piece: &str) -> Option<Token> {
         if TERM.is_match(piece) {
             self.next();
-            Some(N(Text::lowercase(piece)))
+            Some(Term(Text::lowercase(piece)))
         } else {
             None
         }
