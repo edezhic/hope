@@ -1,20 +1,20 @@
 import * as STYLES from './styles'
 
 const SCRIPT_NODE = { x: 0, y: 0, fixed: { x: true, y: true }, mass: 10, font: { color: STYLES.WHITISH, size: 30 } }
-const ASSIGNMENT_NODE = { mass: 4, font: { color: STYLES.WHITISH } }
+const ASSIGNMENT_NODE = { mass: 4, font: { color: STYLES.GREYISH } }
 const COMMAND_NODE = { mass: 4, font: { color: STYLES.COMMAND_COLOR } }
 const COLLECTION_NODE = { mass: 4, font: { color: STYLES.COLLECTION_COLOR } }
 const FORMULA_NODE = { mass: 4, font: { color: STYLES.FORMULA_COLOR } }
 const FLOW_NODE = { mass: 4, font: { color: STYLES.FLOW_COLOR } }
 const CASE_NODE = { mass: 4, font: { color: STYLES.CASE_COLOR } }
 const TERM_NODE = { font: { color: STYLES.TERM_COLOR } }
-const VALUE_NODE = { font: { color: STYLES.GREYISH } }
+const VALUE_NODE = { font: { color: STYLES.WHITISH } }
 
 const ARG_EDGE = { color: STYLES.GREYISH, dashes: true, arrows: { to: { enabled: false } } }
-const SET_EDGE = { color: STYLES.WHITE }
-const GET_EDGE = { color: STYLES.GREY }
-const THEN_EDGE = { color: STYLES.FLOW_COLOR, dashes: true }
-const BREAK_EDGE = { color: STYLES.FLOW_COLOR }
+const SET_EDGE = { color: STYLES.TERM_COLOR }
+const GET_EDGE = { color: STYLES.MOD_COLOR }
+const THEN_EDGE = { color: STYLES.WHITISH, dashes: true }
+const BREAK_EDGE = { color: STYLES.GREYISH }
 const YES_EDGE = { color: STYLES.YES_COLOR, dashes: true, label: 'yes' }
 const NO_EDGE = { color: STYLES.NO_COLOR, dashes: true, label: 'no' }
 
@@ -53,7 +53,7 @@ export const GRAPH_DATA = {
             { id: 'assign_z', label: 'be', ...ASSIGNMENT_NODE },
             { id: 'list', label: 'list', ...COLLECTION_NODE },
             { id: 'assign_xyz', label: 'be', ...ASSIGNMENT_NODE },
-            { id: 'formula', label: 'x + y + z', ...FORMULA_NODE },
+            { id: 'formula', label: '+ +', ...FORMULA_NODE },
             { id: 'assign_s', label: 'be', ...ASSIGNMENT_NODE },
             { id: 'show1', label: 'show', ...COMMAND_NODE },
             { id: 'sum', label: 'sum', ...COMMAND_NODE },
@@ -130,10 +130,10 @@ export const GRAPH_DATA = {
             { from: 'if', to: 'less', ...THEN_EDGE },
             { from: 'x4', to: 'less', ...GET_EDGE },
             { from: 2, to: 'less', ...GET_EDGE },
-            { from: 'less', to: 'more', ...YES_EDGE },
+            { from: 'less', to: 'more', ...THEN_EDGE },
             { from: 'y4', to: 'more', ...GET_EDGE },
             { from: 3, to: 'more', ...GET_EDGE },
-            { from: 'more', to: 'struct', ...YES_EDGE },
+            { from: 'more', to: 'struct', ...THEN_EDGE },
             { from: 'show', to: 'if', ...THEN_EDGE },
             { from: 'if', to: 'when', ...BREAK_EDGE },
             { from: 'struct', to: 'show3', ...THEN_EDGE },

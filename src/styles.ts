@@ -1,13 +1,14 @@
 export const GRAPH_STYLE = { height: '650px' }
 
-export const SCRIPT_BODY_ROWS = 2
+export const SCRIPT_BODY_ROWS = 3
 
 export const WHITE = '#fff'
 export const WHITISH = '#ddd'
 export const GREYISH = '#bbb'
 export const GREY = '#888'
+export const BLACKISH = '#121212'
 
-export const BACKGROUND_COLOR = '#121212'
+export const BACKGROUND_COLOR = BLACKISH
 export const FLOW_COLOR = '#dacc29'
 export const COMMAND_COLOR = '#42d842'
 export const COLLECTION_COLOR = '#00c184'

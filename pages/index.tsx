@@ -33,14 +33,14 @@ export default function IDE() {
 
   return (
     <Container maxWidth='md'>
+      <Divider sx={STYLES.DIVIDER}>Script</Divider>
+      <ScriptForm script={script} setScript={setScript} />
+
       <Divider sx={STYLES.DIVIDER}>Tokens</Divider>
       {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item)} i={i}/>)}
 
       <Divider sx={STYLES.DIVIDER}>Graph</Divider>
       <Graph graph={graphState.graph as any} options={GRAPH_OPTIONS} style={STYLES.GRAPH_STYLE} />
-
-      <Divider sx={STYLES.DIVIDER}>Script</Divider>
-      <ScriptForm script={script} setScript={setScript} />
     </Container>
   );
 }
