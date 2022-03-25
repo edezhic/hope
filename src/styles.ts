@@ -1,6 +1,6 @@
 export const GRAPH_STYLE = { height: '650px' }
 
-export const SCRIPT_BODY_ROWS = 3
+export const SCRIPT_BODY_ROWS = 8
 
 export const WHITE = '#fff'
 export const WHITISH = '#ddd'
