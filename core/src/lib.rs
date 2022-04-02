@@ -37,13 +37,18 @@ pub fn get_tests() -> JsValue {
     JsValue::from_serde(&TESTS).unwrap()
 }
 
-pub const TESTS: [(&'static str, &'static str); 10] = [
-    ("Graphscript X of Y", "Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. For each number in xyz log (number * 2). For each request at @/endpoint/path/ return s. For each message from @URI do smth.
-    Wallet as a core identity abstraction. user, keys, signatures, encryptions etc as its derivatives.
-    Storage, Save etc
-    Table/Row types
-    Filtering
-    UI"),
+pub const TESTS: [(&'static str, &'static str); 9] = [
+    ( "Graphscript X of Y", 
+    "Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
+    For each number in xyz log (number * 2). For each request at @/endpoint/path/ return s. For each message from @URI do smth.
+    Storage(all memory?): store/get (+ @address?). Wallet(user data): auth, sign, others? 
+    Table and/or Row types (what about built-in db? graph engine for these things? All things? One big graph of things?)
+    Filtering, cases, validation (and graph repr for these things)
+    UI, elements, styles, interactions(for each?), windows?, graph repr???
+    Tensors? Only as internal thingies?
+    Categorical variables? Especially custom ones.
+    Error/exception handling/propagation
+    "),
     ("Termscript", "X is 1, Y is 2"),
     ("Listscript", "X is 1, list is [1.333, 2, 3,5, x]"),
     ("Structscript", "X is 1, structure is {x, flag: yes}"),
@@ -57,9 +62,5 @@ pub const TESTS: [(&'static str, &'static str); 10] = [
     (
         "Chainscript",
         "Script1 X1 of command1 of X2 of X3 with Script2 of X4",
-    ),
-    (
-        "Otherscript",
-        "User, account, key, auth, login, storage, etc",
     ),
 ];

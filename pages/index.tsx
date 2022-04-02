@@ -37,7 +37,7 @@ export default function IDE() {
       <ScriptForm script={script} setScript={setScript} />
 
       <Divider sx={STYLES.DIVIDER}>Tokens</Divider>
-      {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item)} i={i}/>)}
+      {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item) + i} i={i}/>)}
 
       <Divider sx={STYLES.DIVIDER}>Graph</Divider>
       <Graph graph={graphState.graph as any} options={GRAPH_OPTIONS} style={STYLES.GRAPH_STYLE} />

@@ -165,7 +165,7 @@ impl<'a> Parser<'a> {
 }
 
 lazy_static! {
-    static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| )+$").unwrap();
+    static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| |\?)+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
     static ref TERM: R = R::new(r"^\p{Letter}+").unwrap();
     static ref RESULT: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();

@@ -20,7 +20,7 @@ use core::fmt;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Value {
-    Fact(Fact),
+    Fact(Fact), // -> Bool? Binary(!)? Something else?
     Id(Id),
     Number(Number),
     List(List), 
@@ -29,7 +29,6 @@ pub enum Value {
     Text(Text),
     Time(Time),
     Version(Version),
-    // TODO add Tensor? Categorical variables? Tables?
     None,
 }
 

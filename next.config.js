@@ -21,6 +21,10 @@ if (process.env.NODE_ENV === 'development') {
 module.exports = {
   basePath,
   assetPrefix,
+  eslint: {
+    // Warning: This allows production builds to successfully complete even if your project has ESLint errors.
+    ignoreDuringBuilds: true,
+  },
   webpack: (config) => {
     config.output.publicPath = publicPath;
 

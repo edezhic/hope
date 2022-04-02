@@ -2,8 +2,8 @@ import Chip from '@mui/material/Chip'
 import Divider from '@mui/material/Divider'
 import * as STYLES from './styles'
 
-export default function Token (props: any) {
-    let [key, token] = props.item; 
+export default function Token ({ item, i } : any) {
+    let [key, token] = item; 
     let color = STYLES.FLOW_COLOR;
     let label = '';
     if (token === 'Break') return (<Divider key={key} sx={STYLES.INVISIBLE_DIVIDER} />)
@@ -31,6 +31,6 @@ export default function Token (props: any) {
       if ('Text' in value) label = value.Text;
       if ('Fact' in value) label = value.Fact.toString();
     }
-    if (props.i == 0) { color = STYLES.WHITISH } // for script name
+    if (i == 0) { color = STYLES.WHITISH } // for script name
     return (<Chip key={key} size={'small'} label={label} sx={{ background: 'none', color }}/>);
   }
