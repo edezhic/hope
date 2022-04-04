@@ -38,16 +38,18 @@ pub fn get_tests() -> JsValue {
 }
 
 pub const TESTS: [(&'static str, &'static str); 9] = [
-    ( "Graphscript X of Y", 
+    ("Testscript X of Y", 
     "Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
-    For each number in xyz log (number * 2). For each request at @/endpoint/path/ return s. For each message from @URI do smth.
-    Storage(all memory?): store/get (+ @address?). Wallet(user data): auth, sign, others? 
-    Table and/or Row types (what about built-in db? graph engine for these things? All things? One big graph of things?)
-    Filtering, cases, validation (and graph repr for these things)
-    UI, elements, styles, interactions(for each?), windows?, graph repr???
-    Tensors? Only as internal thingies?
-    Categorical variables? Especially custom ones.
-    Error/exception handling/propagation
+    For each number in xyz log (number * 2). For each message at @/endpoint/path/ show content of the message. For each message from @URI return x.
+    Request 'query' from @http://wikipedia.com and store result at @storage:wiki. Get 'query' from @storage:wiki and send to @scheme://domain/path.
+    Select 'query' from @storage:x where element is more than 0 and (element * 2) is less than 10
+    Match X: 0 - show 0, 1 - show 1 
+    Sign Q in W as E for R. Wallet, my
+    Raise 'error'? 'exception'? Hanlding and propagation
+    GUI: layout, elements, styles, interactions(for each?). Plot/draw/model?
+    System protocols: event, debug, env, networking, filesystem, web3? 
+    Multiline constructs: flow, structure literals, others
+    'IDE -> HOPE', 'core -> HOBot(runtime/VM)', 'Term -> Reference', 'Node' = 'Token'
     "),
     ("Termscript", "X is 1, Y is 2"),
     ("Listscript", "X is 1, list is [1.333, 2, 3,5, x]"),

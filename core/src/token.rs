@@ -39,7 +39,7 @@ pub enum Token {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Command { // FIX
+pub enum Command { // TODO
     Add,       // X To
     Substract, // X From -> Remove/Delete?
     Send,      // X To
@@ -50,7 +50,7 @@ pub enum Command { // FIX
     Sort,      // X By
     Show,      // X ?
     Sign,      // X With(As?)
-    Split,     // X By
+    Split,     // X By -> Group by?
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
@@ -72,4 +72,5 @@ pub enum Modifier {
     To,
     In,
     At,
+    As,
 }

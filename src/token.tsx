@@ -7,7 +7,7 @@ export default function Token ({ item, i } : any) {
     let color = STYLES.FLOW_COLOR;
     let label = '';
     if (token === 'Break') return (<Divider key={key} sx={STYLES.INVISIBLE_DIVIDER} />)
-    else if (token === 'Being') { label = 'be'; color = STYLES.GREYISH }
+    else if (token === 'Being') { label = 'is'; color = STYLES.GREYISH }
     else if (token === 'This') { label = 'result'; color = STYLES.TERM_COLOR }
     else if (token === 'ListEnd') { label = ']'; color = STYLES.COLLECTION_COLOR }
     else if (token === 'ListStart') { label = '['; color = STYLES.COLLECTION_COLOR }
@@ -21,7 +21,11 @@ export default function Token ({ item, i } : any) {
     else if ('Mod' in token) { label = token.Mod.toLowerCase(); color = STYLES.MOD_COLOR; }
     else if ('Op' in token) {
       color = STYLES.FORMULA_COLOR;
-      label = token.Op.toLowerCase().replace('plus', '+').replace('multiplication', '*');
+      label = token.Op.toLowerCase()
+        .replace('plus', '+')
+        .replace('minus', '-')
+        .replace('multiplication', '*')
+        .replace('division', '/')
     }
     else if ('Value' in token) {
       const value = token.Value
