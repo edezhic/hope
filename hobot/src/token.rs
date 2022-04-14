@@ -3,7 +3,6 @@ use crate::*;
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Token {
     Value(Value),
-    Term(Text),
     Op(Operation),
     Cmd(Command),
     Mod(Modifier),
@@ -19,6 +18,7 @@ pub enum Token {
     Less,
     More,
     Than,
+    Contains,
 
     Break,
     Do,
@@ -28,7 +28,11 @@ pub enum Token {
     If,
     Then,
     While,
+    Where,
     Return,
+    Match,
+    Try,
+    Panic,
 
     ListStart,
     ListEnd,
@@ -39,18 +43,19 @@ pub enum Token {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Command { // TODO
-    Add,       // X To
-    Substract, // X From -> Remove/Delete?
-    Send,      // X To
-    Filter,    // X ?
-    Sum,       // X ?
-    Save,
-    Request,   // X From
-    Sort,      // X By
-    Show,      // X ?
-    Sign,      // X With(As?)
-    Split,     // X By -> Group by?
+pub enum Command {
+    Add,       // To
+    Substract, // From -> Remove/Delete?
+    Send,      // To
+    Filter,    // ?
+    Sum,       // ?
+    Store,     // At
+    Request,   // From
+    Sort,      // By
+    Show,      // ?
+    Sign,      // With(As?)
+    Group,     // By -> Group by?
+    Select,    // From
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]

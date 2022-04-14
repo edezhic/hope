@@ -1,6 +1,6 @@
 [package]
-name = "hope-core"
-description = "Human-oriented programming environment"
+name = "hobot"
+description = "Human-oriented bot"
 version = "0.0.1"
 authors = ["Egor Dezhic <edezhic@gmail.com>"]
 license = "GPL-3.0-or-later"

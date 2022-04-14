@@ -6,13 +6,13 @@ pub enum Scheme {
     Custom(Text),
     Screen,
     Http,
-    Hopes,
+    Ref,
 }
 
 impl fmt::Display for Scheme {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Scheme::Hopes => write!(f, "hopes"),
+            Scheme::Ref => write!(f, "ref"),
             Scheme::Screen => write!(f, "screen"),
             Scheme::Http => write!(f, "http"),
             Scheme::Custom(scheme) => write!(f, "{}", scheme)
@@ -90,18 +90,10 @@ impl Id {
         }
     }
 
-    pub fn reference(selectors: Vec<Text>) -> Id {
+    pub fn reference(s: &str) -> Id {
         Id {
-            scheme: Scheme::Hopes,
-            domain: None,
-            path: Path(selectors),
-        }
-    }
-
-    pub fn ref_result() -> Id {
-        Id {
-            scheme: Scheme::Hopes,
-            domain: None,
+            scheme: Scheme::Ref,
+            domain: Some(Text::from_str(s)),
             path: Path::new(),
         }
     }

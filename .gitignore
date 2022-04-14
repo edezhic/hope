@@ -1,6 +1,6 @@
-/core/target
+/hobot/target
+/hobot/pkg
 /node_modules
 .next
-pkg
 package-lock.json
 Cargo.lock

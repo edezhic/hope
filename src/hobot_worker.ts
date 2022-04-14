@@ -1,7 +1,7 @@
 const core: Worker = self as unknown as Worker;
 
 async function build_script(title: string, body: string) {
-  const { build } = await import('../core/pkg');
+  const { build } = await import('../hobot/pkg');
   core.postMessage({
     type: 'tokens',
     tokens: build(title, body),
@@ -9,7 +9,7 @@ async function build_script(title: string, body: string) {
 }
 
 async function send_tests() {
-  const { get_tests } = await import('../core/pkg');
+  const { get_tests } = await import('../hobot/pkg');
   core.postMessage({
     type: 'tests',
     tests: get_tests(),

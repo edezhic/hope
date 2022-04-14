@@ -15,12 +15,11 @@ export default function Token ({ item, i } : any) {
     else if (token === 'StructStart') { label = '{'; color = STYLES.COLLECTION_COLOR }
     else if (token === 'FormulaEnd') { label = ')'; color = STYLES.FORMULA_COLOR }
     else if (token === 'FormulaStart') { label = '('; color = STYLES.FORMULA_COLOR }
-    else if (typeof token === 'string') label = token.toLowerCase();
-    else if ('Term' in token) { label = token.Term.toLowerCase(); color = STYLES.TERM_COLOR; }
-    else if ('Cmd' in token) { label = token.Cmd.toLowerCase(); color = STYLES.COMMAND_COLOR; }
-    else if ('Mod' in token) { label = token.Mod.toLowerCase(); color = STYLES.MOD_COLOR; }
+    else if (typeof token === 'string') label = token.toLowerCase()
+    else if ('Cmd' in token) { label = token.Cmd.toLowerCase(); color = STYLES.COMMAND_COLOR }
+    else if ('Mod' in token) { label = token.Mod.toLowerCase(); color = STYLES.MOD_COLOR }
     else if ('Op' in token) {
-      color = STYLES.FORMULA_COLOR;
+      color = STYLES.FORMULA_COLOR
       label = token.Op.toLowerCase()
         .replace('plus', '+')
         .replace('minus', '-')
@@ -30,11 +29,17 @@ export default function Token ({ item, i } : any) {
     else if ('Value' in token) {
       const value = token.Value
       color = STYLES.VALUE_COLOR;
-      if ('Number' in value) label = value.Number.value;
-      if ('Id' in value) label = value.Id.scheme.Custom;
-      if ('Text' in value) label = value.Text;
-      if ('Fact' in value) label = value.Fact.toString();
+      if ('Number' in value) label = value.Number.value
+      if ('Id' in value) { 
+        if (value.Id.scheme === 'Ref') {
+          label = value.Id.domain.toLowerCase()
+          color = STYLES.TERM_COLOR
+        } 
+        else label = value.Id.scheme.Custom 
+      }
+      if ('Text' in value) label = value.Text
+      if ('Fact' in value) label = value.Fact.toString()
     }
     if (i == 0) { color = STYLES.WHITISH } // for script name
-    return (<Chip key={key} size={'small'} label={label} sx={{ background: 'none', color }}/>);
+    return (<Chip key={key} size={'small'} label={label} sx={{ background: 'none', color }}/>)
   }

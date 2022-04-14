@@ -17,12 +17,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: into rust
-      run: cd core
+      run: cd hobot
     - name: Go nightly
-      run: cd core && rustup default nightly
+      run: cd hobot && rustup default nightly
     - name: Build
-      run: cd core && cargo +nightly build --verbose
+      run: cd hobot && cargo +nightly build --verbose
     - name: Add wasm target
-      run: cd core && rustup +nightly target add wasm32-unknown-unknown
+      run: cd hobot && rustup +nightly target add wasm32-unknown-unknown
     - name: Build WASM
-      run: cd core && cargo +nightly build --target wasm32-unknown-unknown --release
+      run: cd hobot && cargo +nightly build --target wasm32-unknown-unknown --release

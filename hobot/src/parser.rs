@@ -19,8 +19,8 @@ impl<'a> Parser<'a> {
                 vec.push((index, value));
             } else if let Some(keyword) = parser.match_keyword(piece) {
                 vec.push((index, keyword));
-            } else if let Some(term) = parser.match_term(piece) {
-                vec.push((index, term));
+            } else if let Some(reference) = parser.match_reference(piece) {
+                vec.push((index, reference));
             } else {
                 return Err(Error::ParsingError(format!(
                     r#"I don't know how to translate '{:?}'"#,
@@ -31,7 +31,7 @@ impl<'a> Parser<'a> {
         Ok(vec)
     }
     fn update_peek(&mut self) {
-        self.skiMod();
+        self.skip();
         if let Some(piece) = self.iter.peek() {
             self.peek = Some(*piece)
         } else {
@@ -63,7 +63,7 @@ impl<'a> Parser<'a> {
     pub fn collect_literal(&mut self) -> Text {
         self.collect_until(&SKIP, false)
     }
-    pub fn skiMod(&mut self) {
+    pub fn skip(&mut self) {
         while let Some((_, piece)) = self.iter.peek() {
             if SKIP.is_match(piece) {
                 self.iter.next();
@@ -102,9 +102,16 @@ impl<'a> Parser<'a> {
     pub fn match_keyword(&mut self, piece: &str) -> Option<Token> {
         let token = match piece {
             piece if BE.is_match(piece) => Being,
-            piece if RESULT.is_match(piece) => This,
+            piece if THIS.is_match(piece) => This,
             piece if AND.is_match(piece) => And,
             piece if OR.is_match(piece) => Or,
+
+            piece if ANY.is_match(piece) => Any,
+            piece if EACH.is_match(piece) => Each,
+            piece if LESS.is_match(piece) => Less,
+            piece if MORE.is_match(piece) => More,
+            piece if THAN.is_match(piece) => Than,
+            piece if CONTAINS.is_match(piece) => Contains,
 
             piece if FORMULA_START.is_match(piece) => FormulaStart,
             piece if FORMULA_END.is_match(piece) => FormulaEnd,
@@ -120,12 +127,7 @@ impl<'a> Parser<'a> {
             piece if TO.is_match(piece) => Mod(To),
             piece if IN.is_match(piece) => Mod(In),
             piece if AT.is_match(piece) => Mod(At),
-
-            piece if ANY.is_match(piece) => Any,
-            piece if EACH.is_match(piece) => Each,
-            piece if LESS.is_match(piece) => Less,
-            piece if MORE.is_match(piece) => More,
-            piece if THAN.is_match(piece) => Than,
+            piece if AS.is_match(piece) => Mod(As),
 
             piece if IF.is_match(piece) => If,
             piece if FOR.is_match(piece) => For,
@@ -133,9 +135,14 @@ impl<'a> Parser<'a> {
             piece if ELSE.is_match(piece) => Else,
             piece if BREAK.is_match(piece) => Break,
             piece if RETURN.is_match(piece) => Return,
+            piece if MATCH.is_match(piece) => Match,
+            piece if WHERE.is_match(piece) => Where,
+            piece if WHILE.is_match(piece) => While,
+            piece if TRY.is_match(piece) => Try,
+            piece if PANIC.is_match(piece) => Panic,
 
             piece if ADD.is_match(piece) => Cmd(Add),
-            piece if SAVE.is_match(piece) => Cmd(Save),
+            piece if STORE.is_match(piece) => Cmd(Store),
             piece if SEND.is_match(piece) => Cmd(Send),
             piece if SHOW.is_match(piece) => Cmd(Show),
             piece if SUBSTRACT.is_match(piece) => Cmd(Substract),
@@ -144,6 +151,9 @@ impl<'a> Parser<'a> {
             piece if REQUEST.is_match(piece) => Cmd(Request),
             piece if SORT.is_match(piece) => Cmd(Sort),
             piece if SIGN.is_match(piece) => Cmd(Sign),
+            piece if GROUP.is_match(piece) => Cmd(Group),
+            piece if SELECT.is_match(piece) => Cmd(Select),
+            
             piece if PLUS.is_match(piece) => Op(Plus),
             piece if MINUS.is_match(piece) => Op(Minus),
             piece if MULTIPLICATION.is_match(piece) => Op(Multiplication),
@@ -154,10 +164,10 @@ impl<'a> Parser<'a> {
         Some(token)
     }
 
-    pub fn match_term(&mut self, piece: &str) -> Option<Token> {
-        if TERM.is_match(piece) {
+    pub fn match_reference(&mut self, piece: &str) -> Option<Token> {
+        if REFERENCE.is_match(piece) {
             self.next();
-            Some(Term(Text::lowercase(piece)))
+            Some(Value(Value::Id(Id::reference(piece))))
         } else {
             None
         }
@@ -167,8 +177,8 @@ impl<'a> Parser<'a> {
 lazy_static! {
     static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| |\?)+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
-    static ref TERM: R = R::new(r"^\p{Letter}+").unwrap();
-    static ref RESULT: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();
+    static ref REFERENCE: R = R::new(r"^\p{Letter}+").unwrap();
+    static ref THIS: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();
     static ref AND: R = R::new(r"^(?i)and$").unwrap();
     static ref OR: R = R::new(r"^(?i)or$").unwrap();
 
@@ -186,6 +196,7 @@ lazy_static! {
     static ref TO: R = R::new(r"^(?i)to$").unwrap();
     static ref IN: R = R::new(r"^(?i)in$").unwrap();
     static ref AT: R = R::new(r"^(?i)at$").unwrap();
+    static ref AS: R = R::new(r"^(?i)as$").unwrap();
 
 
     static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl})$").unwrap();
@@ -194,16 +205,22 @@ lazy_static! {
     static ref ELSE: R = R::new(r"^(?i)else$").unwrap();
     static ref FOR: R = R::new(r"^(?i)for$").unwrap();
     static ref RETURN: R = R::new(r"^(?i)return$").unwrap();
+    static ref MATCH: R = R::new(r"^(?i)match$").unwrap();
+    static ref WHERE: R = R::new(r"^(?i)where$").unwrap();
+    static ref WHILE: R = R::new(r"^(?i)while$").unwrap();
+    static ref TRY: R = R::new(r"^(?i)try$").unwrap();
+    static ref PANIC: R = R::new(r"^(?i)panic$").unwrap();
 
     static ref ANY: R = R::new(r"^(?i)any$").unwrap();
     static ref EACH: R = R::new(r"^(?i)each$").unwrap();
     static ref LESS: R = R::new(r"^(?i)less$").unwrap();
     static ref MORE: R = R::new(r"^(?i)more$").unwrap();
     static ref THAN: R = R::new(r"^(?i)than$").unwrap();
+    static ref CONTAINS: R = R::new(r"^(?i)contains$").unwrap();
 
     static ref ADD: R = R::new(r"^(?i)add$").unwrap();
     static ref SUBSTRACT: R = R::new(r"^(?i)substract$").unwrap();
-    static ref SAVE: R = R::new(r"^(?i)save$").unwrap();
+    static ref STORE: R = R::new(r"^(?i)store$").unwrap();
     static ref SEND: R = R::new(r"^(?i)send$").unwrap();
     static ref SHOW: R = R::new(r"^(?i)show$").unwrap();
     static ref SUM: R = R::new(r"^(?i)sum$").unwrap();
@@ -212,6 +229,8 @@ lazy_static! {
     static ref SORT: R = R::new(r"^(?i)sort$").unwrap();
     static ref SIGN: R = R::new(r"^(?i)sign$").unwrap();
     static ref CHECK: R = R::new(r"^(?i)check$").unwrap();
+    static ref GROUP: R = R::new(r"^(?i)group$").unwrap();
+    static ref SELECT: R = R::new(r"^(?i)select$").unwrap();
 
     static ref PLUS: R = R::new(r"^\+$").unwrap();
     static ref MINUS: R = R::new(r"^\-$").unwrap();

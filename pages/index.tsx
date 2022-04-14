@@ -1,15 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider'
-import Graph from 'react-graph-vis'
 import { GRAPH_DATA, GRAPH_OPTIONS } from '../src/test_graph'
 import * as STYLES from '../src/styles'
 import Token from '../src/token'
 import ScriptForm from '../src/script_form'
 
+// To avoid client/server id mismatch
+import dynamic from 'next/dynamic'
+const Graph = dynamic(() => import("react-graph-vis"), { ssr: false })
+
 const DEFAULT_TEST = 0;
 
-export default function IDE() {
+export default function HOPE() {
   const [graphState, setGraphState] = useState(GRAPH_DATA)
   const [script, setScript] = useState(['', '']);
   const [tokens, setTokens] = useState([]);
@@ -17,7 +20,7 @@ export default function IDE() {
   const workerRef = useRef<Worker>();
   useEffect(() => {
     workerRef.current = new Worker(
-      new URL('../src/core_worker.ts', import.meta.url)
+      new URL('../src/hobot_worker.ts', import.meta.url)
     );
     workerRef.current.addEventListener('message', (evt: any) => {
       if (evt.data.type == 'tests') { setScript(evt.data.tests[currentTest]) }
@@ -30,7 +33,7 @@ export default function IDE() {
       workerRef.current.postMessage({ type: 'build', title: script[0], body: script[1] });
     }
   }, [script]);
-
+  // suppressHydrationWarning
   return (
     <Container maxWidth='md'>
       <Divider sx={STYLES.DIVIDER}>Script</Divider>
