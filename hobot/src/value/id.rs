@@ -2,7 +2,7 @@ use core::fmt;
 use crate::*;
 
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
-pub enum Scheme {
+pub enum Scheme { // + system protocols
     Custom(Text),
     Screen,
     Http,

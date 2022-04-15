@@ -40,7 +40,7 @@ pub fn get_tests() -> JsValue {
 pub const TESTS: [(&'static str, &'static str); 9] = [
     ("Testscript X of Y", 
     "Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
-    For each number in xyz log (number * 2). For each message at @/endpoint/path/ show @message/content. For each message from @URI return x.
+    For each number in xyz show (number * 2). For each message at @/endpoint/path/ show @message/content. For each message from @URI return x.
     Request 'query' from @http://wikipedia.com and store result in @db:wiki. Request 'query' from @db:wiki and send to @scheme://domain/path.
     Select 'query' from @db:x where element is more than 0 and (element * 2) is less than 10.
     Match X: 0 then show 0, 1 then show 1. Sign Q in W as E.

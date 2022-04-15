@@ -14,9 +14,9 @@ export const COMMAND_COLOR = '#42d842'
 export const COLLECTION_COLOR = '#00c184'
 export const FORMULA_COLOR = '#8f0'
 export const CASE_COLOR = '#a500da'
-export const TERM_COLOR = '#41afd2'
-export const VALUE_COLOR = GREYISH
-export const MOD_COLOR = '#005772'
+//export const REF_COLOR = WHITISH //'#41afd2'
+export const VALUE_COLOR = WHITISH //GREYISH
+export const MOD_COLOR = '#41afd2' //'#005772'
 export const YES_COLOR = '#0f0'
 export const NO_COLOR = '#f00'
 

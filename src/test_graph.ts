@@ -7,11 +7,10 @@ const COLLECTION_NODE = { mass: 4, font: { color: STYLES.COLLECTION_COLOR } }
 const FORMULA_NODE = { mass: 4, font: { color: STYLES.FORMULA_COLOR } }
 const FLOW_NODE = { mass: 4, font: { color: STYLES.FLOW_COLOR } }
 const CASE_NODE = { mass: 4, font: { color: STYLES.CASE_COLOR } }
-const TERM_NODE = { font: { color: STYLES.TERM_COLOR } }
-const VALUE_NODE = { font: { color: STYLES.WHITISH } }
+const VALUE_NODE = { font: { color: STYLES.VALUE_COLOR } }
 
 const ARG_EDGE = { color: STYLES.GREYISH, dashes: true, arrows: { to: { enabled: false } } }
-const SET_EDGE = { color: STYLES.TERM_COLOR }
+const SET_EDGE = { color: STYLES.COMMAND_COLOR }
 const GET_EDGE = { color: STYLES.MOD_COLOR }
 const THEN_EDGE = { color: STYLES.WHITISH, dashes: true }
 const BREAK_EDGE = { color: STYLES.GREYISH }
@@ -64,34 +63,34 @@ export const GRAPH_DATA = {
             { id: 'show3', label: 'show', ...COMMAND_NODE },
             { id: 'struct', label: 'struct', ...COLLECTION_NODE },
             { id: 'when', label: 'when', ...FLOW_NODE },
-            { id: 'x1', label: 'x', ...TERM_NODE },
-            { id: 'y1', label: 'y', ...TERM_NODE },
-            { id: 'z1', label: 'z', ...TERM_NODE },
-            { id: 'x2', label: 'x', ...TERM_NODE },
-            { id: 'y2', label: 'y', ...TERM_NODE },
-            { id: 'z2', label: 'z', ...TERM_NODE },
-            { id: 'x3', label: 'x', ...TERM_NODE },
-            { id: 'y3', label: 'y', ...TERM_NODE },
-            { id: 'z3', label: 'z', ...TERM_NODE },
-            { id: 'x4', label: 'x', ...TERM_NODE },
-            { id: 'y4', label: 'y', ...TERM_NODE },
-            { id: 'x5', label: 'x', ...TERM_NODE },
-            { id: 'y5', label: 'y', ...TERM_NODE },
-            { id: 'z5', label: 'z', ...TERM_NODE },
-            { id: 's1', label: 's', ...TERM_NODE },
-            { id: 's2', label: 's', ...TERM_NODE },
-            { id: 's3', label: 's', ...TERM_NODE },
-            { id: 'xyz1', label: 'xyz', ...TERM_NODE },
-            { id: 'xyz2', label: 'xyz', ...TERM_NODE },
-            { id: 'xyz3', label: 'xyz', ...TERM_NODE },
-            { id: 'it1', label: 'it', ...TERM_NODE },
-            { id: 'it2', label: 'it', ...TERM_NODE },
-            { id: 'it3', label: 'it', ...TERM_NODE },
-            { id: 'it4', label: 'it', ...TERM_NODE },
-            { id: 'it5', label: 'it', ...TERM_NODE },
-            { id: 'it6', label: 'it', ...TERM_NODE },
-            { id: 'it7', label: 'it', ...TERM_NODE },
-            { id: 'it8', label: 'it', ...TERM_NODE },
+            { id: 'x1', label: 'x', ...VALUE_NODE },
+            { id: 'y1', label: 'y', ...VALUE_NODE },
+            { id: 'z1', label: 'z', ...VALUE_NODE },
+            { id: 'x2', label: 'x', ...VALUE_NODE },
+            { id: 'y2', label: 'y', ...VALUE_NODE },
+            { id: 'z2', label: 'z', ...VALUE_NODE },
+            { id: 'x3', label: 'x', ...VALUE_NODE },
+            { id: 'y3', label: 'y', ...VALUE_NODE },
+            { id: 'z3', label: 'z', ...VALUE_NODE },
+            { id: 'x4', label: 'x', ...VALUE_NODE },
+            { id: 'y4', label: 'y', ...VALUE_NODE },
+            { id: 'x5', label: 'x', ...VALUE_NODE },
+            { id: 'y5', label: 'y', ...VALUE_NODE },
+            { id: 'z5', label: 'z', ...VALUE_NODE },
+            { id: 's1', label: 's', ...VALUE_NODE },
+            { id: 's2', label: 's', ...VALUE_NODE },
+            { id: 's3', label: 's', ...VALUE_NODE },
+            { id: 'xyz1', label: 'xyz', ...VALUE_NODE },
+            { id: 'xyz2', label: 'xyz', ...VALUE_NODE },
+            { id: 'xyz3', label: 'xyz', ...VALUE_NODE },
+            { id: 'it1', label: 'it', ...VALUE_NODE },
+            { id: 'it2', label: 'it', ...VALUE_NODE },
+            { id: 'it3', label: 'it', ...VALUE_NODE },
+            { id: 'it4', label: 'it', ...VALUE_NODE },
+            { id: 'it5', label: 'it', ...VALUE_NODE },
+            { id: 'it6', label: 'it', ...VALUE_NODE },
+            { id: 'it7', label: 'it', ...VALUE_NODE },
+            { id: 'it8', label: 'it', ...VALUE_NODE },
             { id: 1, label: '1', ...VALUE_NODE },
             { id: 2, label: '2', ...VALUE_NODE },
             { id: 3, label: '3', ...VALUE_NODE },
