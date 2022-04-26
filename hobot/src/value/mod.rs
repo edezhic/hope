@@ -8,7 +8,7 @@ mod text;
 mod time;
 mod version;
 pub use fact::Fact;
-pub use id::Id;
+pub use id::*;
 pub use list::List;
 pub use number::Number;
 pub use seal::Seal;
@@ -38,6 +38,14 @@ impl Value {
     }
     pub fn falsehood() -> Value {
         Value::Fact(Fact::falsehood())
+    }
+    pub fn is_ref(&self) -> bool {
+        if let Value::Id(id) = self {
+            if id.scheme == Scheme::Ref {
+                return true
+            }
+        }
+        false
     }
     /*
     pub fn unsafe_set(&self, value: Value) {

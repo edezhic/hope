@@ -2,7 +2,7 @@ use core::fmt;
 use crate::*;
 
 #[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
-pub enum Scheme { // + system protocols
+pub enum Scheme { // + system/network/other protocols
     Custom(Text),
     Screen,
     Http,
@@ -58,15 +58,15 @@ impl fmt::Display for Path {
 
 #[derive(Clone, Debug, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct Id {
-    scheme: Scheme,
-    domain: Option<Text>,
-    path: Path,
+    pub scheme: Scheme,
+    pub domain: Option<Text>,
+    pub path: Option<Path>,
 }
 impl Id {
     pub fn from_str(s: &str) -> Result<Id> {
         let scheme = Scheme::Custom(Text::from_str(s));
         let domain = None;
-        let path = Path::new();
+        let path = None;
         Ok(Id {
             scheme,
             domain,
@@ -77,24 +77,11 @@ impl Id {
         Ok(Id::from_str(t.as_str())?)
     }
 
-    pub fn get_name(&self) -> Result<Text> {
-        if !self.path.empty() {
-            // check Scheme::Hopes = self.scheme?
-            if self.path.single() {
-                Ok(self.path.first_selector())
-            } else {
-                Err(Error::Error("Invalid name"))
-            }
-        } else {
-            Err(Error::Error("Not a name"))
-        }
-    }
-
     pub fn reference(s: &str) -> Id {
         Id {
             scheme: Scheme::Ref,
             domain: Some(Text::from_str(s)),
-            path: Path::new(),
+            path: None,
         }
     }
 }
@@ -102,12 +89,12 @@ impl Id {
 impl fmt::Display for Id {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self.domain {
-            Some(domain) => write!(f, "@{}://{}/{}", self.scheme, domain, self.path),
+            Some(domain) => write!(f, "@{}://{}/{:?}", self.scheme, domain, self.path),
             None => {
-                if self.path.empty() {
-                    write!(f, "@{}", self.scheme)
+                if let Some(path) = &self.path {
+                    write!(f, "@{}:{}", self.scheme, path)
                 } else {
-                    write!(f, "@{}:{}", self.scheme, self.path)
+                    write!(f, "@{}", self.scheme)
                 }
             }
         }

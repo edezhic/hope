@@ -1,5 +1,22 @@
 use crate::*;
 
+impl Token {
+    pub fn is_ref(&self) -> bool {
+        if let Token::Value(value) = self {
+            if value.is_ref() {
+                return true
+            }
+        }
+        false
+    }
+    pub fn is_cmd(&self) -> bool {
+        if let Token::Cmd(_) = self {
+            return true
+        }
+        false
+    }
+}
+
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Token {
     Value(Value),
@@ -69,7 +86,7 @@ pub enum Operation {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Modifier {
+pub enum Modifier { // => Token::Arg(Option<Modifier>)?
     With,
     By,
     Of,
@@ -78,4 +95,5 @@ pub enum Modifier {
     In,
     At,
     As,
+    Input,
 }

@@ -1,49 +1,43 @@
-import React, { Suspense, useEffect, useRef, useState } from 'react';
-import Container from '@mui/material/Container';
+import React, { Suspense, useEffect, useRef, useState } from 'react'
+import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
-import { GRAPH_DATA, GRAPH_OPTIONS } from '../src/test_graph'
-import * as STYLES from '../src/styles'
+import * as CONFIG from '../src/config'
 import Token from '../src/token'
 import ScriptForm from '../src/script_form'
-
-// To avoid client/server id mismatch
-import dynamic from 'next/dynamic'
-const Graph = dynamic(() => import("react-graph-vis"), { ssr: false })
-
-const DEFAULT_TEST = 0;
+import Graph from '../src/graph'
 
 export default function HOPE() {
-  const [graphState, setGraphState] = useState(GRAPH_DATA)
+  const [graph, setGraph] = useState({nodes: [], edges: []})
   const [script, setScript] = useState(['', '']);
   const [tokens, setTokens] = useState([]);
-  const [currentTest, setCurrentTest] = useState(DEFAULT_TEST);
+
   const workerRef = useRef<Worker>();
   useEffect(() => {
     workerRef.current = new Worker(
       new URL('../src/hobot_worker.ts', import.meta.url)
     );
     workerRef.current.addEventListener('message', (evt: any) => {
-      if (evt.data.type == 'tests') { setScript(evt.data.tests[currentTest]) }
-      if (evt.data.type == 'tokens') { setTokens(evt.data.tokens) }
+      if (evt.data.type == 'test') { setScript(evt.data.tests) }
+      if (evt.data.type == 'tokens&graph') { setTokens(evt.data.tokens), setGraph(evt.data.graph) }
     });
-    workerRef.current.postMessage({ type: 'get_tests' });
+    workerRef.current.postMessage({ type: 'get_test' });
   }, []);
   useEffect(() => {
-    if (workerRef.current) {
+    if (workerRef.current && script[0] != '') {
       workerRef.current.postMessage({ type: 'build', title: script[0], body: script[1] });
     }
   }, [script]);
-  // suppressHydrationWarning
+  
   return (
     <Container maxWidth='md'>
-      <Divider sx={STYLES.DIVIDER}>Script</Divider>
+      <Divider sx={CONFIG.DIVIDER}>Script</Divider>
       <ScriptForm script={script} setScript={setScript} />
 
-      <Divider sx={STYLES.DIVIDER}>Tokens</Divider>
+      <Divider sx={CONFIG.DIVIDER}>Tokens (example for syntax highlight)</Divider>
       {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item) + i} i={i}/>)}
 
-      <Divider sx={STYLES.DIVIDER}>Graph</Divider>
-      <Graph graph={graphState.graph as any} options={GRAPH_OPTIONS} style={STYLES.GRAPH_STYLE} />
+      <Divider sx={CONFIG.DIVIDER}>Graph</Divider>
+      <Graph nodes={graph.nodes} edges={graph.edges}/>
     </Container>
   );
 }

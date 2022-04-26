@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField'
-import * as STYLES from './styles'
+import * as CONFIG from './config'
 
 export default function ScriptForm(props: any) {
     return (
@@ -24,7 +24,7 @@ export default function ScriptForm(props: any) {
                 label='Body'
                 sx={{ marginBottom: 2, marginTop: 4 }}
                 multiline
-                rows={STYLES.SCRIPT_BODY_ROWS}
+                rows={CONFIG.SCRIPT_BODY_ROWS}
                 fullWidth
                 onChange={(event: any) => props.setScript([props.script[0], event.target.value])}
                 value={props.script[1]}

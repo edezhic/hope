@@ -244,5 +244,5 @@ lazy_static! {
     static ref SEAL: R = R::new(r"^\&$").unwrap();
     static ref TEXT: R = R::new(r#"^("|')$"#).unwrap();
     static ref TIME: R = R::new(r"^~$").unwrap();
-    static ref VERSION: R = R::new(r"^#$").unwrap(); // FIX change literal to "v{VERSION}"?
+    static ref VERSION: R = R::new(r"^#$").unwrap(); // FIX change literal to "v{VERSION}"? keep "#" for smth else
 }

@@ -1,28 +1,15 @@
 use hobot::*;
-
-/*
-pub struct Script { 
-    // -> enum + struct Auditor/Bot (which contains all debug stuff)?
-    // only Text? only parsed?
-    title: Text,
-    body: Text,
-    source: (Text, Text),
-    name: Text,
-    input: Option<Text>,
-    args: Vec<(Modifier, Text)>,
-    tokens: Vec<(usize, Text)>,
-    compiled: ()
-}
-
-impl Script {
-    // fn build { if Source { convert }; build algorithm }
-}
-*/
+use petgraph::dot::Dot;
 
 fn main() -> Result<()> {
-    let mut tokens = Parser::convert(TESTS[0].0)?;
+    println!("{:?}\n{:?}", TEST.0, TEST.1);
+
+    let mut tokens = Parser::convert(TEST.0)?;
     tokens.push((42, Break));
-    tokens.extend(Parser::convert(TESTS[0].1)?);
+    tokens.extend(Parser::convert(TEST.1)?);
     println!("{:?}", tokens);
+
+    println!("{:?}", Dot::with_config(&link(tokens)?, &[]));
+    
     Ok(())
 }

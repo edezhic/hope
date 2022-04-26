@@ -34,6 +34,11 @@ features = [
     "MouseEvent",
 ]
 
+[dependencies.petgraph]
+version = "0.6.0"
+default-features = false
+features = ["serde-1"]
+
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
 
