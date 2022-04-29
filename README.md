@@ -14,7 +14,7 @@ Besides that, the whole compilation process needs to be redesigned. Inspectable 
 The end result should look like an instruction for performing some command in regular formal english with a few(!) special symbols for convenience. And anyone with the knowledge of natural language should be able to grasp the core ideas in less than an hour.
 
 ## An example of script in hope
-Which can be parsed into tokens already, however graph linking works only for a small part of it as of now. However, this example was carefully crafted to capture syntax that could be linked and executed relatively easily in an intuitive manner without ambiguities.
+Which can be parsed into tokens already and some parts of it even linked into the graph. It was carefully crafted to capture syntax that could be linked and executed relatively easily in an intuitive manner without ambiguities.
 
 Title/definition/header:
 ```
