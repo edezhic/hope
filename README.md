@@ -39,6 +39,7 @@ Short-term targets:
 - execution engine for basic arithmetic, networking, OS interactions(through WASI) and UI development(outputing html/css/js for now).  
 
 Long-term questionable ideas:
+- Hope itself - intuitive IDE with all the debugging tools etc
 - integration with RedoxOS (lots of common underlying ideas)
 - WebGPU-based GPGPU and/or graphics
 - advanced cryptography
