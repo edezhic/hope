@@ -23,7 +23,7 @@ Title/definition/header:
 Body:
 > Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
 For each number in xyz show (number * 2). For each message at @protocol://domain/endpoint/path/ show @message/content. For each message from @URI return x.
-Get @http<area>://wikipedia.com, sign as user and store the result in @db:wiki. Select entries from @db:x where element is more than 0 and (element * 2) is less than 10. If any entries then show 'found'.
+Get @http<area>://wikipedia.com, sign as user and send the result to @db:wiki. Select entries from @db:x where element is more than 0 and (element * 2) is less than 10. If any entries then show 'found'.
 Match X: 0 then show 'zero', 1 then show 'one'.
 Try sum [0, 'a']. If result contains 'error' show 'error expected here'. Try panic with 'error', show result.
 
