@@ -142,13 +142,12 @@ impl<'a> Parser<'a> {
             piece if PANIC.is_match(piece) => Panic,
 
             piece if ADD.is_match(piece) => Cmd(Add),
-            piece if STORE.is_match(piece) => Cmd(Store),
             piece if SEND.is_match(piece) => Cmd(Send),
             piece if SHOW.is_match(piece) => Cmd(Show),
             piece if SUBSTRACT.is_match(piece) => Cmd(Substract),
             piece if SUM.is_match(piece) => Cmd(Sum),
             piece if FILTER.is_match(piece) => Cmd(Filter),
-            piece if REQUEST.is_match(piece) => Cmd(Request),
+            piece if GET.is_match(piece) => Cmd(Get),
             piece if SORT.is_match(piece) => Cmd(Sort),
             piece if SIGN.is_match(piece) => Cmd(Sign),
             piece if GROUP.is_match(piece) => Cmd(Group),
@@ -220,12 +219,11 @@ lazy_static! {
 
     static ref ADD: R = R::new(r"^(?i)add$").unwrap();
     static ref SUBSTRACT: R = R::new(r"^(?i)substract$").unwrap();
-    static ref STORE: R = R::new(r"^(?i)store$").unwrap();
     static ref SEND: R = R::new(r"^(?i)send$").unwrap();
     static ref SHOW: R = R::new(r"^(?i)show$").unwrap();
     static ref SUM: R = R::new(r"^(?i)sum$").unwrap();
     static ref FILTER: R = R::new(r"^(?i)filter$").unwrap();
-    static ref REQUEST: R = R::new(r"^(?i)request$").unwrap();
+    static ref GET: R = R::new(r"^(?i)get$").unwrap();
     static ref SORT: R = R::new(r"^(?i)sort$").unwrap();
     static ref SIGN: R = R::new(r"^(?i)sign$").unwrap();
     static ref CHECK: R = R::new(r"^(?i)check$").unwrap();

@@ -7,7 +7,6 @@ const ReactGraphVis = dynamic(() => import("react-graph-vis"), { ssr: false })
 
 export default function Graph ({ nodes, edges }: any) {
     if (nodes.length == 0) return null;
-    //console.log(nodes, edges)
     
     const normalized_nodes = nodes.map((node: any, index: number) => {
         const id = index
@@ -24,8 +23,8 @@ export default function Graph ({ nodes, edges }: any) {
         const from = edge[0]
         const to = edge[1]
         if (edge[2].Mod) return { from, to, label: edge[2].Mod, ...CONFIG.ARG_EDGE }
-        if (edge[2].Cmd == 'Request') return { from, to, ...CONFIG.GET_EDGE }
-        if (edge[2].Cmd == 'Store') return { from, to, ...CONFIG.SET_EDGE }
+        if (edge[2].Cmd == 'Get') return { from, to, ...CONFIG.GET_EDGE }
+        if (edge[2].Cmd == 'Send') return { from, to, ...CONFIG.SET_EDGE }
         if (edge[2] == 'Then') return { from, to, ...CONFIG.THEN_EDGE }
     })
 

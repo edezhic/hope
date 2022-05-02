@@ -11,25 +11,21 @@ I believe that the best way to solve this is to create a programming language(PL
 
 Besides that, the whole compilation process needs to be redesigned. Inspectable PL can't be done with a dozen of unintuitive intermediate representations, so for now I want to keep only tokens and computational graph. Execution flow has to be simplified. Things like mandatory semicolons/indentation and base2 float arithmetic rounding errors have to leave the stage already. And there is plenty of other details that are intuitive to software engineers but very confusing to regular folks. Also, I think it should be comfortable to read and write on small devices like smartphones and tablets. 
 
-The end result should look like an instruction for performing some command in regular formal english with a few(!) special symbols for convenience. And anyone with the knowledge of natural language should be able to grasp the core ideas in less than an hour.
+The end result should look like an instruction for execution of a command in regular formal english with a few(!) special symbols for convenience. And anyone with the knowledge of natural language should be able to grasp the core ideas in less than an hour.
 
 ## An example of script in hope
 Which can be parsed into tokens already and some parts of it even linked into the graph. It was carefully crafted to capture syntax that could be linked and executed relatively easily in an intuitive manner without ambiguities.
 
 Title/definition/header:
-```
-CustomScript X and Y 
-```
+
+> CustomScript X and Y 
+
 Body:
-```
-Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
-For each number in xyz show (number * 2). For each message at @/endpoint/path/ show @message/content. For each message from @URI return x.
-Request 'query' from @http://wikipedia.com, sign as user and store the result in @db:wiki. Select 'query' from @db:x where element is more than 0 and (element * 2) is less than 10.
-Match X: 
-0 then show 0
-1 then show 1
+> Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum and show xyz. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
+For each number in xyz show (number * 2). For each message at @protocol://domain/endpoint/path/ show @message/content. For each message from @URI return x.
+Get @http<area>://wikipedia.com, sign as user and store the result in @db:wiki. Select entries from @db:x where element is more than 0 and (element * 2) is less than 10. If any entries then show 'found'.
+Match X: 0 then show 'zero', 1 then show 'one'.
 Try sum [0, 'a']. If result contains 'error' show 'error expected here'. Try panic with 'error', show result.
-```
 
 ## Roadmap
 
@@ -41,7 +37,7 @@ Short-term targets:
 Long-term questionable ideas:
 - Hope itself - intuitive IDE with all the debugging tools etc
 - integration with RedoxOS (lots of common underlying ideas)
-- WebGPU-based GPGPU and/or graphics
+- WebGPU-based GPGPU for machine learning and/or graphics
 - advanced cryptography
 - [insert what **you** want in a perfect programming language here]
 

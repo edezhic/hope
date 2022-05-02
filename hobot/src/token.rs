@@ -63,11 +63,10 @@ pub enum Token {
 pub enum Command {
     Add,       // To
     Substract, // From -> Remove/Delete?
-    Send,      // To
     Filter,    // ?
     Sum,       // ?
-    Store,     // At
-    Request,   // From
+    Send,      // To
+    Get,       // ?
     Sort,      // By
     Show,      // ?
     Sign,      // With(As?)
