@@ -177,7 +177,7 @@ lazy_static! {
     static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| |\?)+$").unwrap();
     static ref BE: R = R::new(r"^(?i)(:|=|is|are|equal)$").unwrap();
     static ref REFERENCE: R = R::new(r"^\p{Letter}+").unwrap();
-    static ref THIS: R = R::new(r"^(?i)(result|this|it|that)$").unwrap();
+    static ref THIS: R = R::new(r"^(?i)(result|this|it|that)$").unwrap(); // remove 'result' from it?
     static ref AND: R = R::new(r"^(?i)and$").unwrap();
     static ref OR: R = R::new(r"^(?i)or$").unwrap();
 

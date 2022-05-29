@@ -37,7 +37,7 @@ features = [
 [dependencies.petgraph]
 version = "0.6.0"
 default-features = false
-features = ["serde-1"]
+features = ["serde-1", "stable_graph"]
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"

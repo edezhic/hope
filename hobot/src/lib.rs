@@ -31,8 +31,8 @@ pub fn build(title: &str, body: &str) -> JsValue {
     let mut tokens = Parser::convert(title).unwrap();
     tokens.push((42, Break));
     tokens.extend(Parser::convert(body).unwrap());
-    let graph = link(tokens.clone()).unwrap();
-    JsValue::from_serde(&(tokens, graph)).unwrap()
+    let program = link(tokens.clone()).unwrap();
+    JsValue::from_serde(&(tokens, program.graph)).unwrap()
 }
 
 #[wasm_bindgen]

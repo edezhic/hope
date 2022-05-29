@@ -1,66 +1,143 @@
 use crate::*;
-use petgraph::graph::DiGraph;
+use petgraph::stable_graph::{StableDiGraph, NodeIndex};
+use std::{vec::IntoIter, iter::Peekable};
 
-pub fn link(tokens: Vec<(usize, Token)>) -> Result<DiGraph<Token, Token>> {
-    // LINK TOKENS INTO GRAPH ----------------------------------------------
-    let mut graph = DiGraph::<Token, Token>::new();
-    let mut iter = tokens.into_iter().peekable();
-
-    // Parse title ^^^^^^^^^^^^^^^^^^^^
-    let script = graph.add_node(iter.next().unwrap().1);
-    let input = graph.add_node(iter.next().unwrap().1);
-    graph.add_edge(input, script, Token::Mod(Modifier::Input));
-    
-    while iter.peek().unwrap().1 != Break {
-        let modifier = iter.next().unwrap().1;
-        let arg = graph.add_node(iter.next().unwrap().1);
-        graph.add_edge(arg, script, modifier);
+pub struct Program {
+    id: Id,
+    args: Vec<(Modifier, Id)>,
+    pub graph: StableDiGraph::<Token, Token>
+}
+impl Program {
+    pub fn init(firstToken: Token) -> Result<Program> {
+        if let Value(Value::Id(id)) = firstToken {
+            Ok(Program {
+                id,
+                args: vec![],
+                graph: StableDiGraph::<Token, Token>::new(),
+            })
+        } else {
+            Err(Error::Error("Script name must come 1st"))
+        }
     }
+    pub fn add_arg(&mut self, modifier: Modifier, id: Id) {
+        self.args.push((modifier, id))
+    }
+    pub fn assign(&mut self, target: Token) -> NodeIndex {
+        let assigment = self.graph.add_node(Being);
+        let target = self.graph.add_node(target);
+        self.graph.add_edge(assigment, target, Cmd(Command::Send));
+        assigment
+    }
+    pub fn add_value(&mut self, value: Token) -> NodeIndex {
+        self.graph.add_node(value)
+    }
+    pub fn link(&mut self, source: NodeIndex, target: NodeIndex, label: Token) {
+        self.graph.add_edge(source, target, label);
+    }
+}
+
+pub struct TokensIterator {
+    iter: Peekable<IntoIter<(usize, Token)>>
+}
+impl TokensIterator {
+    pub fn init(tokens: Vec<(usize, Token)>) -> Result<TokensIterator> {
+        if tokens.len() > 0 {
+            Ok(TokensIterator { iter: tokens.into_iter().peekable() })
+        } else {
+            Err(Error::Error("Script cannot be empty"))
+        }
+    }
+    pub fn take(&mut self) -> Token {
+        self.iter.next().unwrap().1
+    }
+    pub fn take_mod(&mut self) -> Result<Modifier> {
+        if let Token::Mod(modifier) = self.take() {
+            Ok(modifier)
+        } else {
+            Err(Error::Error("Expected modifier"))
+        }
+    }
+    pub fn take_id(&mut self) -> Result<Id> {
+        if let Token::Value(Value::Id(id)) = self.take() { // && id.is_ref() { 
+            Ok(id)
+        } else {
+            Err(Error::Error("Expected reference"))
+        }
+    }
+    pub fn remain(&self) -> bool {
+        if let Some(_) = self.iter.peek() {
+            return true
+        }
+        false
+    }
+    pub fn peek(&self) -> Token {
+        self.iter.peek().unwrap().1
+    }
+    pub fn skip(&mut self) {
+        self.iter.next();
+    }
+}
+
+pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
+    let mut tokens = TokensIterator::init(vec)?;
+    let mut program = Program::init(tokens.take())?;
     
-    iter.next();
+    if let Value(Value::Id(id)) = tokens.peek() {
+        program.add_arg(Modifier::Input, id)
+    }
 
-    // parse headers of all scripts before parsing their bodies to construct namespace?
+    while tokens.peek() != Break {
+        program.add_arg(tokens.take_mod()?, tokens.take_id()?);
+    }
+    tokens.skip();
 
-    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    // Parse Body *********************
+    // parse headers of all scripts before parsing their bodies to construct namespace
 
-    let mut last_node = script;
-
-    while let Some(_) = iter.peek() {
-        //println!("{:?}", iter.peek().unwrap().1);
-        match iter.next().unwrap().1 {
+    while tokens.remain() {
+        //println!("{:?}", tokens.peek());
+        match tokens.take() {
             token if token.is_ref() => {
-                // if ref to script proceed like with Cmd
-
-                if iter.peek().unwrap().1 == Being {
-                    let assigment = graph.add_node(iter.next().unwrap().1);
-                    let target = graph.add_node(token);
-                    graph.add_edge(assigment, target, Cmd(Command::Send));
-                    // collect input:
-                    match iter.peek().unwrap().1 {
+                // check if ref leads to a script, if so - proceed like with Cmd, else:
+                if tokens.peek() == Being { // replace with tokens.expect(Being)?
+                    let assigment = program.assign(token); // hanging nodes
+                    tokens.skip();
+                    // COLLECT INPUT(!) / EVALUATE / ???: ------------------------------------------------
+                    match tokens.peek() {
                         Value(_) => {
-                            let value = graph.add_node(iter.next().unwrap().1);
-                            graph.add_edge(value, assigment, Cmd(Command::Get));
+                            let value = program.add_value(tokens.take());
+                            program.link(value, assigment, Cmd(Command::Get));
                         }
-                        ListStart => {
-                            let list = graph.add_node(iter.next().unwrap().1);
-                            while iter.peek().unwrap().1 != ListEnd {
+                        ListStart => { 
+                            // create Append node for each collect_input sequentially? or
+                            // create an aggr node and point each collect_input result there in parallel?
+                            let list = graph.add_node(tokens.take());
+                            while tokens.peek() != ListEnd {
                                 // collect input (simplified?)
-                                let list_item = graph.add_node(iter.next().unwrap().1);
+                                let list_item = graph.add_node(tokens.take());
                                 graph.add_edge(list_item, list, Cmd(Command::Get));
                             }
-                            iter.next();
+                            tokens.skip();
                         }
-                        _ => break // get result as input?
+                        StructStart => {
+                            // collect struct
+                        }
+                        token if token.is_cmd() => {
+                            // collect cmd and link its result
+                        }
+                        FormulaStart => {
+                            // collect formula
+                        }
+                        _ => break // get Result as input?
                     }
+                    // ------------------------------------------------------------------
                     graph.add_edge(last_node, assigment, Then);
-                    last_node = assigment;
+                    //last_node = assigment;
                 } 
                 // else Unexpected token
             }
             token if token.is_cmd() => {
                 let command = graph.add_node(token);
-                match &iter.peek().unwrap().1 {
+                match tokens.peek() {
                     token if token.is_ref() => {
                         let input = graph.add_node(token.clone());
                         graph.add_edge(input, command, Cmd(Command::Get));
@@ -71,7 +148,7 @@ pub fn link(tokens: Vec<(usize, Token)>) -> Result<DiGraph<Token, Token>> {
                     }
                 }
                 graph.add_edge(last_node, command, Then);
-                last_node = command;
+                //last_node = command;
                 // expect CMD.modifier()?
                 // collect argument
             }
@@ -95,8 +172,5 @@ pub fn link(tokens: Vec<(usize, Token)>) -> Result<DiGraph<Token, Token>> {
         }
 
     } 
-
-    // ********************************
-
-    Ok(graph)
+    Ok(program)
 }
