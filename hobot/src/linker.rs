@@ -9,7 +9,7 @@ pub struct Program {
 }
 impl Program {
     pub fn init(firstToken: Token) -> Result<Program> {
-        if let Value(Value::Id(id)) = firstToken {
+        if let Value(Value::Id(id)) = firstToken { // & is 1st-level ref
             Ok(Program {
                 id,
                 args: vec![],
@@ -122,7 +122,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                             // collect struct
                         }
                         token if token.is_cmd() => {
-                            // collect cmd and link its result
+                            // 
                         }
                         FormulaStart => {
                             // collect formula
@@ -136,6 +136,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                 // else Unexpected token
             }
             token if token.is_cmd() => {
+                // let syntax = token.syntax()
                 let command = graph.add_node(token);
                 match tokens.peek() {
                     token if token.is_ref() => {
