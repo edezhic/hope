@@ -5,7 +5,7 @@ use derive_more::{IntoIterator};
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, IntoIterator, PartialEq)]
 pub struct List {
     #[into_iterator(owned, ref, ref_mut)]
-    values: VecDeque<Value>
+    pub values: VecDeque<Value>
 }
 
 impl List {

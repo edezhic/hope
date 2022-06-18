@@ -5,7 +5,7 @@ type Key = Text;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub struct Structure {
-    content: HashMap<Key, Value>,
+    pub content: HashMap<Key, Value>,
 }
 
 impl Structure {
