@@ -1,17 +1,61 @@
-use crate::*;
+use crate::{*, Value::*};
+use std::{vec::IntoIter, iter::Peekable};
+
+pub struct TokensIterator {
+    iter: Peekable<IntoIter<(usize, Token)>>
+}
+impl TokensIterator {
+    pub fn init(tokens: Vec<(usize, Token)>) -> Result<TokensIterator> {
+        if tokens.len() > 0 {
+            Ok(TokensIterator { iter: tokens.into_iter().peekable() })
+        } else {
+            Err(Message("Script cannot be empty"))
+        }
+    }
+    pub fn take(&mut self) -> Token {
+        self.iter.next().unwrap().1
+    }
+    pub fn take_prep(&mut self) -> Result<Preposition> {
+        if let P(preposition) = self.take() {
+            Ok(preposition)
+        } else {
+            Err(Message("Expected modifier"))
+        }
+    }
+    pub fn take_id(&mut self) -> Result<Id> {
+        if let V(I(id)) = self.take() { // && id.is_ref()
+            Ok(id)
+        } else {
+            Err(Message("Expected reference"))
+        }
+    }
+    pub fn remain(&mut self) -> bool {
+        if let Some(_) = self.iter.peek() {
+            return true
+        }
+        false
+    }
+    pub fn peek(&mut self) -> &Token {
+        &self.iter.peek().unwrap().1
+    }
+    pub fn next(&mut self) {
+        self.iter.next();
+    }
+}
+
 
 impl Token {
     pub fn is_ref(&self) -> bool {
-        if let Token::Value(value) = self {
+        if let Token::V(value) = self {
             if value.is_ref() {
-                return true
+                return true;
             }
         }
         false
     }
-    pub fn is_cmd(&self) -> bool {
-        if let Token::Cmd(_) = self {
-            return true
+    pub fn is_function(&self) -> bool {
+        if let Token::F(_) = self {
+            return true;
         }
         false
     }
@@ -19,48 +63,51 @@ impl Token {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Token {
-    Value(Value),
-    Op(Operation),
-    Cmd(Command),
-    Mod(Modifier),
-    
-    Being,
     This,
-
+    Be,
     And,
     Or,
-    
-    Any,
-    Each,
-    Less,
-    More,
-    Than,
-    Contains,
+    V(Value),
+    A(Algebra),
+    F(Function),
+    P(Preposition),
+    R(Relation),
+    S(Selector),
+    C(Control),
+}
 
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+pub enum Control {
+    Closure,
     Break,
     Do,
     Else,
-    End,
-    For,
     If,
     Then,
     While,
-    Where,
     Return,
     Match,
     Try,
     Panic,
-
-    ListStart,
-    ListEnd,
-    StructStart,
-    StructEnd,
-    FormulaStart,
-    FormulaEnd,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Command {
+pub enum Selector {
+    Where,
+    Any,
+    Each,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+pub enum Relation {
+    Than,
+    Less,
+    More,
+    Contains,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+pub enum Function {
     Add,       // To
     Substract, // From -> Remove/Delete?
     Filter,    // ?
@@ -72,10 +119,13 @@ pub enum Command {
     Sign,      // With(As?)
     Group,     // By -> Group by?
     Select,    // From
+               // Join?
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Operation {
+pub enum Algebra {
+    Start,
+    End,
     Plus,
     Minus,
     Multiplication,
@@ -85,7 +135,8 @@ pub enum Operation {
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
-pub enum Modifier { // => Token::Arg(Option<Modifier>)?
+pub enum Preposition {
+    For,
     With,
     By,
     Of,
@@ -94,5 +145,4 @@ pub enum Modifier { // => Token::Arg(Option<Modifier>)?
     In,
     At,
     As,
-    Input,
 }

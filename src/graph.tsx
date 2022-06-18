@@ -11,7 +11,7 @@ export default function Graph ({ nodes, edges }: any) {
     const normalized_nodes = nodes.map((node: any, index: number) => {
         const id = index
         if (index == 0) return { id, label: node.Value.Id.domain, ...CONFIG.SCRIPT_NODE }
-        if (node == 'Being') return { id, label: 'be', ...CONFIG.ASSIGNMENT_NODE }
+        if (node == 'Be') return { id, label: 'be', ...CONFIG.ASSIGNMENT_NODE }
         if (node == 'ListStart') return { id, label: 'list', ...CONFIG.COLLECTION_NODE }
         if (node == 'This') return { id, label: 'result', ...CONFIG.VALUE_NODE }
         if (node.Value?.Id?.scheme == 'Ref') return { id, label: node.Value.Id.domain, ...CONFIG.VALUE_NODE }

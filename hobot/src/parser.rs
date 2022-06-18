@@ -1,4 +1,4 @@
-use crate::{*, Modifier::*, Operation::*, Command::*};
+use crate::{*, Preposition::*, Algebra::*, Function::*, Control::*, Selector::*, Relation::*};
 use regex::Regex as R;
 use std::iter::Peekable;
 use unicode_segmentation::UWordBoundIndices;
@@ -22,7 +22,7 @@ impl<'a> Parser<'a> {
             } else if let Some(reference) = parser.match_reference(piece) {
                 vec.push((index, reference));
             } else {
-                return Err(Error::ParsingError(format!(
+                return Err(Parsing(format!(
                     r#"I don't know how to translate '{:?}'"#,
                     piece
                 )));
@@ -77,86 +77,85 @@ impl<'a> Parser<'a> {
         let value = match piece {
             piece if TRUE.is_match(piece) => {
                 self.next();
-                Value::truth()
+                Value::Yes
             }
             piece if FALSE.is_match(piece) => {
                 self.next();
-                Value::falsehood()
+                Value::No
             }
             piece if NUMBER.is_match(piece) => {
                 let num = piece.replacen(",", ".", 1);
                 self.next();
-                Value::Number(Number::from_string(num)?)
+                Value::Num(Number::from_string(num)?)
             }
             piece if TEXT.is_match(piece) => Value::Text(self.collect_until(&TEXT, true)),
-            piece if ID.is_match(piece) => Value::Id(Id::from_text(self.collect_literal())?),
-            piece if SEAL.is_match(piece) => Value::Seal(Seal::from_text(self.collect_literal())?),
-            piece if TIME.is_match(piece) => Value::Time(Time::from_text(self.collect_literal())?),
-            piece if VERSION.is_match(piece) => {
-                Value::Version(Version::from_text(self.collect_literal())?)
-            }
+            piece if ID.is_match(piece) => Value::I(Id::from_text(self.collect_literal())?),
+            //piece if SEAL.is_match(piece) => Value::Seal(Seal::from_text(self.collect_literal())?),
+            piece if TIME.is_match(piece) => Value::Dt(Datetime::from_text(self.collect_literal())?),
+            piece if VERSION.is_match(piece) => Value::Ver(Version::from_text(self.collect_literal())?),
             _ => return Ok(None),
         };
-        Ok(Some(Value(value)))
+        Ok(Some(V(value)))
     }
-    pub fn match_keyword(&mut self, piece: &str) -> Option<Token> {
-        let token = match piece {
-            piece if BE.is_match(piece) => Being,
-            piece if THIS.is_match(piece) => This,
-            piece if AND.is_match(piece) => And,
-            piece if OR.is_match(piece) => Or,
+    pub fn match_keyword(&mut self, s: &str) -> Option<Token> {
+        let token = match s {
+            s if BE.is_match(s) => Be,
+            s if THIS.is_match(s) => This,
+            s if AND.is_match(s) => And,
+            s if OR.is_match(s) => Or,
 
-            piece if ANY.is_match(piece) => Any,
-            piece if EACH.is_match(piece) => Each,
-            piece if LESS.is_match(piece) => Less,
-            piece if MORE.is_match(piece) => More,
-            piece if THAN.is_match(piece) => Than,
-            piece if CONTAINS.is_match(piece) => Contains,
-
-            piece if FORMULA_START.is_match(piece) => FormulaStart,
-            piece if FORMULA_END.is_match(piece) => FormulaEnd,
-            piece if STRUCT_START.is_match(piece) => StructStart,
-            piece if STRUCT_END.is_match(piece) => StructEnd,
-            piece if LIST_START.is_match(piece) => ListStart,
-            piece if LIST_END.is_match(piece) => ListEnd,
-
-            piece if WITH.is_match(piece) => Mod(With),
-            piece if BY.is_match(piece) => Mod(By),
-            piece if OF.is_match(piece) => Mod(Of),
-            piece if FROM.is_match(piece) => Mod(From),
-            piece if TO.is_match(piece) => Mod(To),
-            piece if IN.is_match(piece) => Mod(In),
-            piece if AT.is_match(piece) => Mod(At),
-            piece if AS.is_match(piece) => Mod(As),
-
-            piece if IF.is_match(piece) => If,
-            piece if FOR.is_match(piece) => For,
-            piece if THEN.is_match(piece) => Then,
-            piece if ELSE.is_match(piece) => Else,
-            piece if BREAK.is_match(piece) => Break,
-            piece if RETURN.is_match(piece) => Return,
-            piece if MATCH.is_match(piece) => Match,
-            piece if WHERE.is_match(piece) => Where,
-            piece if WHILE.is_match(piece) => While,
-            piece if TRY.is_match(piece) => Try,
-            piece if PANIC.is_match(piece) => Panic,
-
-            piece if ADD.is_match(piece) => Cmd(Add),
-            piece if SEND.is_match(piece) => Cmd(Send),
-            piece if SHOW.is_match(piece) => Cmd(Show),
-            piece if SUBSTRACT.is_match(piece) => Cmd(Substract),
-            piece if SUM.is_match(piece) => Cmd(Sum),
-            piece if FILTER.is_match(piece) => Cmd(Filter),
-            piece if GET.is_match(piece) => Cmd(Get),
-            piece if SORT.is_match(piece) => Cmd(Sort),
-            piece if SIGN.is_match(piece) => Cmd(Sign),
-            piece if GROUP.is_match(piece) => Cmd(Group),
-            piece if SELECT.is_match(piece) => Cmd(Select),
+            s if WHERE.is_match(s) => S(Where),
+            s if ANY.is_match(s) => S(Any),
+            s if EACH.is_match(s) => S(Each),
             
-            piece if PLUS.is_match(piece) => Op(Plus),
-            piece if MINUS.is_match(piece) => Op(Minus),
-            piece if MULTIPLICATION.is_match(piece) => Op(Multiplication),
-            piece if DIVISION.is_match(piece) => Op(Division),
+            s if LESS.is_match(s) => R(Less),
+            s if MORE.is_match(s) => R(More),
+            s if THAN.is_match(s) => R(Than),
+            s if CONTAINS.is_match(s) => R(Contains),
+            
+            s if STRUCT_START.is_match(s) => V(Value::new_struct()),
+            s if STRUCT_END.is_match(s) => C(Closure),
+            s if LIST_START.is_match(s) => V(Value::new_list()),
+            s if LIST_END.is_match(s) => C(Closure),
+
+            s if WITH.is_match(s) => P(With),
+            s if BY.is_match(s) => P(By),
+            s if OF.is_match(s) => P(Of),
+            s if FROM.is_match(s) => P(From),
+            s if TO.is_match(s) => P(To),
+            s if IN.is_match(s) => P(In),
+            s if AT.is_match(s) => P(At),
+            s if AS.is_match(s) => P(As),
+            s if FOR.is_match(s) => P(For),
+            
+            s if IF.is_match(s) => C(If),
+            s if THEN.is_match(s) => C(Then),
+            s if ELSE.is_match(s) => C(Else),
+            s if BREAK.is_match(s) => C(Break),
+            s if RETURN.is_match(s) => C(Return),
+            s if MATCH.is_match(s) => C(Match),
+            s if WHILE.is_match(s) => C(While),
+            s if TRY.is_match(s) => C(Try),
+            s if PANIC.is_match(s) => C(Panic),
+
+            s if ADD.is_match(s) => F(Add),
+            s if SEND.is_match(s) => F(Send),
+            s if SHOW.is_match(s) => F(Show),
+            s if SUBSTRACT.is_match(s) => F(Substract),
+            s if SUM.is_match(s) => F(Sum),
+            s if FILTER.is_match(s) => F(Filter),
+            s if GET.is_match(s) => F(Get),
+            s if SORT.is_match(s) => F(Sort),
+            s if SIGN.is_match(s) => F(Sign),
+            s if GROUP.is_match(s) => F(Group),
+            s if SELECT.is_match(s) => F(Select),
+            
+            s if FORMULA_START.is_match(s) => A(Start),
+            s if FORMULA_END.is_match(s) => A(End),
+            s if PLUS.is_match(s) => A(Plus),
+            s if MINUS.is_match(s) => A(Minus),
+            s if MULTIPLICATION.is_match(s) => A(Multiplication),
+            s if DIVISION.is_match(s) => A(Division),
             _ => return None,
         };
         self.next();
@@ -166,7 +165,7 @@ impl<'a> Parser<'a> {
     pub fn match_reference(&mut self, piece: &str) -> Option<Token> {
         if REFERENCE.is_match(piece) {
             self.next();
-            Some(Value(Value::Id(Id::reference(piece))))
+            Some(V(Value::I(Id::reference(piece))))
         } else {
             None
         }
@@ -196,13 +195,12 @@ lazy_static! {
     static ref IN: R = R::new(r"^(?i)in$").unwrap();
     static ref AT: R = R::new(r"^(?i)at$").unwrap();
     static ref AS: R = R::new(r"^(?i)as$").unwrap();
-
+    static ref FOR: R = R::new(r"^(?i)for$").unwrap();
 
     static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl})$").unwrap();
     static ref IF: R = R::new(r"^(?i)if$").unwrap();
     static ref THEN: R = R::new(r"^(?i)then$").unwrap();
     static ref ELSE: R = R::new(r"^(?i)else$").unwrap();
-    static ref FOR: R = R::new(r"^(?i)for$").unwrap();
     static ref RETURN: R = R::new(r"^(?i)return$").unwrap();
     static ref MATCH: R = R::new(r"^(?i)match$").unwrap();
     static ref WHERE: R = R::new(r"^(?i)where$").unwrap();

@@ -5,7 +5,7 @@ fn main() -> Result<()> {
     println!("{:?}\n{:?}", TEST.0, TEST.1);
 
     let mut tokens = Parser::convert(TEST.0)?;
-    tokens.push((42, Break));
+    tokens.push((42, C(Break)));
     tokens.extend(Parser::convert(TEST.1)?);
     println!("{:?}", tokens);
 

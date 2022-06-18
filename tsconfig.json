@@ -24,7 +24,6 @@
     "**/*.ts",
     "**/*.tsx",
     "typings.d.ts",
-    "styles/theme.js"
   ],
   "exclude": [
     "node_modules"

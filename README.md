@@ -1,7 +1,7 @@
 # Hope
 Human-oriented programming environment
 
-This project is about making a 'programming language' that is as close to natural language (currently targeting English) as possible. You can find an example of such "code" and HOBot (human-oriented bot) compiled into wasm module that builds the script on the fly [on the github pages of this repo](https://edezhic.github.io/Hope/). 
+This project is about making a 'programming language' that is as close to natural language (currently targeting English) as possible. You can find an example of such "code" and HOBot (human-oriented bot) compiled into wasm module that builds the script on the fly [on the github pages of this repo](https://edezhic.github.io/hope/). 
 
 ## Motivation
 
@@ -14,7 +14,7 @@ Besides that, the whole compilation process needs to be redesigned. Inspectable 
 The end result should look like an instruction for execution of a command in regular formal english with a few(!) special symbols for convenience. And anyone with the knowledge of natural language should be able to grasp the core ideas in less than an hour.
 
 ## An example of script in hope
-Which can be parsed into tokens already and some parts of it even linked into the graph. It was carefully crafted to capture syntax that could be linked and executed relatively easily in an intuitive manner without ambiguities.
+Which can be parsed into tokens already and some parts of it even linked into the graph. It was carefully crafted to capture syntax that could be linked and executed relatively easily in an intuitive manner without ambiguities. However, syntax is still unstable and will most likely differ in multiple ways from this example.
 
 Header:
 

@@ -19,7 +19,7 @@ mod parser;
 mod linker;
 mod token;
 mod value;
-pub use error::{Error, Result};
+pub use error::{Error::*, Result};
 pub use parser::Parser;
 pub use token::{Token::*, *};
 pub use value::*;
@@ -29,7 +29,7 @@ pub use linker::link;
 pub fn build(title: &str, body: &str) -> JsValue {
     console_error_panic_hook::set_once();
     let mut tokens = Parser::convert(title).unwrap();
-    tokens.push((42, Break));
+    tokens.push((42, C(Control::Break)));
     tokens.extend(Parser::convert(body).unwrap());
     let program = link(tokens.clone()).unwrap();
     JsValue::from_serde(&(tokens, program.graph)).unwrap()

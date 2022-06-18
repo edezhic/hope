@@ -1,142 +1,105 @@
-use crate::*;
-use petgraph::stable_graph::{StableDiGraph, NodeIndex};
-use std::{vec::IntoIter, iter::Peekable};
+use crate::{*, Value::*, Preposition::*, Algebra::*, Function::*, Control::*, Selector::*, Relation::*};
+use petgraph::stable_graph::{StableDiGraph, NodeIndex as Node};
+//use std::{vec::IntoIter, iter::Peekable};
 
+pub struct Argument {
+    prep: Option<Preposition>,
+    id: Id
+}
 pub struct Program {
     id: Id,
-    args: Vec<(Modifier, Id)>,
+    args: Vec<Argument>,
     pub graph: StableDiGraph::<Token, Token>
 }
 impl Program {
     pub fn init(firstToken: Token) -> Result<Program> {
-        if let Value(Value::Id(id)) = firstToken { // & is 1st-level ref
+        if let V(I(id)) = firstToken { // && is 1st-level ref
             Ok(Program {
                 id,
                 args: vec![],
                 graph: StableDiGraph::<Token, Token>::new(),
             })
         } else {
-            Err(Error::Error("Script name must come 1st"))
+            Err(Message("Script name must come 1st"))
         }
     }
-    pub fn add_arg(&mut self, modifier: Modifier, id: Id) {
-        self.args.push((modifier, id))
+    pub fn program_input(&mut self, id: Id) {
+        self.args.push(Argument { prep: None, id })
     }
-    pub fn assign(&mut self, target: Token) -> NodeIndex {
-        let assigment = self.graph.add_node(Being);
-        let target = self.graph.add_node(target);
-        self.graph.add_edge(assigment, target, Cmd(Command::Send));
-        assigment
+    pub fn program_arg(&mut self, prep: Preposition, id: Id) {
+        self.args.push(Argument { prep: Some(prep), id })
     }
-    pub fn add_value(&mut self, value: Token) -> NodeIndex {
+    pub fn add_input(&mut self, incoming: Token, target: Node, edge: Token) -> Node {
+        let input = self.graph.add_node(incoming);
+        self.graph.add_edge(input, target, edge);
+        input
+    }
+    pub fn assign(&mut self, target: Token) -> Node {
+        self.graph.add_node(target)
+    }
+    pub fn add_value(&mut self, value: Token) -> Node {
         self.graph.add_node(value)
     }
-    pub fn link(&mut self, source: NodeIndex, target: NodeIndex, label: Token) {
+    pub fn link(&mut self, source: Node, target: Node, label: Token) {
         self.graph.add_edge(source, target, label);
     }
 }
 
-pub struct TokensIterator {
-    iter: Peekable<IntoIter<(usize, Token)>>
-}
-impl TokensIterator {
-    pub fn init(tokens: Vec<(usize, Token)>) -> Result<TokensIterator> {
-        if tokens.len() > 0 {
-            Ok(TokensIterator { iter: tokens.into_iter().peekable() })
-        } else {
-            Err(Error::Error("Script cannot be empty"))
-        }
-    }
-    pub fn take(&mut self) -> Token {
-        self.iter.next().unwrap().1
-    }
-    pub fn take_mod(&mut self) -> Result<Modifier> {
-        if let Token::Mod(modifier) = self.take() {
-            Ok(modifier)
-        } else {
-            Err(Error::Error("Expected modifier"))
-        }
-    }
-    pub fn take_id(&mut self) -> Result<Id> {
-        if let Token::Value(Value::Id(id)) = self.take() { // && id.is_ref() { 
-            Ok(id)
-        } else {
-            Err(Error::Error("Expected reference"))
-        }
-    }
-    pub fn remain(&self) -> bool {
-        if let Some(_) = self.iter.peek() {
-            return true
-        }
-        false
-    }
-    pub fn peek(&self) -> Token {
-        self.iter.peek().unwrap().1
-    }
-    pub fn skip(&mut self) {
-        self.iter.next();
-    }
-}
 
 pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
     let mut tokens = TokensIterator::init(vec)?;
-    let mut program = Program::init(tokens.take())?;
+    let mut program = Program::init(tokens.take())?; // first tokens until break (header)?
     
-    if let Value(Value::Id(id)) = tokens.peek() {
-        program.add_arg(Modifier::Input, id)
+    if let V(I(id)) = tokens.peek() {
+        program.program_input(tokens.take_id()?)
     }
 
-    while tokens.peek() != Break {
-        program.add_arg(tokens.take_mod()?, tokens.take_id()?);
+    while *tokens.peek() != C(Break) {
+        program.program_arg(tokens.take_prep()?, tokens.take_id()?);
     }
-    tokens.skip();
+    tokens.next();
 
-    // parse headers of all scripts before parsing their bodies to construct namespace
+    // parse headers of all scripts before parsing their bodies to construct namespace?
 
     while tokens.remain() {
-        //println!("{:?}", tokens.peek());
         match tokens.take() {
             token if token.is_ref() => {
                 // check if ref leads to a script, if so - proceed like with Cmd, else:
-                if tokens.peek() == Being { // replace with tokens.expect(Being)?
-                    let assigment = program.assign(token); // hanging nodes
-                    tokens.skip();
+                if *tokens.peek() == Be { // replace with tokens.expect(Be)?
+                    let target = program.assign(token);
+                    tokens.next();
                     // COLLECT INPUT(!) / EVALUATE / ???: ------------------------------------------------
                     match tokens.peek() {
-                        Value(_) => {
-                            let value = program.add_value(tokens.take());
-                            program.link(value, assigment, Cmd(Command::Get));
+                        V(Struct(_)) => {
+                            // fill in struct
                         }
-                        ListStart => { 
+                        V(List(_)) => {
                             // create Append node for each collect_input sequentially? or
                             // create an aggr node and point each collect_input result there in parallel?
-                            let list = graph.add_node(tokens.take());
-                            while tokens.peek() != ListEnd {
+                            let list = program.add_input(tokens.take(), target, F(Get));
+                            while *tokens.peek() != C(Closure) {
                                 // collect input (simplified?)
-                                let list_item = graph.add_node(tokens.take());
-                                graph.add_edge(list_item, list, Cmd(Command::Get));
+                                program.add_input(tokens.take(), list, F(Get));
                             }
-                            tokens.skip();
+                            tokens.next();
                         }
-                        StructStart => {
-                            // collect struct
+                        V(_) => {
+                            program.add_input(tokens.take(), target, F(Get)); 
                         }
-                        token if token.is_cmd() => {
+                        token if token.is_function() => {
                             // 
                         }
-                        FormulaStart => {
+                        A(Start) => {
                             // collect formula
                         }
                         _ => break // get Result as input?
                     }
-                    // ------------------------------------------------------------------
-                    graph.add_edge(last_node, assigment, Then);
-                    //last_node = assigment;
                 } 
                 // else Unexpected token
             }
-            token if token.is_cmd() => {
+            token if token.is_function() => {
                 // let syntax = token.syntax()
+                /*
                 let command = graph.add_node(token);
                 match tokens.peek() {
                     token if token.is_ref() => {
@@ -149,24 +112,22 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                     }
                 }
                 graph.add_edge(last_node, command, Then);
+                */
                 //last_node = command;
                 // expect CMD.modifier()?
                 // collect argument
             }
-            Break | And => continue,
-            If => {
-                // collect conditions until then?
+            C(Break) | And => continue,
+            C(If) => {
+                // create Or node, input conditions until then and output yes+no edges
             } 
-            For => {
+            P(For) => {
                 // expect Each
                 // expect Ref
                 // expect Mod
                 // expect Ref / collect input ?
             }
-            Where => {
-                // filter? conditions?
-            }
-            Try => {
+            C(Try) => {
                 // add node, remember it and keep going until ...? Break?
             }
             _ => break // Unexpected token
