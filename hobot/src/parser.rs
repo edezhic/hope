@@ -47,7 +47,7 @@ impl<'a> Parser<'a> {
         self.iter.next();
         let mut text = Text::empty();
         while let Some((_, piece)) = self.iter.peek() {
-            if pattern.is_match(piece) || BREAK.is_match(piece) {
+            if pattern.is_match(piece) || DOT.is_match(piece) {
                 break;
             } else {
                 text.add(piece);
@@ -88,7 +88,7 @@ impl<'a> Parser<'a> {
                 self.next();
                 Value::Num(Number::from_string(num)?)
             }
-            piece if TEXT.is_match(piece) => Value::Text(self.collect_until(&TEXT, true)),
+            piece if TEXT.is_match(piece) => Value::Txt(self.collect_until(&TEXT, true)),
             piece if ID.is_match(piece) => Value::I(Id::from_text(self.collect_literal())?),
             //piece if SEAL.is_match(piece) => Value::Seal(Seal::from_text(self.collect_literal())?),
             piece if TIME.is_match(piece) => Value::Dt(Datetime::from_text(self.collect_literal())?),
@@ -103,7 +103,9 @@ impl<'a> Parser<'a> {
             s if THIS.is_match(s) => This,
             s if AND.is_match(s) => And,
             s if OR.is_match(s) => Or,
-
+            s if DOT.is_match(s) => Dot,
+            s if NEWLINE.is_match(s) => Newline,
+            
             s if WHERE.is_match(s) => S(Where),
             s if ANY.is_match(s) => S(Any),
             s if EACH.is_match(s) => S(Each),
@@ -131,7 +133,6 @@ impl<'a> Parser<'a> {
             s if IF.is_match(s) => C(If),
             s if THEN.is_match(s) => C(Then),
             s if ELSE.is_match(s) => C(Else),
-            s if BREAK.is_match(s) => C(Break),
             s if RETURN.is_match(s) => C(Return),
             s if MATCH.is_match(s) => C(Match),
             s if WHILE.is_match(s) => C(While),
@@ -197,7 +198,8 @@ lazy_static! {
     static ref AS: R = R::new(r"^(?i)as$").unwrap();
     static ref FOR: R = R::new(r"^(?i)for$").unwrap();
 
-    static ref BREAK: R = R::new(r"^(\.|\n|\p{Zl})$").unwrap();
+    static ref NEWLINE: R = R::new(r"^(\n|\p{Zl})$").unwrap();
+    static ref DOT: R = R::new(r"^\.$").unwrap();
     static ref IF: R = R::new(r"^(?i)if$").unwrap();
     static ref THEN: R = R::new(r"^(?i)then$").unwrap();
     static ref ELSE: R = R::new(r"^(?i)else$").unwrap();

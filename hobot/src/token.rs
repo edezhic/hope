@@ -67,6 +67,8 @@ pub enum Token {
     Be,
     And,
     Or,
+    Dot,
+    Newline,
     V(Value),
     A(Algebra),
     F(Function),
@@ -74,12 +76,13 @@ pub enum Token {
     R(Relation),
     S(Selector),
     C(Control),
+    // + static?
+    // + T(Type)
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Control {
     Closure,
-    Break,
     Do,
     Else,
     If,
@@ -120,6 +123,7 @@ pub enum Function {
     Group,     // By -> Group by?
     Select,    // From
                // Join?
+    Script()   // for user-defined functions
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]

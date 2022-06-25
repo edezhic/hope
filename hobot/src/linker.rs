@@ -54,7 +54,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
         program.program_input(tokens.take_id()?)
     }
 
-    while *tokens.peek() != C(Break) {
+    while *tokens.peek() != Newline {
         program.program_arg(tokens.take_prep()?, tokens.take_id()?);
     }
     tokens.next();
@@ -73,7 +73,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                         V(Struct(_)) => {
                             // fill in struct
                         }
-                        V(List(_)) => {
+                        V(Lst(_)) => {
                             // create Append node for each collect_input sequentially? or
                             // create an aggr node and point each collect_input result there in parallel?
                             let list = program.add_input(tokens.take(), target, F(Get));
@@ -98,7 +98,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                 // else Unexpected token
             }
             token if token.is_function() => {
-                // let syntax = token.syntax()
+                // let syntax = token.syntax() --- STRICTLY ACCORDING TO IT
                 /*
                 let command = graph.add_node(token);
                 match tokens.peek() {
@@ -117,7 +117,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                 // expect CMD.modifier()?
                 // collect argument
             }
-            C(Break) | And => continue,
+            Dot | Newline | And => continue,
             C(If) => {
                 // create Or node, input conditions until then and output yes+no edges
             } 

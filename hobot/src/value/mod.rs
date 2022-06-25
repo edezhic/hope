@@ -24,12 +24,13 @@ pub enum Value {
     No,
     I(Id),
     Num(Number),
-    List(List), 
-    Seal(Seal),
+    Lst(List), 
+    Sl(Seal),
     Struct(Structure),
-    Text(Text),
+    Txt(Text),
     Dt(Datetime),
     Ver(Version), 
+    Model()
 }
 
 impl Value {
@@ -47,7 +48,7 @@ impl Value {
         })
     }
     pub fn new_list() -> Self {
-        Self::List(List {
+        Self::Lst(List {
             values: VecDeque::new()
         })
     }
@@ -70,13 +71,14 @@ impl fmt::Display for Value {
             Value::No => write!(f, "No"),
             Value::I(id) => write!(f, "{}", id),
             Value::Num(number) => write!(f, "{}", number),
-            Value::List(list) => write!(f, "{}", list),
-            Value::Seal(seal) => write!(f, "{}", seal),
+            Value::Lst(list) => write!(f, "{}", list),
+            Value::Sl(seal) => write!(f, "{}", seal),
             Value::Struct(structure) => write!(f, "{}", structure),
-            Value::Text(text) => write!(f, "{}", text),
+            Value::Txt(text) => write!(f, "{}", text),
             Value::Dt(time) => write!(f, "{}", time),
             Value::Ver(version) => write!(f, "{}", version),
             Value::Blank => write!(f, "blank"),
+            Value::Model() => write!(f, "Model")
         }
     }
 }
