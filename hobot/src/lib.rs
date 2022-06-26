@@ -19,6 +19,7 @@ mod parser;
 mod linker;
 mod token;
 mod value;
+pub use matches_macro::Matches;
 pub use error::{Error::*, Result};
 pub use parser::Parser;
 pub use token::{Token::*, *};
@@ -42,4 +43,4 @@ pub fn get_test() -> JsValue {
 }
 
 pub const TEST: (&'static str, &'static str) = 
-    ("Testscript X of Y", "Z is 1, xyz is [x, y, z]. Sum xyz and show.");
+    ("Testscript X of Y", "Z is 1, xyz is [x, y, z], abc is @abcd. Sum xyz and show.");

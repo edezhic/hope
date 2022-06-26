@@ -1,13 +1,15 @@
-use crate::{*, Value::*};
-use std::{vec::IntoIter, iter::Peekable};
+use crate::{Value::*, *};
+use std::{iter::Peekable, vec::IntoIter};
 
 pub struct TokensIterator {
-    iter: Peekable<IntoIter<(usize, Token)>>
+    iter: Peekable<IntoIter<(usize, Token)>>,
 }
 impl TokensIterator {
     pub fn init(tokens: Vec<(usize, Token)>) -> Result<TokensIterator> {
         if tokens.len() > 0 {
-            Ok(TokensIterator { iter: tokens.into_iter().peekable() })
+            Ok(TokensIterator {
+                iter: tokens.into_iter().peekable(),
+            })
         } else {
             Err(Message("Script cannot be empty"))
         }
@@ -23,7 +25,8 @@ impl TokensIterator {
         }
     }
     pub fn take_id(&mut self) -> Result<Id> {
-        if let V(I(id)) = self.take() { // && id.is_ref()
+        if let V(I(id)) = self.take() {
+            // && id.is_ref()
             Ok(id)
         } else {
             Err(Message("Expected reference"))
@@ -31,7 +34,7 @@ impl TokensIterator {
     }
     pub fn remain(&mut self) -> bool {
         if let Some(_) = self.iter.peek() {
-            return true
+            return true;
         }
         false
     }
@@ -42,7 +45,6 @@ impl TokensIterator {
         self.iter.next();
     }
 }
-
 
 impl Token {
     pub fn is_ref(&self) -> bool {
@@ -61,14 +63,20 @@ impl Token {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Token {
-    This,
-    Be,
     And,
     Or,
+    #[regex = r"^(?i)(result|this|it|that)$"]
+    This,
+    #[regex = r"^(?i)(:|=|is|are|equal)$"]
+    Be,
+    #[regex = r"^\.$"]
     Dot,
+    #[regex = r"^(\n|\p{Zl})$"]
     Newline,
+    #[regex = r"^(\]|\})$"]
+    CollectionEnd,
     V(Value),
     A(Algebra),
     F(Function),
@@ -80,9 +88,8 @@ pub enum Token {
     // + T(Type)
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Control {
-    Closure,
     Do,
     Else,
     If,
@@ -94,14 +101,14 @@ pub enum Control {
     Panic,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Selector {
     Where,
     Any,
     Each,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Relation {
     Than,
     Less,
@@ -109,7 +116,7 @@ pub enum Relation {
     Contains,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Function {
     Add,       // To
     Substract, // From -> Remove/Delete?
@@ -122,23 +129,29 @@ pub enum Function {
     Sign,      // With(As?)
     Group,     // By -> Group by?
     Select,    // From
-               // Join?
-    Script()   // for user-defined functions
+    // Join?
+    Script {}, // for user-defined functions
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Algebra {
+    #[regex = r"^\($"]
     Start,
+    #[regex = r"^\)$"]
     End,
+    #[regex = r"^\+$"]
     Plus,
+    #[regex = r"^\-$"]
     Minus,
+    #[regex = r"^\*$"]
     Multiplication,
+    #[regex = r"^/$"]
     Division,
     Mean,
     Deviation,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Preposition {
     For,
     With,

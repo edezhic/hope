@@ -1,55 +1,58 @@
+mod datetime;
 mod id;
 mod list;
 mod number;
 mod seal;
 mod structure;
 mod text;
-mod datetime;
 mod version;
+use crate::{Value::*, *};
+use core::fmt;
+use std::collections::{HashMap, VecDeque};
+pub use datetime::Datetime;
 pub use id::*;
 pub use list::List;
 pub use number::Number;
 pub use seal::Seal;
 pub use structure::*;
 pub use text::Text;
-pub use datetime::Datetime;
 pub use version::Version;
-use core::fmt;
-use std::collections::{HashMap, VecDeque};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Value {
     Blank,
+    #[regex = r"^(?i)(true|yes|ok)$"]
     Yes,
+    #[regex = r"^(?i)(false|no)$"]
     No,
     I(Id),
     Num(Number),
-    Lst(List), 
+    Lst(List),
     Sl(Seal),
     Struct(Structure),
     Txt(Text),
     Dt(Datetime),
-    Ver(Version), 
-    Model()
+    Ver(Version),
+    Model {},
 }
 
 impl Value {
     pub fn is_ref(&self) -> bool {
         if let Value::I(id) = self {
             if id.scheme == Scheme::Ref {
-                return true
+                return true;
             }
         }
         false
     }
     pub fn new_struct() -> Self {
         Self::Struct(Structure {
-            content: HashMap::new()
+            content: HashMap::new(),
         })
     }
     pub fn new_list() -> Self {
         Self::Lst(List {
-            values: VecDeque::new()
+            values: VecDeque::new(),
         })
     }
     /*
@@ -78,7 +81,7 @@ impl fmt::Display for Value {
             Value::Dt(time) => write!(f, "{}", time),
             Value::Ver(version) => write!(f, "{}", version),
             Value::Blank => write!(f, "blank"),
-            Value::Model() => write!(f, "Model")
+            Value::Model {} => write!(f, "Model"),
         }
     }
 }

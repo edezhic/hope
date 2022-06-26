@@ -77,7 +77,7 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                             // create Append node for each collect_input sequentially? or
                             // create an aggr node and point each collect_input result there in parallel?
                             let list = program.add_input(tokens.take(), target, F(Get));
-                            while *tokens.peek() != C(Closure) {
+                            while *tokens.peek() != CollectionEnd {
                                 // collect input (simplified?)
                                 program.add_input(tokens.take(), list, F(Get));
                             }
