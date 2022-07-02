@@ -1,7 +1,6 @@
-use core::fmt;
 use crate::*;
 
-#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub enum Scheme { // + system/network/other protocols
     Custom(Text),
     Screen,
@@ -20,7 +19,7 @@ impl fmt::Display for Scheme {
     }
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Path(Vec<Text>);
 
 impl Path {
@@ -56,7 +55,7 @@ impl fmt::Display for Path {
     }
 }
 
-#[derive(Clone, Debug, serde::Serialize, serde::Deserialize, PartialEq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Id {
     pub scheme: Scheme,
     pub domain: Option<Text>,

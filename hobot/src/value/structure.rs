@@ -1,9 +1,8 @@
 use crate::*;
-use core::fmt;
-use std::{collections::HashMap, iter::FromIterator, ops::Index};
+use std::{iter::FromIterator, ops::Index};
 type Key = Text;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Structure {
     pub content: HashMap<Key, Value>,
 }

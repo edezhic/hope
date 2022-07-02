@@ -5,7 +5,7 @@ use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
 use syn::{parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, PathSegment, Type, TypePath};
 
-#[proc_macro_derive(Matches, attributes(regex))]
+#[proc_macro_derive(Matches, attributes(regex, dont_match))]
 pub fn derive_match(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let enum_name = input.ident;
@@ -17,6 +17,13 @@ pub fn derive_match(input: TokenStream) -> TokenStream {
     match input.data {
         Data::Enum(data_enum) => {
             for variant in &data_enum.variants {
+                if let Some(_) = variant
+                    .attrs
+                    .iter()
+                    .find(|attr| attr.path.is_ident("dont_match"))
+                {
+                    continue;
+                }
                 let ref variant_name = variant.ident;
 
                 match &variant.fields {

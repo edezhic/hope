@@ -1,41 +1,28 @@
-use crate::{*, Value::*, Preposition::*, Algebra::*, Function::*, Control::*, Selector::*, Relation::*};
-use petgraph::stable_graph::{StableDiGraph, NodeIndex as Node};
-//use std::{vec::IntoIter, iter::Peekable};
-
-pub struct Argument {
-    prep: Option<Preposition>,
-    id: Id
-}
+use crate::*;
 pub struct Program {
-    id: Id,
-    args: Vec<Argument>,
-    pub graph: StableDiGraph::<Token, Token>
+    pub graph: Graph<Token, Token>,
 }
 impl Program {
-    pub fn init(firstToken: Token) -> Result<Program> {
-        if let V(I(id)) = firstToken { // && is 1st-level ref
-            Ok(Program {
-                id,
-                args: vec![],
-                graph: StableDiGraph::<Token, Token>::new(),
-            })
-        } else {
-            Err(Message("Script name must come 1st"))
-        }
+    pub fn init(id: Id) -> (Program, Node) {
+        let mut graph = Graph::<Token, Token>::new();
+        let script_id = graph.add_node(Script(id));
+        (
+            Program {
+                graph: Graph::<Token, Token>::new(),
+            },
+            script_id,
+        )
     }
-    pub fn program_input(&mut self, id: Id) {
-        self.args.push(Argument { prep: None, id })
+    pub fn add_arg(&mut self, target: Node, edge: Token, input: Token) -> (Node, Node) {
+        let incoming = self.graph.add_node(input);
+        self.graph.add_edge(incoming, target, edge);
+        (target, incoming)
     }
-    pub fn program_arg(&mut self, prep: Preposition, id: Id) {
-        self.args.push(Argument { prep: Some(prep), id })
+    pub fn add_input(&mut self, target: Node, input: Token) -> (Node, Node) {
+        self.add_arg(target, Input, input)
     }
-    pub fn add_input(&mut self, incoming: Token, target: Node, edge: Token) -> Node {
-        let input = self.graph.add_node(incoming);
-        self.graph.add_edge(input, target, edge);
-        input
-    }
-    pub fn assign(&mut self, target: Token) -> Node {
-        self.graph.add_node(target)
+    pub fn add_node(&mut self, token: Token) -> Node {
+        self.graph.add_node(token)
     }
     pub fn add_value(&mut self, value: Token) -> Node {
         self.graph.add_node(value)
@@ -45,28 +32,25 @@ impl Program {
     }
 }
 
-
-pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
+pub fn build(vec: Vec<(usize, Token)>) -> Result<Program> {
     let mut tokens = TokensIterator::init(vec)?;
-    let mut program = Program::init(tokens.take())?; // first tokens until break (header)?
-    
-    if let V(I(id)) = tokens.peek() {
-        program.program_input(tokens.take_id()?)
-    }
+    let (mut program, script) = Program::init(tokens.take_ref()?);
 
-    while *tokens.peek() != Newline {
-        program.program_arg(tokens.take_prep()?, tokens.take_id()?);
+    // --- Parsing Header (parse all headers before parsing their bodies to construct namespace?)
+    program.add_input(script, V(I(tokens.take_ref()?)));
+    while *tokens.peek() != Linebreak {
+        program.add_arg(script, P(tokens.take_prep()?), V(I(tokens.take_ref()?)));
     }
     tokens.next();
 
-    // parse headers of all scripts before parsing their bodies to construct namespace?
-
+    // --- Parsing Body
     while tokens.remain() {
         match tokens.take() {
             token if token.is_ref() => {
                 // check if ref leads to a script, if so - proceed like with Cmd, else:
-                if *tokens.peek() == Be { // replace with tokens.expect(Be)?
-                    let target = program.assign(token);
+                if *tokens.peek() == Be {
+                    // replace with tokens.expect(Be)?
+                    let variable = program.add_node(token);
                     tokens.next();
                     // COLLECT INPUT(!) / EVALUATE / ???: ------------------------------------------------
                     match tokens.peek() {
@@ -76,25 +60,25 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                         V(Lst(_)) => {
                             // create Append node for each collect_input sequentially? or
                             // create an aggr node and point each collect_input result there in parallel?
-                            let list = program.add_input(tokens.take(), target, F(Get));
+                            let (list, _) = program.add_input(variable, tokens.take());
                             while *tokens.peek() != CollectionEnd {
                                 // collect input (simplified?)
-                                program.add_input(tokens.take(), list, F(Get));
+                                program.add_input(list, tokens.take());
                             }
                             tokens.next();
                         }
                         V(_) => {
-                            program.add_input(tokens.take(), target, F(Get)); 
+                            program.add_input(variable, tokens.take());
                         }
                         token if token.is_function() => {
-                            // 
+                            //
                         }
                         A(Start) => {
                             // collect formula
                         }
-                        _ => break // get Result as input?
+                        _ => break, // get Result as input?
                     }
-                } 
+                }
                 // else Unexpected token
             }
             token if token.is_function() => {
@@ -117,10 +101,10 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
                 // expect CMD.modifier()?
                 // collect argument
             }
-            Dot | Newline | And => continue,
+            Dot | Linebreak | And => continue,
             C(If) => {
                 // create Or node, input conditions until then and output yes+no edges
-            } 
+            }
             P(For) => {
                 // expect Each
                 // expect Ref
@@ -130,9 +114,8 @@ pub fn link(vec: Vec<(usize, Token)>) -> Result<Program> {
             C(Try) => {
                 // add node, remember it and keep going until ...? Break?
             }
-            _ => break // Unexpected token
+            _ => break, // Unexpected token
         }
-
-    } 
+    }
     Ok(program)
 }

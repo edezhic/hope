@@ -6,9 +6,7 @@ mod seal;
 mod structure;
 mod text;
 mod version;
-use crate::{Value::*, *};
-use core::fmt;
-use std::collections::{HashMap, VecDeque};
+use crate::*;
 pub use datetime::Datetime;
 pub use id::*;
 pub use list::List;
@@ -18,7 +16,7 @@ pub use structure::*;
 pub use text::Text;
 pub use version::Version;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Value {
     Blank,
     #[regex = r"^(?i)(true|yes|ok)$"]
@@ -33,7 +31,6 @@ pub enum Value {
     Txt(Text),
     Dt(Datetime),
     Ver(Version),
-    Model {},
 }
 
 impl Value {
@@ -81,7 +78,7 @@ impl fmt::Display for Value {
             Value::Dt(time) => write!(f, "{}", time),
             Value::Ver(version) => write!(f, "{}", version),
             Value::Blank => write!(f, "blank"),
-            Value::Model {} => write!(f, "Model"),
+            //Value::Model {} => write!(f, "Model"),
         }
     }
 }

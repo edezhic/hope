@@ -1,8 +1,8 @@
 const core: Worker = self as unknown as Worker;
 
-async function build_script(title: string, body: string) {
-  const { build } = await import('../hobot/pkg');
-  const [tokens, graph] = build(title, body);
+async function get_build_script(title: string, body: string) {
+  const { get_build } = await import('../hobot/pkg');
+  const [tokens, graph] = get_build(title, body);
   core.postMessage({
     type: 'tokens&graph',
     tokens,
@@ -20,8 +20,8 @@ async function send_test() {
 
 core.addEventListener('message', (evt) => {
   switch (evt.data.type) {
-    case 'build':
-      build_script(evt.data.title, evt.data.body);
+    case 'get_build':
+      get_build_script(evt.data.title, evt.data.body);
       return;
     case 'get_test':
       send_test();

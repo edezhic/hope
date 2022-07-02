@@ -24,7 +24,7 @@ impl TokensIterator {
             Err(Message("Expected modifier"))
         }
     }
-    pub fn take_id(&mut self) -> Result<Id> {
+    pub fn take_ref(&mut self) -> Result<Id> {
         if let V(I(id)) = self.take() {
             // && id.is_ref()
             Ok(id)
@@ -63,9 +63,11 @@ impl Token {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Token {
     And,
+    #[dont_match]
+    Input,
     Or,
     #[regex = r"^(?i)(result|this|it|that)$"]
     This,
@@ -74,21 +76,26 @@ pub enum Token {
     #[regex = r"^\.$"]
     Dot,
     #[regex = r"^(\n|\p{Zl})$"]
-    Newline,
+    Linebreak,
     #[regex = r"^(\]|\})$"]
     CollectionEnd,
-    V(Value),
     A(Algebra),
+    C(Control),
+    S(Selector),
     F(Function),
+    V(Value),
     P(Preposition),
     R(Relation),
-    S(Selector),
-    C(Control),
+    #[dont_match]
+    Script(Id),
+    #[dont_match]
+    Model(Id),
     // + static?
     // + T(Type)
+    // + Script and Model here?
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Control {
     Do,
     Else,
@@ -101,14 +108,14 @@ pub enum Control {
     Panic,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Selector {
     Where,
     Any,
     Each,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Relation {
     Than,
     Less,
@@ -116,7 +123,7 @@ pub enum Relation {
     Contains,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Function {
     Add,       // To
     Substract, // From -> Remove/Delete?
@@ -130,10 +137,9 @@ pub enum Function {
     Group,     // By -> Group by?
     Select,    // From
     // Join?
-    Script {}, // for user-defined functions
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Algebra {
     #[regex = r"^\($"]
     Start,
@@ -151,7 +157,7 @@ pub enum Algebra {
     Deviation,
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Preposition {
     For,
     With,

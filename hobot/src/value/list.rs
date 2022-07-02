@@ -1,8 +1,7 @@
-use super::Value;
-use core::fmt;
-use std::collections::VecDeque;
+use crate::*;
 use derive_more::{IntoIterator};
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, IntoIterator, PartialEq)]
+
+#[derive(Serialize, Deserialize, Debug, Clone, IntoIterator, PartialEq)]
 pub struct List {
     #[into_iterator(owned, ref, ref_mut)]
     pub values: VecDeque<Value>

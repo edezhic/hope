@@ -1,7 +1,6 @@
 use crate::*;
-use core::fmt;
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Seal(Text);
 // TODO Combine signatures, public keys and other crypto primitives as Seal? 
 // Incapsulate private keys in some security module?

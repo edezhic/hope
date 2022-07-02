@@ -24,7 +24,7 @@ export default function HOPE() {
   }, []);
   useEffect(() => {
     if (workerRef.current && script[0] != '') {
-      workerRef.current.postMessage({ type: 'build', title: script[0], body: script[1] });
+      workerRef.current.postMessage({ type: 'get_build', title: script[0], body: script[1] });
     }
   }, [script]);
   

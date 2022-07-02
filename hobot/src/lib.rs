@@ -7,32 +7,37 @@
     non_snake_case,
     unused_assignments
 )]
-#[macro_use]
-extern crate lazy_static;
-extern crate console_error_panic_hook;
-extern crate derive_more;
-use petgraph::graph::DiGraph;
+
+use console_error_panic_hook;
+pub use core::fmt;
+pub use derive_more;
+pub use lazy_static::lazy_static;
+pub use petgraph::stable_graph::{NodeIndex as Node, StableDiGraph as Graph};
+pub use serde::{Deserialize, Serialize};
+pub use std::collections::{HashMap, VecDeque};
 use wasm_bindgen::prelude::*;
 
+mod builder;
 mod error;
 mod parser;
-mod linker;
 mod token;
 mod value;
-pub use matches_macro::Matches;
+pub use builder::build;
 pub use error::{Error::*, Result};
+pub use matches_macro::Matches;
 pub use parser::Parser;
-pub use token::{Token::*, *};
-pub use value::*;
-pub use linker::link;
+pub use token::{
+    Algebra::*, Control::*, Function::*, Preposition::*, Relation::*, Selector::*, Token::*, *,
+};
+pub use value::{Value::*, *};
 
 #[wasm_bindgen]
-pub fn build(title: &str, body: &str) -> JsValue {
+pub fn get_build(title: &str, body: &str) -> JsValue {
     console_error_panic_hook::set_once();
     let mut tokens = Parser::convert(title).unwrap();
-    tokens.push((42, Newline));
+    tokens.push((42, Linebreak));
     tokens.extend(Parser::convert(body).unwrap());
-    let program = link(tokens.clone()).unwrap();
+    let program = build(tokens.clone()).unwrap();
     JsValue::from_serde(&(tokens, program.graph)).unwrap()
 }
 
@@ -42,5 +47,7 @@ pub fn get_test() -> JsValue {
     JsValue::from_serde(&TEST).unwrap()
 }
 
-pub const TEST: (&'static str, &'static str) = 
-    ("Testscript X of Y", "Z is 1, xyz is [x, y, z], abc is @abcd. Sum xyz and show.");
+pub const TEST: (&'static str, &'static str) = (
+    "Testscript X of Y",
+    "Z is 1, xyz is [x, y, z], abc is @abcd. Sum xyz and show.",
+);

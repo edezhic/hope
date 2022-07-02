@@ -1,10 +1,8 @@
-use super::*;
-use core::fmt;
-use crate::Result;
+use crate::*;
 use unicode_normalization::UnicodeNormalization;
 use unicode_segmentation::{UWordBoundIndices, UnicodeSegmentation};
 
-#[derive(serde::Serialize, serde::Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Text(String);
 impl Text {
     pub fn new(s: Option<&str>) -> Text {
@@ -42,13 +40,13 @@ impl Text {
     }
 }
 
-impl From<&str> for Text {
+impl std::convert::From<&str> for Text {
     fn from(item: &str) -> Self {
         Text::from_str(item)
     }
 }
 
-impl From<String> for Text {
+impl std::convert::From<String> for Text {
     fn from(item: String) -> Self {
         Text::from_string(item)
     }
