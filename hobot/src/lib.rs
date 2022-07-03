@@ -12,7 +12,7 @@ use console_error_panic_hook;
 pub use core::fmt;
 pub use derive_more;
 pub use lazy_static::lazy_static;
-pub use petgraph::stable_graph::{NodeIndex as Node, StableDiGraph as Graph};
+pub use petgraph::{stable_graph::{NodeIndex as Node, StableDiGraph as Graph}, dot::Dot};
 pub use serde::{Deserialize, Serialize};
 pub use std::collections::{HashMap, VecDeque};
 use wasm_bindgen::prelude::*;

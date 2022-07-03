@@ -26,10 +26,13 @@ impl TokensIterator {
     }
     pub fn take_ref(&mut self) -> Result<Id> {
         if let V(I(id)) = self.take() {
-            // && id.is_ref()
-            Ok(id)
+            if id.scheme.is_ref() {
+                Ok(id)
+            } else {
+                Err(Message("Expected ref scheme in id while taking"))
+            }
         } else {
-            Err(Message("Expected reference"))
+            Err(Message("Expected Id when taking reference"))
         }
     }
     pub fn remain(&mut self) -> bool {
@@ -41,17 +44,32 @@ impl TokensIterator {
     pub fn peek(&mut self) -> &Token {
         &self.iter.peek().unwrap().1
     }
-    pub fn next(&mut self) {
-        self.iter.next();
+    pub fn next(&mut self) -> Option<(usize, Token)> {
+        self.iter.next()
     }
+    pub fn until(&mut self, token: Token) -> bool {
+        if *self.peek() != token {
+            true
+        } else {
+            self.next();
+            false
+        }
+    }
+    pub fn expect(&mut self, token: Token) -> Result<()> {
+        if let Some((_, next_token)) = self.iter.next() {
+            if token == next_token {
+                return Ok(());
+            }
+        }
+        Err(UnexpectedToken(token))
+    }
+
 }
 
 impl Token {
     pub fn is_ref(&self) -> bool {
-        if let Token::V(value) = self {
-            if value.is_ref() {
-                return true;
-            }
+        if let V(I(id)) = self {
+            return id.scheme.is_ref();
         }
         false
     }
@@ -65,6 +83,7 @@ impl Token {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Token {
+    Then,
     And,
     #[dont_match]
     Input,
@@ -136,7 +155,7 @@ pub enum Function {
     Sign,      // With(As?)
     Group,     // By -> Group by?
     Select,    // From
-    // Join?
+               // Join?
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]

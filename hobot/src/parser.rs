@@ -115,7 +115,7 @@ impl<'a> Parser<'a> {
     fn match_reference(&mut self, piece: &str) -> Option<Token> {
         if REFERENCE.is_match(piece) {
             self.next();
-            Some(V(Value::I(Id::reference(piece))))
+            Some(V(Value::I(Id::new_reference(piece))))
         } else {
             None
         }

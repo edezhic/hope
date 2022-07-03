@@ -8,6 +8,15 @@ pub enum Scheme { // + system/network/other protocols
     Ref,
 }
 
+impl Scheme {
+    pub fn is_ref(&self) -> bool {
+        match self {
+            Scheme::Ref => true,
+            _ => false
+        }
+    }
+}
+
 impl fmt::Display for Scheme {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -76,7 +85,7 @@ impl Id {
         Ok(Id::from_str(t.as_str())?)
     }
 
-    pub fn reference(s: &str) -> Id {
+    pub fn new_reference(s: &str) -> Id {
         Id {
             scheme: Scheme::Ref,
             domain: Some(Text::from_str(s)),

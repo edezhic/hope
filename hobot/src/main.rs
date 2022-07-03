@@ -1,5 +1,4 @@
 use hobot::*;
-use petgraph::dot::Dot;
 
 fn main() -> Result<()> {
     println!("{:?}\n{:?}", TEST.0, TEST.1);

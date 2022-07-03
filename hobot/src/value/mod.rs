@@ -34,14 +34,6 @@ pub enum Value {
 }
 
 impl Value {
-    pub fn is_ref(&self) -> bool {
-        if let Value::I(id) = self {
-            if id.scheme == Scheme::Ref {
-                return true;
-            }
-        }
-        false
-    }
     pub fn new_struct() -> Self {
         Self::Struct(Structure {
             content: HashMap::new(),
