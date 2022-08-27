@@ -1,9 +1,8 @@
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const { resolve } = require('path');
 
-let basePath = '/Hope';
-let assetPrefix = '/Hope';
-let publicPath = '/Hope/_next/';
+let basePath = assetPrefix = '/hope';
+let publicPath = '/hope/_next/';
 
 if (process.env.NODE_ENV === 'development') {
   basePath = '';
