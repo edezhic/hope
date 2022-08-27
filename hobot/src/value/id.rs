@@ -5,22 +5,11 @@ pub enum Scheme { // + system/network/other protocols
     Custom(Text),
     Screen,
     Http,
-    Ref,
-}
-
-impl Scheme {
-    pub fn is_ref(&self) -> bool {
-        match self {
-            Scheme::Ref => true,
-            _ => false
-        }
-    }
 }
 
 impl fmt::Display for Scheme {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Scheme::Ref => write!(f, "ref"),
             Scheme::Screen => write!(f, "screen"),
             Scheme::Http => write!(f, "http"),
             Scheme::Custom(scheme) => write!(f, "{}", scheme)
@@ -83,14 +72,6 @@ impl Id {
     }
     pub fn from_text(t: Text) -> Result<Id> {
         Ok(Id::from_str(t.as_str())?)
-    }
-
-    pub fn new_reference(s: &str) -> Id {
-        Id {
-            scheme: Scheme::Ref,
-            domain: Some(Text::from_str(s)),
-            path: None,
-        }
     }
 }
 

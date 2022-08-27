@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "next dev",
+    "hobot": "cd hobot && cargo run",
     "build": "next build",
     "export": "next build && next export -o docs/ && echo $null >> docs/.nojekyll",
     "start": "next start",

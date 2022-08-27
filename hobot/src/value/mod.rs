@@ -23,13 +23,21 @@ pub enum Value {
     Yes,
     #[regex = r"^(?i)(false|no)$"]
     No,
+    #[dont_match]
     I(Id),
+    #[dont_match]
     Num(Number),
+    #[dont_match]
     Lst(List),
+    #[dont_match]
     Sl(Seal),
+    #[dont_match]
     Struct(Structure),
+    #[dont_match]
     Txt(Text),
+    #[dont_match]
     Dt(Datetime),
+    #[dont_match]
     Ver(Version),
 }
 

@@ -1,6 +1,4 @@
 use crate::*;
-use unicode_normalization::UnicodeNormalization;
-use unicode_segmentation::{UWordBoundIndices, UnicodeSegmentation};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Hash, Clone)]
 pub struct Text(String);

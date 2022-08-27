@@ -8,7 +8,8 @@ pub enum Error { // TODO https://crates.io/crates/thiserror ?
     Parsing(String),
     Regex(String),
     Message(&'static str),
-    UnexpectedToken(Token),
+    UnexpectedToken(Token, usize),
+    ExpectedToken(Token),
 }
 
 impl std::convert::From<regex::Error> for Error {

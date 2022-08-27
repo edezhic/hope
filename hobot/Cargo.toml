@@ -4,13 +4,15 @@ description = "Human-oriented bot"
 version = "0.0.1"
 authors = ["Egor Dezhic <edezhic@gmail.com>"]
 license = "GPL-3.0-or-later"
-edition = "2018"
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-matches_macro = { path = "./matches_macro"}
+derive_matches = { path = "./derive_matches"}
+derive_of_type = { path = "./derive_of_type"}
+derive_syntax = { path = "./derive_syntax"}
 chrono = { version = "0.4.19", features = ["wasmbind", "serde"] }
 serde = { version = "1.0.130", features = ["derive"] }
 unicode-normalization = "0.1.19"

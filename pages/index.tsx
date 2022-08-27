@@ -33,9 +33,10 @@ export default function HOPE() {
       <Divider sx={CONFIG.DIVIDER}>Script</Divider>
       <ScriptForm script={script} setScript={setScript} />
 
+      { /* 
       <Divider sx={CONFIG.DIVIDER}>Tokens (example for syntax highlight)</Divider>
       {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item) + i} i={i}/>)}
-
+      */ }
       <Divider sx={CONFIG.DIVIDER}>Graph</Divider>
       <Graph nodes={graph.nodes} edges={graph.edges}/>
     </Container>
