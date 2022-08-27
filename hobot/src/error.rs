@@ -12,6 +12,12 @@ pub enum Error { // TODO https://crates.io/crates/thiserror ?
     ExpectedToken(Token),
 }
 
+impl std::convert::Into<JsValue> for Error {
+    fn into(self) -> JsValue {
+        JsValue::from_serde(&self).unwrap()
+    }
+}
+
 impl std::convert::From<regex::Error> for Error {
     fn from(e: regex::Error) -> Self {
         if let regex::Error::Syntax(err) = e {

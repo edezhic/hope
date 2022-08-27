@@ -20,8 +20,8 @@ pub use regex::Regex as R;
 pub use serde::{Deserialize, Serialize};
 pub use std::collections::{HashMap, VecDeque};
 pub use std::{iter::Peekable, vec::IntoIter};
-pub use unicode_segmentation::{UWordBoundIndices, UnicodeSegmentation};
 pub use unicode_normalization::UnicodeNormalization;
+pub use unicode_segmentation::{UWordBoundIndices, UnicodeSegmentation};
 use wasm_bindgen::prelude::*;
 
 mod builder;
@@ -30,10 +30,10 @@ mod parser;
 mod token;
 mod value;
 pub use builder::build;
-pub use error::{Error::*, Result};
 pub use derive_matches::Matches;
 pub use derive_of_type::OfType;
 pub use derive_syntax::FunctionSyntax;
+pub use error::{Error, Error::*, Result};
 pub use parser::parse;
 pub use token::{
     Algebra::*, Control::*, Function::*, Preposition::*, Relation::*, Selector::*, Token::*, *,
@@ -45,22 +45,18 @@ pub type IndexedTokenIter = Peekable<IntoIter<IndexedToken>>;
 pub type TokenGraph = StableDiGraph<Token, Token>;
 
 #[wasm_bindgen]
-pub fn get_build(title: &str, body: &str) -> JsValue {
-    console_error_panic_hook::set_once();
-    let mut tokens = parse(title).unwrap();
-    tokens.push((42, Linebreak));
-    tokens.extend(parse(body).unwrap());
-    let program = build(tokens.clone()).unwrap();
-    JsValue::from_serde(&(tokens, program.graph)).unwrap()
+pub fn get_build(script: &str) -> Result<JsValue> {
+    let indexed_tokens = parse(script)?;
+    let program = build(indexed_tokens.clone())?;
+    Ok(JsValue::from_serde(&(indexed_tokens, program.graph)).unwrap())
 }
 
 #[wasm_bindgen]
-pub fn get_test() -> JsValue {
-    console_error_panic_hook::set_once();
-    JsValue::from_serde(&TEST).unwrap()
+pub fn get_test() -> Result<JsValue> {
+    Ok(JsValue::from_serde(&TEST).unwrap())
 }
 
-pub const TEST: (&'static str, &'static str) = (
-    "Testscript X of Y",
-    r#"Z is 1, xyz is [x, y, z], abc is @abcd. Sum xyz and show. If xyz is less than 5 then show "hell yeah", else show "oh no"."#,
-);
+pub const TEST: &'static str = r#"Testscript X of Y
+Z is 1, xyz is [x, y, z], abc is @abcd. Sum xyz and show. Substract 1 from xyz.
+If xyz is less than 5 then show "hell yeah", else show "oh no".
+"#;

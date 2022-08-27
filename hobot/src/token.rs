@@ -31,7 +31,6 @@ pub enum Token {
     Script(Id), // for custom scripts
                 // + static?
                 // + T(Type)
-                // + Script and Model here?
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]

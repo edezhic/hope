@@ -49,10 +49,8 @@ Long-term questionable ideas:
 - **Languages beside English**. I can't think of a decent solution right now except for forking and rewriting lots of stuff. Maybe NNs would be able to help with that in the future, maybe English will become global enough to alleviate this problem, I don't know yet.
 - [insert **your** complaint here]
 
-## How to run source code locally
+## How to run it locally
 1. install latest stable Node/NPM
-2. install latest stable Rust/rustup
-3. install [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
-4. build hobot with `cd hobot && wasm-pack build --out-name index`  
-5. build and run hope with `cd .. && npm run dev`
-6. visit [localhost:3000](http://localhost:3000)
+2. install latest nightly Rust/rustup
+3. install latest wasm-pack. For Linux/MacOS: `npm run install:wasm-pack`, to find installation instructions for other platforms visit [rust-wasm.github.io/wasm-pack/installer](https://rustwasm.github.io/wasm-pack/installer/#)
+4. `npm run dev:hope` and visit [localhost:3000](http://localhost:3000)

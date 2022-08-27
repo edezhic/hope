@@ -1,15 +1,13 @@
 use hobot::*;
 
 fn main() -> Result<()> {
-    println!("{:?}\n{:?}", TEST.0, TEST.1);
+    println!("{:?}", TEST);
     
-    let mut tokens = parse(TEST.0)?;
-    tokens.push((42, Linebreak));
-    tokens.extend(parse(TEST.1)?);
+    let indexed_tokens = parse(TEST)?;
 
-    println!("{:?}", tokens);
+    println!("{:?}", indexed_tokens);
 
-    println!("{:?}", Dot::with_config(&build(tokens)?.graph, &[]));
+    println!("{:?}", Dot::with_config(&build(indexed_tokens)?.graph, &[]));
 
     Ok(())
 }

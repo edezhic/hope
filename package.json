@@ -2,31 +2,31 @@
   "name": "hope",
   "version": "0.1.0",
   "scripts": {
-    "dev": "next dev",
-    "hobot": "cd hobot && cargo run",
-    "build": "next build",
-    "export": "next build && next export -o docs/ && echo $null >> docs/.nojekyll",
-    "start": "next start",
-    "lint": "next lint"
+    "install:wasm-pack": "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh",
+    "dev:hope": "next dev",
+    "dev:hobot": "cd hobot && cargo run",
+    "build:hope": "next build",
+    "build:hobot": "cd hobot && wasm-pack build --out-name index",
+    "export": "next build && next export -o docs/ && echo $null >> docs/.nojekyll"
   },
   "dependencies": {
-    "@emotion/cache": "^11.7.1",
-    "@emotion/react": "^11.9.0",
-    "@emotion/server": "^11.4.0",
-    "@emotion/styled": "^11.8.1",
-    "@mui/icons-material": "^5.6.1",
-    "@mui/material": "^5.6.1",
+    "@emotion/cache": "^11.10.3",
+    "@emotion/react": "^11.10.0",
+    "@emotion/server": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "@mui/icons-material": "^5.10.2",
+    "@mui/material": "^5.10.2",
     "@wasm-tool/wasm-pack-plugin": "^1.6.0",
-    "next": "12.1.5",
+    "next": "12.2.5",
     "next-compose-plugins": "^2.2.1",
-    "react": "18.0.0",
-    "react-dom": "18.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "react-graph-vis": "^1.0.7"
   },
   "devDependencies": {
-    "@types/react": "^18.0.5",
-    "@types/vis": "^4.21.23",
+    "@types/react": "^18.0.17",
+    "@types/vis": "^4.21.24",
     "@types/npm": "^7.19.0",
-    "typescript": "^4.6.3"
+    "typescript": "^4.8.2"
   }
 }

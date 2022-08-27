@@ -11,23 +11,17 @@ export default function ScriptForm(props: any) {
             onSubmit={(event: any) => event.preventDefault()}
         >
             <TextField
-                id='standard-basic'
-                label='Title'
-                fullWidth
-                className='script-title'
-                variant='standard'
-                onChange={(event: any) => props.setScript([event.target.value, props.script[1]])}
-                value={props.script[0]}
-            />
-            <TextField
                 id='multiline-static'
-                label='Body'
-                sx={{ marginBottom: 2, marginTop: 4 }}
+                sx={{ marginBottom: 0, marginTop: 0, fontSize: "13px !important" }}
+                inputProps={{
+                    style: { fontSize: 15 }
+                }}
                 multiline
                 rows={CONFIG.SCRIPT_BODY_ROWS}
                 fullWidth
-                onChange={(event: any) => props.setScript([props.script[0], event.target.value])}
-                value={props.script[1]}
+                onChange={(event: any) => props.setScript(event.target.value)}
+                value={props.script}
+                spellCheck={false}
             />
         </Box>
     )
