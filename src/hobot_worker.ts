@@ -1,9 +1,15 @@
 const worker: Worker = self as unknown as Worker;
 
-async function get_build_script(script: string) {
+let hobot: { get_build: Function, get_test: Function } = await import('../hobot/pkg');
+
+worker.postMessage({
+  type: 'test_script',
+  test: hobot.get_test(),
+})
+
+async function build(script: string) {
   try {
-    const { get_build } = await import('../hobot/pkg');
-    const [tokens, graph] = get_build(script);
+    const [tokens, graph] = hobot.get_build(script);
     worker.postMessage({
       type: 'build',
       tokens,
@@ -17,21 +23,10 @@ async function get_build_script(script: string) {
   }
 }
 
-async function send_test() {
-  const { get_test } = await import('../hobot/pkg');
-  worker.postMessage({
-    type: 'test',
-    test: get_test(),
-  });
-}
-
 worker.addEventListener('message', (msg) => {
   switch (msg.data.type) {
-    case 'get_build':
-      get_build_script(msg.data.script);
-      return;
-    case 'get_test':
-      send_test();
+    case 'build':
+      build(msg.data.script);
       return;
   }
 });

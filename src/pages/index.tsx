@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
-import * as CONFIG from '../src/config'
-import Token from '../src/token'
-import ScriptForm from '../src/script_form'
-import Graph from '../src/graph'
+import * as STYLES from '../styles'
+import Token from '../Token'
+import ScriptForm from '../Script'
+import Graph from '../Graph'
 import { Alert, Grid } from '@mui/material'
 
 const formatError = (e: any) => {
@@ -25,11 +25,11 @@ export default function HOPE() {
   const workerRef = useRef<Worker>();
   useEffect(() => {
     workerRef.current = new Worker(
-      new URL('../src/hobot_worker.ts', import.meta.url)
+      new URL('../hobot_worker.ts', import.meta.url)
     );
     workerRef.current.addEventListener('message', (msg: any) => {
       switch (msg.data.type) {
-        case 'test':
+        case 'test_script':
           setScript(msg.data.test)
           return;
         case 'build':
@@ -43,21 +43,17 @@ export default function HOPE() {
           return;
       }
     });
-    workerRef.current.postMessage({ type: 'get_test' });
   }, []);
 
   useEffect(() => {
-    if (workerRef.current && script != '') {
-      workerRef.current.postMessage({ type: 'get_build', script });
-    }
+    if (workerRef.current) workerRef.current.postMessage({ type: 'build', script });
   }, [script]);
 
   return (
     <Container maxWidth='lg'>
       <Grid container spacing={2}>
-
-        <Grid item xs={6}>
-          <Divider sx={CONFIG.DIVIDER}>Script</Divider>
+        <Grid item xs={12} md={6}>
+          <Divider sx={STYLES.DIVIDER}>Script</Divider>
           <ScriptForm script={script} setScript={setScript} />
         </Grid>
         {error && (
@@ -66,8 +62,8 @@ export default function HOPE() {
           </Grid>
         )}
         {tokens.length > 0 && (
-          <Grid item xs={6}>
-            <Divider sx={CONFIG.DIVIDER}>Tokens</Divider>
+          <Grid item xs={12} md={6}>
+            <Divider sx={STYLES.DIVIDER}>Tokens</Divider>
             <Container sx={{ padding: "12px 12px 0 !important" }}>
               {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item) + i} i={i} />)}
             </Container>
@@ -75,10 +71,10 @@ export default function HOPE() {
         )}
       </Grid>
       {graph.nodes.length > 0 && (
-        <>
-          <Divider sx={CONFIG.DIVIDER}>Graph</Divider>
+        <Grid item xs={12}>
+          <Divider sx={STYLES.DIVIDER}>Graph</Divider>
           <Graph nodes={graph.nodes} edges={graph.edges} />
-        </>
+        </Grid>
       )}
     </Container>
   );

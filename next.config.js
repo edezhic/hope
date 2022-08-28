@@ -21,7 +21,9 @@ module.exports = {
 
     config.experiments = {
       syncWebAssembly: true,
+      topLevelAwait: true,
     };
+
 
     config.module.rules.push({
       test: /\.wasm$/,

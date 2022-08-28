@@ -5,3 +5,4 @@ pkg
 .next
 package-lock.json
 Cargo.lock
+next-env.d.ts
