@@ -23,7 +23,7 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "typings.d.ts",
+    "src/typings.d.ts",
   ],
   "exclude": [
     "node_modules"

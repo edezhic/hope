@@ -51,11 +51,11 @@ pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
 
 pub struct Builder {
     //pub namespace: HashMap<Id, &Builder>,
-    pub tokens: IndexedTokenIter,
+    tokens: IndexedTokenIter,
     pub graph: TokenGraph,
-    pub syntax: Syntax,
-    pub last_step: NodeIndex,
-    pub this: Option<NodeIndex>,
+    script_syntax: Syntax,
+    last_step: NodeIndex,
+    this: Option<NodeIndex>, // if script contains C(Return) or this is_some at the end then returns=true
 }
 impl Builder {
     pub fn init(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
@@ -74,7 +74,7 @@ impl Builder {
             graph,
             last_step: scriptNode,
             this: None,
-            syntax: Syntax {
+            script_syntax: Syntax {
                 expects_input: false,
                 expected_args: vec![],
                 returns: false,
@@ -85,7 +85,7 @@ impl Builder {
             let input = builder.move_token_into_node();
             builder.link(input, scriptNode, Input);
             builder.this = Some(input);
-            builder.syntax.expects_input = true;
+            builder.script_syntax.expects_input = true;
         }
 
         while builder.peek_until(Linebreak)? {
@@ -93,7 +93,7 @@ impl Builder {
             let arg = Term(builder.take_term()?);
             let argNode = builder.add_node(arg);
             builder.link(argNode, scriptNode, P(prep));
-            builder.syntax.expected_args.push(prep);
+            builder.script_syntax.expected_args.push(prep);
         }
         Ok(builder)
     }

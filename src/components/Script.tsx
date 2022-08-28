@@ -1,6 +1,6 @@
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField'
-import * as STYLES from './styles'
+import * as STYLES from '../styles'
 
 export default function ScriptForm(props: any) {
     return (

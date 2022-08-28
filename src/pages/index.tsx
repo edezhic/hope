@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import * as STYLES from '../styles'
-import Token from '../Token'
-import ScriptForm from '../Script'
-import Graph from '../Graph'
+import Token from '../components/Token'
+import ScriptForm from '../components/Script'
+import Graph from '../components/Graph'
 import { Alert, Grid } from '@mui/material'
 
 const formatError = (e: any) => {
