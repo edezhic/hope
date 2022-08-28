@@ -1,13 +1,12 @@
 const WasmPackPlugin = require('@wasm-tool/wasm-pack-plugin');
 const { resolve } = require('path');
 
-let basePath = assetPrefix = '/hope';
-let publicPath = '/hope/_next/';
+let basePath = assetPrefix = '';
+let publicPath = '/_next/';
 
-if (process.env.NODE_ENV === 'development') {
-  basePath = '';
-  assetPrefix = '';
-  publicPath = '/_next/';
+if (process.env.NODE_ENV === 'production') {
+  basePath = assetPrefix = '/hope';
+  publicPath = '/hope/_next/';
 }
 
 module.exports = {
@@ -23,7 +22,6 @@ module.exports = {
       syncWebAssembly: true,
       topLevelAwait: true,
     };
-
 
     config.module.rules.push({
       test: /\.wasm$/,
