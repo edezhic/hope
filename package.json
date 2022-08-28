@@ -7,7 +7,8 @@
     "dev:hobot": "cd hobot && cargo run",
     "build:hope": "next build",
     "build:hobot": "cd hobot && wasm-pack build --out-name index",
-    "export": "next build && next export -o docs/ && echo $null >> docs/.nojekyll"
+    "fmt": "cd hobot && cargo fmt",
+    "export": "npm run fmt && next build && next export -o docs/ && echo $null >> docs/.nojekyll"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.3",

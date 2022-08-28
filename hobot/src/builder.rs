@@ -1,68 +1,50 @@
+use petgraph::graph::Node;
+
 use crate::*;
 
 fn context_lookup_script(term: &Text) -> Option<Id> {
     None
 }
 fn context_lookup_definition(term: &Text) -> Option<Text> {
+    // not in context?
     None
 }
 fn context_find_definition(term: &Text) -> Option<Text> {
+    // not in context?
     Some(term.clone())
 }
+
+type PhraseResult = (NodeIndex, bool);
 
 pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
     let mut builder = Builder::init(indexed_tokens)?;
 
     while let Some((position, token)) = builder.iterate() {
-        let (step, returns) = match token {
+        let (phrase_result, returns) = match token {
             Term(term) => {
                 if let Some(id) = context_lookup_script(&term) {
                     unimplemented!("custom script handling in build")
                 } else if let Some(id) = context_lookup_definition(&term) {
-                    return Err(Message("Redifinitions aren't allowed?"));
+                    return Err(Message("Redefinitions aren't allowed?"));
                 } else {
-                    let definition = builder.add_node(Term(term));
-                    builder.expect_token(Be)?;
-                    builder.add_input_to(definition, Input, false)?;
-                    // context.add_definition(term)
-                    (definition, true)
+                    builder.collect_definition(term)?
                 }
             }
-            F(func) => {
-                let syntax = func.syntax();
-                let function = builder.add_node(F(func));
-                if syntax.expects_input {
-                    builder.add_input_to(function, Input, true)?;
-                }
-                for expected_prep in syntax.expected_args {
-                    // prep/arg ordering?
-                    let prep = builder.expect_token(P(expected_prep))?;
-                    builder.add_input_to(function, prep, false)?;
-                }
-                (function, syntax.returns)
+            F(function) => builder.collect_function(function)?,
+            C(If) => {
+                // Or node, conditions in, yes+no edges out
+                break;
             }
+            //P(For) => Each Term Prep(Of/In/?) Term collect_sentence ?
+            //C(Try) => collect_sentence?
             Dot | And => continue,
             Linebreak => {
-                builder.this = None;
+                builder.this = None; // ?
                 continue;
             }
-            C(If) => {
-                let fork = builder.add_node(Or);
-                //builder.add_conditions_to(fork)?;
-                //let yes = builder.collect_statements_until(vec![C(Else), Dot, Linebreak]);
-                //let no = builder.collect_statements_until(vec![Dot, Linebreak]);
-                break //(vec![yes, no], false)
-            }
-            //P(For) => {
-            // expect Each
-            // expect Term
-            // expect Mod
-            // expect Term / collect input ?
-            //C(Try) => {
-            // add NodeIndex, remember it and keep going until ...? Break?
-            _ => return Err(UnexpectedToken(token, position)), // Unexpected token?
+            _ => return Err(UnexpectedPhraseToken(token, position)),
         };
-        builder.next_step(step, returns);
+        builder.next_phrase(phrase_result, returns);
     }
     Ok(builder)
 }
@@ -79,18 +61,18 @@ impl Builder {
     pub fn init(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
         let mut tokens = indexed_tokens.into_iter().peekable();
 
-        let function = tokens.next().unwrap().1;
-        if !function.of_type("Term") {
+        let script = tokens.next().unwrap().1;
+        if !script.of_type("Term") {
             return Err(Message("Expected a term for the function name"));
         }
 
         let mut graph = TokenGraph::new();
-        let functionNode = graph.add_node(function);
+        let scriptNode = graph.add_node(script);
 
         let mut builder = Builder {
             tokens,
             graph,
-            last_step: functionNode,
+            last_step: scriptNode,
             this: None,
             syntax: Syntax {
                 expects_input: false,
@@ -101,7 +83,7 @@ impl Builder {
 
         if let Term(term) = builder.peek_token()? {
             let input = builder.move_token_into_node();
-            builder.link(input, functionNode, Input);
+            builder.link(input, scriptNode, Input);
             builder.this = Some(input);
             builder.syntax.expects_input = true;
         }
@@ -110,83 +92,123 @@ impl Builder {
             let prep = builder.take_preposition()?;
             let arg = Term(builder.take_term()?);
             let argNode = builder.add_node(arg);
-            builder.link(argNode, functionNode, P(prep.clone()));
+            builder.link(argNode, scriptNode, P(prep));
             builder.syntax.expected_args.push(prep);
         }
         Ok(builder)
     }
-    pub fn add_node(&mut self, token: Token) -> NodeIndex {
-        self.graph.add_node(token)
-    }
-    pub fn move_token_into_node(&mut self) -> NodeIndex {
-        let token = self.tokens.next().unwrap().1;
-        self.graph.add_node(token)
-    }
-    pub fn link(&mut self, source: NodeIndex, target: NodeIndex, label: Token) {
-        self.graph.add_edge(source, target, label);
-    }
-    pub fn add_conditions_to(&mut self, target: NodeIndex) -> Result<()> {
-        while self.peek_until(C(Then))? {
-
-        }
-        Ok(())
-    }
-    pub fn add_input_to(&mut self, target: NodeIndex, label: Token, lookup_this: bool) -> Result<()> {
-        let input = match self.peek_token()? {
-            Term(term) if let Some(id) = context_lookup_script(term) => {
-                unimplemented!("custom script handling in add_input_to")
-            }
-            Term(term) if let Some(id) = context_find_definition(term) => {
-                self.move_token_into_node()
-            }
-            V(Struct(_)) => {
-                let structure = self.move_token_into_node();
-                while self.peek_until(CollectionEnd)? {
-                    let attr_name = Term(Text::from_str("atrr")); // collect proper name for an attribute
-                    self.add_input_to(structure, attr_name, false);
-                }
-                structure
-            }
-            V(Lst(_)) => {
-                let list = self.move_token_into_node();
-                while self.peek_until(CollectionEnd)? {
-                    self.add_input_to(list, Input, false);
-                }
-                list
-            }
-            V(_) => self.move_token_into_node(),
-            This => {
-                if let Some(node) = self.this {
-                    self.this.unwrap()
-                } else {
-                    return Err(Message(
-                        "Unexpected local term: don't know where it should lead.",
-                    ));
-                }
-            }
-            //token if token.is_function() => ?
-            //A(Start) => {collect formula}
-            //Return => syntax.returns = true?
-            // _ => try getting the last NodeIndex with syntax.returns_value == true
-            _ => {
-                if lookup_this && self.this.is_some() {
-                    self.this.unwrap()
-                } else {
-                    return Err(Message("Unexpected token"));
-                }
-            }
-        };
-        Ok(self.link(input, target, label))
-    }
-    pub fn next_step(&mut self, next_step: NodeIndex, returns: bool) {
-        self.link(self.last_step, next_step, Edge);
-        self.last_step = next_step;
+    pub fn next_phrase(&mut self, next_phrase: NodeIndex, returns: bool) {
+        self.link(self.last_step, next_phrase, Edge);
+        self.last_step = next_phrase;
         if returns {
             self.this = Some(self.last_step);
         } else {
             self.this = None;
         }
     }
+    /*
+    pub fn add_conditions_to(&mut self, target: NodeIndex) -> Result<()> {
+        while self.peek_until(C(Then))? {
+
+        }
+        Ok(())
+    }
+     */
+    pub fn collect_definition(&mut self, term: Text) -> Result<PhraseResult> {
+        let definition = self.add_node(Term(term));
+        self.expect_token(Be)?;
+        self.add_input_to(definition, Input, false)?;
+        // context.add_definition(term)
+        Ok((definition, true))
+    }
+    pub fn collect_function(&mut self, function: Function) -> Result<PhraseResult> {
+        let syntax = function.syntax();
+        let target = self.add_node(F(function));
+        if syntax.expects_input {
+            self.add_input_to(target, Input, true)?;
+        }
+        for expected_prep in syntax.expected_args {
+            // prep/arg ordering?
+            let prep = self.expect_token(P(expected_prep))?;
+            self.add_input_to(target, prep, false)?;
+        }
+        Ok((target, syntax.returns))
+    }
+    pub fn add_input_to(
+        &mut self,
+        target: NodeIndex,
+        label: Token,
+        lookup_this: bool,
+    ) -> Result<()> {
+        let (index, next_token) = self.iterate().unwrap();
+        let input = match next_token {
+            //Term(term) if let Some(id) = context_lookup_script(term) => {
+            //    unimplemented!("custom script handling in add_input_to")
+            //}
+            Term(term) if let Some(id) = context_find_definition(&term) => self.add_node(Term(term)),
+            V(Struct(structure)) => {
+                let target = self.add_node(V(Struct(structure)));
+                while self.peek_until(CollectionEnd)? {
+                    let attr_name = Term(Text::from_str("atrr")); // collect proper name for an attribute
+                    self.add_input_to(target, attr_name, false);
+                }
+                target
+            }
+            V(Lst(list)) => {
+                let target = self.add_node(V(Lst(list)));
+                while self.peek_until(CollectionEnd)? {
+                    self.add_input_to(target, Input, false);
+                }
+                target
+            }
+            V(value) => self.add_node(V(value)),
+            This => {
+                if let Some(node) = self.this {
+                    node
+                } else {
+                    return Err(FormattedMesssage(
+                        format!("Unexpected local reference at {:?}: don't know where it should lead.", index)
+                    ));
+                }
+            }
+            F(function) =>  {
+                let (result, returns) = self.collect_function(function)?;
+                if !returns {
+                    return Err(FormattedMesssage(
+                        format!("Can't use function {:?} that doesn't return as input at {:?}", self.graph[result], index)
+                    ))
+                }
+                result
+            }
+            //A(Start) => {collect formula}
+            //Return => syntax.returns = true?
+            token => {
+                if lookup_this {
+                    if let Some(node) = self.this {
+                        node
+                    } else {
+                        return Err(FormattedMesssage(
+                            format!("Expected local reference at {:?} but don't know where it should lead.", index)
+                        ));
+                    }
+                }  else {
+                    return Err(UnexpectedInputToken(token, index));
+                }
+            }
+        };
+        Ok(self.link(input, target, label))
+    }
+    pub fn add_node(&mut self, token: Token) -> NodeIndex {
+        self.graph.add_node(token)
+    }
+    pub fn link(&mut self, source: NodeIndex, target: NodeIndex, label: Token) {
+        self.graph.add_edge(source, target, label);
+    }
+    pub fn move_token_into_node(&mut self) -> NodeIndex {
+        let token = self.tokens.next().unwrap().1;
+        self.graph.add_node(token)
+    }
+
     pub fn take_token(&mut self) -> Result<Token> {
         if let Some((_, token)) = self.tokens.next() {
             Ok(token)
@@ -212,7 +234,7 @@ impl Builder {
         if let Some((_, token)) = self.tokens.peek() {
             Ok(token)
         } else {
-            Err(Message("Expected token at the end of script"))
+            Err(Message("Expected token at the end of the script"))
         }
     }
     pub fn iterate(&mut self) -> Option<(usize, Token)> {
@@ -222,11 +244,11 @@ impl Builder {
         if let Some((position, next_token)) = self.tokens.next() {
             if token == next_token {
                 return Ok(token);
+            } else {
+                return Err(ExpectedToken(token, position));
             }
-            return Err(UnexpectedToken(next_token, position))
         }
-        Err(ExpectedToken(token))
-        
+        return Err(UnexpectedEnd);
     }
     pub fn peek_until(&mut self, token: Token) -> Result<bool> {
         if *self.peek_token()? != token {

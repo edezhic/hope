@@ -24,7 +24,7 @@ pub fn parse(s: &str) -> Result<Vec<IndexedToken>> {
     Ok(indexed_tokens)
 }
 
-struct Parser<'a> {
+pub struct Parser<'a> {
     pieces: Peekable<UWordBoundIndices<'a>>,
     pub peek: Option<(usize, &'a str)>,
 }

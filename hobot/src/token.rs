@@ -68,9 +68,9 @@ pub struct Syntax {
     pub returns: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches, FunctionSyntax)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Matches, FunctionSyntax)]
 pub enum Function {
-    #[syntax(returns, args = "To")]
+    #[syntax(args = "To")]
     Add,
     #[syntax(args = "From")]
     Substract,
@@ -112,7 +112,7 @@ pub enum Algebra {
     Deviation,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Matches)]
 pub enum Preposition {
     For,
     With,

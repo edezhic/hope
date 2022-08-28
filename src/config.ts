@@ -1,6 +1,6 @@
-export const GRAPH_STYLE = { height: '600px', border: '1px dashed #3a3a3a', borderRadius: "4px" }
+export const GRAPH_STYLE = { height: '700px', border: '1px dashed #3a3a3a', borderRadius: "4px" }
 
-export const SCRIPT_BODY_ROWS = 3
+export const SCRIPT_BODY_ROWS = 4
 
 export const WHITE = '#fff'
 export const WHITISH = '#ddd'

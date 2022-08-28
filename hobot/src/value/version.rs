@@ -16,7 +16,7 @@ impl Version {
             minor: None,
             patch: None,
             rc: None,
-            meta: Some(String::from(t.as_str()))
+            meta: Some(String::from(t.as_str())),
         })
     }
 }
@@ -39,4 +39,3 @@ impl fmt::Display for Version {
         write!(f, "")
     }
 }
-

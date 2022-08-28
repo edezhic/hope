@@ -9,7 +9,7 @@ export default function Token({ item, i }: any) {
   if (token === 'Linebreak') return (<Divider key={key} sx={CONFIG.INVISIBLE_DIVIDER} />)
   else if (token === 'Dot') { label = '.'; color = CONFIG.CONTROL_COLOR }
   else if (token === 'This') { label = 'this'; color = CONFIG.VALUE_COLOR }
-  else if (token === 'CollectionEnd') { label = ']/}'; color = CONFIG.COLLECTION_COLOR }
+  else if (token === 'CollectionEnd') { label = '|'; color = CONFIG.COLLECTION_COLOR }
   else if (token?.V?.Lst) { label = '['; color = CONFIG.COLLECTION_COLOR }
   else if (typeof (token) === 'string') label = token.toLowerCase();
   else if (token.Term) { label = token.Term; color = CONFIG.TERM_COLOR }

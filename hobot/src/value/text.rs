@@ -28,11 +28,11 @@ impl Text {
     pub fn lowercase(s: &str) -> Text {
         Text::new(Some(&s.to_lowercase()))
     }
-    
+
     pub fn split_by_word_bounds(&self) -> UWordBoundIndices {
         UnicodeSegmentation::split_word_bound_indices(self.as_str())
     }
-    
+
     fn norm(s: String) -> String {
         s.nfc().collect::<String>()
     }

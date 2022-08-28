@@ -1,16 +1,16 @@
 use crate::*;
-use derive_more::{IntoIterator};
+use derive_more::IntoIterator;
 
 #[derive(Serialize, Deserialize, Debug, Clone, IntoIterator, PartialEq)]
 pub struct List {
     #[into_iterator(owned, ref, ref_mut)]
-    pub values: VecDeque<Value>
+    pub values: VecDeque<Value>,
 }
 
 impl List {
     pub fn new() -> List {
         List {
-            values: VecDeque::new() 
+            values: VecDeque::new(),
         }
     }
     pub fn append(&mut self, value: Value) {
@@ -25,7 +25,7 @@ impl fmt::Display for List {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "[ ");
         let length = self.values.len();
-            if length > 0 {
+        if length > 0 {
             for index in (0..).take(length - 1) {
                 write!(f, "{}, ", &self.values[index]);
             }

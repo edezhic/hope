@@ -57,6 +57,6 @@ pub fn get_test() -> Result<JsValue> {
 }
 
 pub const TEST: &'static str = r#"Testscript X of Y
-Z is 1, xyz is [x, y, z], abc is @abcd. Sum xyz and show. Substract 1 from xyz.
-If xyz is less than 5 then show "hell yeah", else show "oh no".
+Z is 1, xyz is [x, y, sum [x, y, z]], abc is @abcd. S is sum xyz. Show it. Substract 1 from s.
+If s is less than 10 then show "hell yeah", else show "oh no".
 "#;

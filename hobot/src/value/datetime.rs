@@ -18,7 +18,7 @@ impl Datetime {
 impl fmt::Display for Datetime {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Datetime::Stamp(stamp) => write!(f, "T{}", stamp)
+            Datetime::Stamp(stamp) => write!(f, "T{}", stamp),
         }
     }
 }

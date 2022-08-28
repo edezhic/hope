@@ -25,10 +25,10 @@ async function send_test() {
   });
 }
 
-worker.addEventListener('message', (evt) => {
-  switch (evt.data.type) {
+worker.addEventListener('message', (msg) => {
+  switch (msg.data.type) {
     case 'get_build':
-      get_build_script(evt.data.script);
+      get_build_script(msg.data.script);
       return;
     case 'get_test':
       send_test();

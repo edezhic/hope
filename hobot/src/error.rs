@@ -3,13 +3,18 @@ use crate::*;
 pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub enum Error { // TODO https://crates.io/crates/thiserror ?
+pub enum Error {
+    // TODO https://crates.io/crates/thiserror ?
     Execution(String),
     Parsing(String),
     Regex(String),
     Message(&'static str),
+    FormattedMesssage(String),
+    UnexpectedEnd,
     UnexpectedToken(Token, usize),
-    ExpectedToken(Token),
+    UnexpectedInputToken(Token, usize),
+    UnexpectedPhraseToken(Token, usize),
+    ExpectedToken(Token, usize),
 }
 
 impl std::convert::Into<JsValue> for Error {

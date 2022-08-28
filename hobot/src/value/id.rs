@@ -1,7 +1,8 @@
 use crate::*;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
-pub enum Scheme { // + system/network/other protocols
+pub enum Scheme {
+    // + system/network/other protocols
     Custom(Text),
     Screen,
     Http,
@@ -12,7 +13,7 @@ impl fmt::Display for Scheme {
         match self {
             Scheme::Screen => write!(f, "screen"),
             Scheme::Http => write!(f, "http"),
-            Scheme::Custom(scheme) => write!(f, "{}", scheme)
+            Scheme::Custom(scheme) => write!(f, "{}", scheme),
         }
     }
 }

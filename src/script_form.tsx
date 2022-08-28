@@ -14,7 +14,7 @@ export default function ScriptForm(props: any) {
                 id='multiline-static'
                 sx={{ marginBottom: 0, marginTop: 0, fontSize: "13px !important" }}
                 inputProps={{
-                    style: { fontSize: 15 }
+                    style: { fontSize: 14 }
                 }}
                 multiline
                 rows={CONFIG.SCRIPT_BODY_ROWS}
