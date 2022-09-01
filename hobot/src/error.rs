@@ -14,6 +14,7 @@ pub enum Error {
     UnexpectedToken(Token, usize),
     UnexpectedInputToken(Token, usize),
     UnexpectedPhraseToken(Token, usize),
+    UnexpectedConditionToken(Token, usize),
     ExpectedToken(Token, usize),
 }
 

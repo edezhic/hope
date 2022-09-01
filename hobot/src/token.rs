@@ -1,40 +1,32 @@
 use crate::*;
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches, OfType)]
-pub enum Token {
-    #[dont_match]
-    Edge,
-    And,
-    #[dont_match]
-    Input,
-    Or,
-    #[regex = r"^(?i)(result|this|it|that)$"]
-    This,
-    #[regex = r"^(?i)(:|=|is|are|equal)$"]
-    Be,
-    #[regex = r"^\.$"]
-    Dot,
-    #[regex = r"^(\n|\p{Zl})$"]
-    Linebreak,
-    #[regex = r"^(\]|\})$"]
-    CollectionEnd,
-    A(Algebra),
-    C(Control),
-    S(Selector),
-    F(Function),
-    V(Value),
-    P(Preposition),
-    R(Relation),
-    #[dont_match]
-    Term(Text),
-    #[dont_match]
-    Script(Id), // for custom scripts
-                // + static?
-                // + T(Type)
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct IndexedToken {
+    pub index: usize,
+    pub token: Token,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Control {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches, OfType)]
+pub enum Token {
+    #[matches(nothing)]
+    Edge,
+    #[matches(nothing)]
+    Input,
+    #[matches(regex = r"^(?i)(result|this|it|that)$")]
+    This,
+    #[matches(regex = r"^(?i)(:|=|is|are|equal)$")]
+    Be,
+    #[matches(regex = r"^\.$")]
+    Dot,
+    #[matches(regex = r"^(\n|\p{Zl})$")]
+    Linebreak,
+    #[matches(regex = r"^(\]|\})$")]
+    CollectionEnd,
+
+    And,
+    Or,
+    Not,
+
     Do,
     Else,
     If,
@@ -44,18 +36,29 @@ pub enum Control {
     Then,
     Try,
     Panic,
-}
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Selector {
     Where,
     Any,
     Each,
+
+    Than,
+
+    A(Algebra),
+    C(Comparative),
+    F(Function),
+    P(Preposition),
+    V(Value),
+    #[matches(nothing)]
+    Term(Text),
+    //#[matches(nothing)]
+    //Script(Id), // for custom scripts
+    // + static?
+    // + T(Type)
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Relation {
-    Than,
+pub enum Comparative {
+    // -> Relative? Relational?
     Less,
     More,
     Contains,
@@ -70,13 +73,13 @@ pub struct Syntax {
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Matches, FunctionSyntax)]
 pub enum Function {
-    #[syntax(args = "To")]
+    #[syntax(args = "To", returns)]
     Add,
-    #[syntax(args = "From")]
+    #[syntax(args = "From", returns)]
     Substract,
     #[syntax(args = "By")]
     Filter,
-    #[syntax(returns)]
+    #[syntax(no_input, args = "Of", returns)]
     Sum,
     #[syntax(args = "To")]
     Send,
@@ -96,17 +99,17 @@ pub enum Function {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Algebra {
-    #[regex = r"^\($"]
+    #[matches(regex = r"^\($")]
     Start,
-    #[regex = r"^\)$"]
+    #[matches(regex = r"^\)$")]
     End,
-    #[regex = r"^\+$"]
+    #[matches(regex = r"^\+$")]
     Plus,
-    #[regex = r"^\-$"]
+    #[matches(regex = r"^\-$")]
     Minus,
-    #[regex = r"^\*$"]
+    #[matches(regex = r"^\*$")]
     Multiplication,
-    #[regex = r"^/$"]
+    #[matches(regex = r"^/$")]
     Division,
     Mean,
     Deviation,

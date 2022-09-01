@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "scripts": {
     "install:wasm-pack": "curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh",
-    "dev:hope": "next dev",
-    "dev:hobot": "cd hobot && cargo run",
-    "build:hope": "next build",
     "build:hobot": "cd hobot && wasm-pack build --out-name index",
+    "build:hope": "next build",
     "fmt": "cd hobot && cargo fmt",
-    "export": "npm run fmt && next build && next export -o docs/ && echo $null >> docs/.nojekyll"
+    "dev:hobot": "cd hobot && cargo run",
+    "dev:hope": "next dev",
+    "export:ghpages": "npm run fmt && next build && next export -o docs/ && echo $null >> docs/.nojekyll"
   },
   "dependencies": {
     "@emotion/cache": "^11.10.3",

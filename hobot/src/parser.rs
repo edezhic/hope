@@ -8,12 +8,15 @@ pub fn parse(s: &str) -> Result<Vec<IndexedToken>> {
     let mut indexed_tokens = vec![];
     while let Some((index, piece)) = parser.peek {
         if let Some(value) = parser.match_value(piece)? {
-            indexed_tokens.push((index, value));
-        } else if let Some(keyword) = Token::matches(piece) {
-            indexed_tokens.push((index, keyword));
+            indexed_tokens.push(IndexedToken {
+                index,
+                token: value,
+            });
+        } else if let Some(token) = Token::matches(piece) {
+            indexed_tokens.push(IndexedToken { index, token });
             parser.next();
         } else if let Some(term) = parser.validate_term(piece) {
-            indexed_tokens.push((index, term));
+            indexed_tokens.push(IndexedToken { index, token: term });
         } else {
             return Err(Parsing(format!(
                 r#"I don't know how to parse '{:?}'"#,
@@ -30,7 +33,7 @@ pub struct Parser<'a> {
 }
 impl<'a> Parser<'a> {
     fn update_peek(&mut self) {
-        self.skip();
+        self.skip_ignored();
         if let Some(piece) = self.pieces.peek() {
             self.peek = Some(*piece)
         } else {
@@ -75,9 +78,9 @@ impl<'a> Parser<'a> {
         text
     }
 
-    fn skip(&mut self) {
+    fn skip_ignored(&mut self) {
         while let Some((_, piece)) = self.pieces.peek() {
-            if SKIP.is_match(piece) {
+            if IGNORED.is_match(piece) {
                 self.pieces.next();
             } else {
                 break;
@@ -121,9 +124,9 @@ impl<'a> Parser<'a> {
 }
 
 lazy_static! {
-    static ref SKIP: R = R::new(r"^(?i)(a|the|let|,|\t| |\?)+$").unwrap();
-    static ref LITERAL_END: R = R::new(r"^(?i)(\.|\n|\t| |\?)+$").unwrap();
-    static ref TERM: R = R::new(r"^\p{Letter}+").unwrap();
-    static ref NUMBER: R = R::new(r"^(\d+([\.,]\d+)?)$").unwrap();
-    static ref TEXT: R = R::new(r#"^("|')$"#).unwrap();
+    static ref IGNORED: Regex = Regex::new(r"^(?i)(a|the|let|,|\t| |\?)+$").unwrap();
+    static ref LITERAL_END: Regex = Regex::new(r"^(?i)(\.|\n|\t| |\?)+$").unwrap();
+    static ref TERM: Regex = Regex::new(r"^\p{Letter}+").unwrap();
+    static ref NUMBER: Regex = Regex::new(r"^(\d+([\.,]\d+)?)$").unwrap();
+    static ref TEXT: Regex = Regex::new(r#"^("|')$"#).unwrap();
 }

@@ -9,7 +9,7 @@ use syn::{
     parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, NestedMeta, PathSegment, Variant,
 };
 
-fn get_syntax_values(variant: &Variant) -> (bool, IntoIter<Ident>, bool) {
+fn get_macro_attributes(variant: &Variant) -> (bool, IntoIter<Ident>, bool) {
     let mut expects_input = true;
     let mut expected_args = vec![];
     let mut returns_value = false;
@@ -61,7 +61,7 @@ pub fn derive_function_syntax(input: TokenStream) -> TokenStream {
 
                 match &variant.fields {
                     Fields::Unit => {
-                        let (expects_input, expected_args, returns) = get_syntax_values(variant);
+                        let (expects_input, expected_args, returns) = get_macro_attributes(variant);
                         function_syntax_arm.extend(quote_spanned! {variant.span() =>
                             Function::#variant_name => Syntax { expects_input: #expects_input, expected_args: vec![#(#expected_args),*], returns: #returns },
                         });

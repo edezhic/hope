@@ -20,8 +20,8 @@ unicode-segmentation = "1.8.0"
 regex = "1.5.4"
 derive_more = "0.99.16"
 lazy_static = "1.4.0"
-console_error_panic_hook = "0.1.7"
 wasm-bindgen = { version = "0.2.78", features = ["serde-serialize"] }
+itertools = "0.10.3"
 
 [dependencies.rust_decimal]
 version = "1.17.0"

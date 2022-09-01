@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import Container from '@mui/material/Container'
 import Divider from '@mui/material/Divider'
 import * as STYLES from '../styles'
-import Token from '../components/Token'
+import TokenChip from '../components/Token'
 import ScriptForm from '../components/Script'
 import Graph from '../components/Graph'
 import { Alert, Grid } from '@mui/material'
@@ -27,19 +27,19 @@ export default function HOPE() {
     workerRef.current = new Worker(
       new URL('../hobot_worker.ts', import.meta.url)
     );
-    workerRef.current.addEventListener('message', (msg: any) => {
-      switch (msg.data.type) {
+    workerRef.current.addEventListener('message', ({ data: { type, test, tokens, graph, error } }) => {
+      switch (type) {
         case 'test_script':
-          setScript(msg.data.test)
+          setScript(test)
           return;
         case 'build':
           setError(null)
-          setTokens(msg.data.tokens)
-          setGraph(msg.data.graph)
+          setTokens(tokens)
+          setGraph(graph)
           return;
         case 'error':
           resetResults()
-          setError(msg.data.e)
+          setError(error)
           return;
       }
     });
@@ -65,7 +65,7 @@ export default function HOPE() {
           <Grid item xs={12} md={6}>
             <Divider sx={STYLES.DIVIDER}>Tokens</Divider>
             <Container sx={{ padding: "12px 12px 0 !important" }}>
-              {tokens?.map((item: any, i) => <Token item={item} key={JSON.stringify(item) + i} i={i} />)}
+              {tokens?.map(({ index, token }) => <TokenChip key={index} token={token} index={index} />)}
             </Container>
           </Grid>
         )}

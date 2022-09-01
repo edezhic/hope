@@ -8,15 +8,16 @@
     unused_assignments
 )]
 #![feature(if_let_guard)]
-use console_error_panic_hook;
 pub use core::fmt;
 pub use derive_more;
+pub use itertools::Itertools;
+use itertools::MultiPeek;
 pub use lazy_static::lazy_static;
 pub use petgraph::{
     dot::Dot,
     stable_graph::{NodeIndex, StableDiGraph},
 };
-pub use regex::Regex as R;
+pub use regex::Regex;
 pub use serde::{Deserialize, Serialize};
 pub use std::collections::{HashMap, VecDeque};
 pub use std::{iter::Peekable, vec::IntoIter};
@@ -28,6 +29,7 @@ mod builder;
 mod error;
 mod parser;
 mod token;
+mod token_impls;
 mod value;
 pub use builder::build;
 pub use derive_matches::Matches;
@@ -35,13 +37,10 @@ pub use derive_of_type::OfType;
 pub use derive_syntax::FunctionSyntax;
 pub use error::{Error, Error::*, Result};
 pub use parser::parse;
-pub use token::{
-    Algebra::*, Control::*, Function::*, Preposition::*, Relation::*, Selector::*, Token::*, *,
-};
+pub use token::{Algebra::*, Comparative::*, Function::*, Preposition::*, Token::*, *};
 pub use value::{Value::*, *};
 
-pub type IndexedToken = (usize, Token);
-pub type IndexedTokenIter = Peekable<IntoIter<IndexedToken>>;
+pub type IndexedTokenIter = MultiPeek<IntoIter<IndexedToken>>;
 pub type TokenGraph = StableDiGraph<Token, Token>;
 
 #[wasm_bindgen]
@@ -57,6 +56,6 @@ pub fn get_test() -> Result<JsValue> {
 }
 
 pub const TEST: &'static str = r#"Testscript X of Y
-Z is 1, xyz is [x, y, sum [x, y, z]], abc is @abcd. S is sum xyz. Show it. Substract 1 from s.
-If s is less than 10 then show "hell yeah", else show "oh no".
+Z is 1, xyz is [x, y, sum of [x, y, z]], abc is @abcd. S is the sum of xyz. Show it. Substract 1 from s.
+If this is less than 10 then show "hell yeah" and add z to s, else show it. Show "it works!".
 "#;

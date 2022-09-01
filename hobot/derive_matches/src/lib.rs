@@ -3,9 +3,42 @@ use proc_macro2::TokenStream as TokenStream2;
 
 use quote::{format_ident, quote, quote_spanned};
 use syn::spanned::Spanned;
-use syn::{parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, PathSegment, Type, TypePath};
+use syn::{
+    parse_macro_input, Data, DeriveInput, Fields, Lit, Meta, NestedMeta, PathSegment, Type,
+    TypePath, Variant,
+};
 
-#[proc_macro_derive(Matches, attributes(regex, dont_match))]
+fn get_macro_attributes(variant: &Variant) -> (bool, String) {
+    let mut dont_match = false;
+    let mut regex = format!(r"^(?i){}$", variant.ident.to_string());
+
+    if let Some(i) = variant
+        .attrs
+        .iter()
+        .position(|attr| attr.path.is_ident("matches"))
+    {
+        if let Meta::List(list) = variant.attrs[i].parse_meta().unwrap() {
+            for arg in list.nested {
+                if let NestedMeta::Meta(Meta::Path(path)) = arg {
+                    let PathSegment { ident, .. } = &path.segments[0];
+                    if ident.to_string() == "nothing" {
+                        dont_match = true;
+                    }
+                } else if let NestedMeta::Meta(Meta::NameValue(namevalue)) = arg {
+                    let PathSegment { ident, .. } = &namevalue.path.segments[0];
+                    if ident.to_string() == "regex" {
+                        if let Lit::Str(literal) = namevalue.lit {
+                            regex = literal.value()
+                        }
+                    }
+                }
+            }
+        }
+    }
+    (dont_match, regex)
+}
+
+#[proc_macro_derive(Matches, attributes(matches))]
 pub fn derive_match(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let enum_name = input.ident;
@@ -17,32 +50,17 @@ pub fn derive_match(input: TokenStream) -> TokenStream {
     match input.data {
         Data::Enum(data_enum) => {
             for variant in &data_enum.variants {
-                if let Some(_) = variant
-                    .attrs
-                    .iter()
-                    .find(|attr| attr.path.is_ident("dont_match"))
-                {
+                let (dont_match, regex) = get_macro_attributes(variant);
+                if dont_match {
                     continue;
                 }
+
                 let ref variant_name = variant.ident;
 
                 match &variant.fields {
                     Fields::Unit => {
                         let regex_name =
                             format_ident!("{}", variant_name.to_string().to_uppercase());
-                        let mut regex = format!(r"^(?i){}$", variant_name.to_string());
-
-                        if let Some(i) = variant
-                            .attrs
-                            .iter()
-                            .position(|attr| attr.path.is_ident("regex"))
-                        {
-                            if let Meta::NameValue(value) = variant.attrs[i].parse_meta().unwrap() {
-                                if let Lit::Str(rgx) = value.lit {
-                                    regex = rgx.value();
-                                }
-                            }
-                        }
 
                         variant_regexs.extend(quote_spanned! {variant.span() =>
                             static ref #regex_name: regex::Regex = regex::Regex::new(#regex).unwrap();

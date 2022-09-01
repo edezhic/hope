@@ -19,25 +19,25 @@ pub use version::Version;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Value {
     Blank,
-    #[regex = r"^(?i)(true|yes|ok)$"]
+    #[matches(regex = r"^(?i)(true|yes|ok)$")]
     Yes,
-    #[regex = r"^(?i)(false|no)$"]
+    #[matches(regex = r"^(?i)(false|no)$")]
     No,
-    #[dont_match]
+    #[matches(nothing)]
     I(Id),
-    #[dont_match]
+    #[matches(nothing)]
     Num(Number),
-    #[dont_match]
+    #[matches(nothing)]
     Lst(List),
-    #[dont_match]
+    #[matches(nothing)]
     Sl(Seal),
-    #[dont_match]
+    #[matches(nothing)]
     Struct(Structure),
-    #[dont_match]
+    #[matches(nothing)]
     Txt(Text),
-    #[dont_match]
+    #[matches(nothing)]
     Dt(Datetime),
-    #[dont_match]
+    #[matches(nothing)]
     Ver(Version),
 }
 

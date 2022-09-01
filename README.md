@@ -53,4 +53,4 @@ Long-term questionable ideas:
 1. install latest stable Node/NPM
 2. install latest nightly Rust/rustup
 3. install latest wasm-pack. For Linux/MacOS: `npm run install:wasm-pack`, to find installation instructions for other platforms visit [rust-wasm.github.io/wasm-pack/installer](https://rustwasm.github.io/wasm-pack/installer/#)
-4. `npm run dev:hope` and visit [localhost:3000](http://localhost:3000)
+4. `npm run dev:hope` and visit [localhost:3000](http://localhost:3000) (sometimes wasm-pack crate compilation fails, but usually works fine when you run it again)
