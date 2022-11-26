@@ -1,41 +1,39 @@
-use petgraph::graph::Node;
-
 use crate::*;
 
 fn context_lookup_script(term: &Text) -> Option<Id> {
     None
 }
-fn context_lookup_definition(term: &Text) -> Option<Text> {
-    // not in context?
-    None
-}
-fn context_find_definition(term: &Text) -> Option<Text> {
-    // not in context?
-    Some(term.clone())
-}
-/// How about:
-///
-/// collect -> pull? compose? ???
-/// phrase -> instruction? ???
+/// Build loop logic:
+/// * 'If' -> collect conditions, collect sentence(potentially multiple phrases), optional ['else' + another sentence]
+/// * _    -> attach phrase(definition or function invocation)
+/// Definitions and functions are collecting inputs which might be references, values or outputs of other fns
 
 type PhraseOutput = (NodeIndex, bool);
 
 pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
     let mut builder = Builder::init(indexed_tokens)?;
 
-    while let Some(IndexedToken { index, token }) = builder.peek() {
+    while let Some(IndexedToken { index, token }) = builder.tokens.peek() {
         match token {
             If => {
-                builder.skip(If);
-                let fork = builder.attach_node(Or);
+                builder.tokens.skip(If);
+                let fork = match builder.tokens.peek_token()? {
+                    Either => {
+                        builder.tokens.skip(Either);
+                        builder.attach_node(Or)
+                    }
+                    _ => builder.attach_node(And),
+                };
+
                 builder.collect_conditions(fork)?;
+
                 let remembered_this = builder.this;
 
                 let then_branch = builder.collect_sentence(fork, V(Yes))?;
                 let mut else_branch = fork;
 
-                if builder.next_sentence_starts_with(Else)? {
-                    builder.skip_until(Else);
+                if builder.tokens.next_sentence_starts_with(Else)? {
+                    builder.tokens.skip_until(Else);
                     builder.tip = fork;
                     builder.this = remembered_this;
                     else_branch = builder.collect_sentence(fork, V(No))?;
@@ -44,10 +42,9 @@ pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
                 builder.merge(then_branch, else_branch);
                 builder.this = None;
             }
-            //P(For) => Each Term Prep(Of/In/?) Term collect_sentence ?
             //C(Try) => collect_sentence?
             Dot | And | Linebreak => {
-                builder.skip_any();
+                builder.tokens.skip_any();
             } // ?
             _ => {
                 builder.attach_phrase(Edge)?;
@@ -58,26 +55,22 @@ pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
 }
 
 pub struct Builder {
-    iter: IndexedTokenIter,
+    tokens: IndexedTokensIter,
     pub graph: TokenGraph,
-    script_syntax: Syntax,
+    script_syntax: Syntax, // if script contains Return (or this.is_some at the end?) then returns=true
     tip: NodeIndex,
-    this: Option<NodeIndex>, // if script contains Return (or this.is_some at the end?) then returns=true
+    this: Option<NodeIndex>,
 }
 impl Builder {
     pub fn init(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
-        let mut iter = indexed_tokens.into_iter().multipeek();
+        let mut iter = IndexedTokensIter::init(indexed_tokens);
 
-        let script = iter.next().unwrap().token;
-        if !script.of_type("Term") {
-            return Err(Message("Expected a term for the function name"));
-        }
-
+        let script = iter.take_term()?;
         let mut graph = TokenGraph::new();
-        let scriptNode = graph.add_node(script);
+        let scriptNode = graph.add_node(Term(script));
 
         let mut builder = Builder {
-            iter,
+            tokens: iter,
             graph,
             tip: scriptNode,
             this: None,
@@ -88,82 +81,62 @@ impl Builder {
             },
         };
 
-        if let Term(term) = builder.peek_token()? {
-            let input = builder.move_token_into_node();
+        if let Term(term) = builder.tokens.peek_token()? {
+            let input = builder.move_token_into_node()?;
             builder.link(input, scriptNode, Input);
             builder.this = Some(input);
             builder.script_syntax.expects_input = true;
         }
 
-        while builder.loop_until(Linebreak)? {
-            let prep = builder.take_preposition()?;
-            let arg = Term(builder.take_term()?);
+        while builder.tokens.next_isnt(Linebreak)? {
+            let prep = builder.tokens.take_preposition()?;
+            let arg = Term(builder.tokens.take_term()?);
             let argNode = builder.add_node(arg);
             builder.link(argNode, scriptNode, P(prep));
             builder.script_syntax.expected_args.push(prep);
         }
         Ok(builder)
     }
+
     pub fn collect_sentence(&mut self, origin: NodeIndex, link: Token) -> Result<NodeIndex> {
         let mut tip = self.attach_phrase(link)?;
-        while let Some(itoken) = self.peek() {
+        while let Some(itoken) = self.tokens.peek() {
             if itoken == Linebreak || itoken == Dot || itoken == Else {
                 break;
             }
-            self.skip_optional(And);
+            self.tokens.skip_optional(And);
             tip = self.attach_phrase(Edge)?;
         }
         Ok(tip)
     }
-    pub fn attach_phrase(&mut self, link: Token) -> Result<NodeIndex> {
-        let IndexedToken { index, token } = self.next().unwrap();
-        let (phrase_node, returns) = match token {
-            Term(term) => {
-                if let Some(id) = context_lookup_script(&term) {
-                    unimplemented!("custom script handling in attach_phrase")
-                } else {
-                    self.collect_definition(term)?
-                }
-            }
-            F(function) => self.collect_function(function)?,
-            //Return => self.script_syntax.returns = true,
-            _ => return Err(UnexpectedPhraseToken(token, index)),
-        };
-        self.link(self.tip, phrase_node, link);
-        self.tip = phrase_node;
-        if returns {
-            self.this = Some(self.tip);
-        } else {
-            self.this = None;
-        }
-        Ok(phrase_node)
-    }
 
     pub fn collect_conditions(&mut self, target: NodeIndex) -> Result<()> {
-        while let Some(IndexedToken { index, token }) = self.peek_until(Then)? {
+        while let Some(IndexedToken { index, token }) = self.tokens.peek_until(Then)? {
             let mut comparison: Option<NodeIndex> = None;
             let left = self.collect_input(true)?;
             let mut right: Option<NodeIndex> = None;
 
-            self.skip_optional(Be)?; // if Be => comparison = Equal?
+            self.tokens.skip_optional(Be)?;
 
-            if let Not = self.peek_token()? {
+            if let Not = self.tokens.peek_token()? {
                 // 'No' link from comparison to target?
                 return Err(Message("Unimplemented negation"));
             }
-            if let C(_) = self.peek_token()? {
-                let comparative = C(self.take_comparison()?);
+            if let C(_) = self.tokens.peek_token()? {
+                let comparative = C(self.tokens.take_comparison()?);
                 // if peek == Or => take more comparisons?
                 comparison = Some(self.add_node(comparative));
-                self.skip_optional(Than);
+                self.tokens.skip_optional(Than);
                 // after all comparisons
                 right = Some(self.collect_input(true)?);
             }
 
-            if let Or = self.peek_token()? {
+            if let Or = self.tokens.peek_token()? {
                 // continue collecting conditions with the same target?
-            } else if let And = self.peek_token()? {
+                return Err(Message("Unimplemented OR conditions"));
+            } else if let And = self.tokens.peek_token()? {
                 // add_node(And), change target to it and collect_conditions?
+                return Err(Message("Unimplemented AND conditions"));
             }
 
             if let Some(node) = comparison {
@@ -175,52 +148,92 @@ impl Builder {
             }
             // Err(UnexpectedConditionToken(token, index))?
         }
-        self.skip(Then);
+        self.tokens.skip(Then);
         Ok(())
     }
-    pub fn collect_definition(&mut self, term: Text) -> Result<PhraseOutput> {
-        let definition = self.add_node(Term(term));
-        self.expect_token(Be)?;
-        self.add_input_to(definition, Input, false)?;
-        // context.add_definition(term)?
-        Ok((definition, true))
-    }
-    pub fn collect_function(&mut self, function: Function) -> Result<PhraseOutput> {
-        let syntax = function.syntax();
-        let target = self.add_node(F(function));
-        if syntax.expects_input {
-            self.add_input_to(target, Input, true)?;
+
+    pub fn attach_phrase(&mut self, link: Token) -> Result<NodeIndex> {
+        let IndexedToken { index, token } = self.tokens.peek().unwrap();
+        let (phrase_tip, returns) = match token {
+            // Term(term) if context_find_script(term) => ?
+            F(_) => self.collect_function()?,
+            _ if token.is_valid_ref_start() => (self.collect_definition()?, true), // Each X`s Y is ...? Wtf?
+            //Return => self.script_syntax.returns = true, collect_input,
+            _ => return Err(UnexpectedPhraseToken(token.clone(), *index)),
+        };
+        self.link(self.tip, phrase_tip, link);
+        self.tip = phrase_tip;
+        if returns {
+            self.this = Some(self.tip);
+        } else {
+            self.this = None;
         }
+        Ok(phrase_tip)
+    }
+
+    pub fn collect_definition(&mut self) -> Result<NodeIndex> {
+        let reference = self.collect_ref()?;
+        self.tokens.expect(Be)?;
+        self.attach_input_to(reference, Input, false)?;
+        // context.add_definition(term)?
+        Ok(reference)
+    }
+
+    pub fn collect_function(&mut self) -> Result<PhraseOutput> {
+        let function = self.tokens.take_function()?;
+        let syntax = function.syntax();
+        let target = self.add_node(F(function.clone()));
+        if syntax.expects_input {
+            self.attach_input_to(target, Input, true)?;
+        }
+        // TODO: REPLACE LOOP WITH COLLECTING IN ANY ORDER, AND BREAK IF ENCOUNTERED A COMMA
         for expected_prep in syntax.expected_args {
-            // prep/arg ordering?
-            let prep = self.expect_token(P(expected_prep))?;
-            self.add_input_to(target, prep, false)?;
+            let prep = self.tokens.expect(P(expected_prep))?;
+            self.attach_input_to(target, prep, false)?;
         }
         Ok((target, syntax.returns))
     }
+
+    pub fn collect_ref(&mut self) -> Result<NodeIndex> {
+        // TODO
+        //Term(term) if let Some(id) = context_lookup_script(term) => ?
+
+        // Terms, Possesives, Each, All, Where and other thingies
+        let mut reference = self.move_token_into_node()?;
+        while let Some(IndexedToken {
+            token: Possessive, ..
+        }) = self.tokens.peek()
+        {
+            self.tokens.skip(Possessive);
+            let subterm = Term(self.tokens.take_term()?);
+            let subterm_node = self.add_node(subterm);
+            self.link(reference, subterm_node, Possessive);
+            reference = subterm_node;
+        }
+        Ok(reference)
+    }
+
     pub fn collect_input(&mut self, lookup_this: bool) -> Result<NodeIndex> {
-        let IndexedToken { index, token } = self.next().unwrap();
+        let IndexedToken { index, token } = self.tokens.peek_Itoken()?;
+        // the error ^ is wrong if fn at the end of the script takes `this` as input
         let input = match token {
-            //Term(term) if let Some(id) = context_lookup_script(term) => {
-            //    unimplemented!("custom script handling in add_input_to")
-            //}
-            Term(term) => self.add_node(Term(term)),
-            V(Struct(structure)) => {
-                let target = self.add_node(V(Struct(structure)));
-                while self.loop_until(CollectionEnd)? {
-                    let attr_name = Term(Text::from_str("atrr")); // collect proper name for an attribute
-                    self.add_input_to(target, attr_name, false);
+            _ if token.is_valid_ref_start() => self.collect_ref()?,
+            V(Struct(_)) => {
+                let target = self.move_token_into_node()?;
+                while self.tokens.next_isnt(CollectionEnd)? {
+                    let attr_name = Term(Text::from_str("attr")); // collect proper name for an attribute
+                    self.attach_input_to(target, attr_name, false);
                 }
                 target
             }
-            V(Lst(list)) => {
-                let target = self.add_node(V(Lst(list)));
-                while self.loop_until(CollectionEnd)? {
-                    self.add_input_to(target, Input, false);
+            V(Lst(_)) => {
+                let target = self.move_token_into_node()?;
+                while self.tokens.next_isnt(CollectionEnd)? {
+                    self.attach_input_to(target, Input, false);
                 }
                 target
             }
-            V(value) => self.add_node(V(value)),
+            V(_) => self.move_token_into_node()?,
             This => {
                 if let Some(node) = self.this {
                     node
@@ -232,16 +245,16 @@ impl Builder {
                 }
             }
             F(function) => {
-                let (result, returns) = self.collect_function(function)?;
-                if !returns {
+                if function.syntax().returns {
+                    self.collect_function()?.0
+                } else {
                     return Err(FormattedMesssage(format!(
-                        "Can't use function {:?} that doesn't return as input at {:?}",
-                        self.graph[result], index
+                        "Can't use function {:?} that doesn't return as input to another thing at {:?}",
+                        function.clone(), index
                     )));
                 }
-                result
             }
-            //A(Start) => {collect formula}
+            //A(Start) => { collect_formula }
             token => {
                 if lookup_this {
                     if let Some(node) = self.this {
@@ -253,13 +266,14 @@ impl Builder {
                         )));
                     }
                 } else {
-                    return Err(UnexpectedInputToken(token, index));
+                    return Err(UnexpectedInputToken(token.clone(), *index));
                 }
             }
         };
         Ok(input)
     }
-    pub fn add_input_to(
+
+    pub fn attach_input_to(
         &mut self,
         target: NodeIndex,
         label: Token,
@@ -268,6 +282,7 @@ impl Builder {
         let input = self.collect_input(lookup_this)?;
         Ok(self.link(input, target, label))
     }
+
     pub fn merge(&mut self, branch1: NodeIndex, branch2: NodeIndex) -> Result<()> {
         let node = self.add_node(Edge);
         self.link(branch1, node, Edge);
@@ -287,120 +302,8 @@ impl Builder {
     pub fn link(&mut self, source: NodeIndex, target: NodeIndex, label: Token) {
         self.graph.add_edge(source, target, label);
     }
-    pub fn move_token_into_node(&mut self) -> NodeIndex {
-        let token = self.next().unwrap().token;
-        self.graph.add_node(token)
-    }
-
-    pub fn take_token(&mut self) -> Result<Token> {
-        if let Some(IndexedToken { token, .. }) = self.next() {
-            Ok(token)
-        } else {
-            Err(Message("Expected token at the end of script"))
-        }
-    }
-    pub fn take_comparison(&mut self) -> Result<Comparative> {
-        if let C(comparison) = self.take_token()? {
-            Ok(comparison)
-        } else {
-            Err(Message("Expected comparison"))
-        }
-    }
-    pub fn take_preposition(&mut self) -> Result<Preposition> {
-        if let P(preposition) = self.take_token()? {
-            Ok(preposition)
-        } else {
-            Err(Message("Expected preposition"))
-        }
-    }
-    pub fn take_term(&mut self) -> Result<Text> {
-        if let Term(term) = self.take_token()? {
-            Ok(term)
-        } else {
-            Err(Message("Expected term"))
-        }
-    }
-    pub fn next_sentence_starts_with(&mut self, expected_token: Token) -> Result<bool> {
-        self.iter.reset_peek();
-        while let Some(itoken) = self.iter.peek() {
-            if itoken == expected_token {
-                return Ok(true);
-            } else if itoken == Dot || itoken == Linebreak {
-                continue;
-            } else {
-                break;
-            }
-        }
-        Ok(false)
-    }
-    pub fn peek_token(&mut self) -> Result<&Token> {
-        if let Some(IndexedToken { token, .. }) = self.peek() {
-            Ok(token)
-        } else {
-            Err(Message("Expected token at the end of the script"))
-        }
-    }
-    pub fn skip_optional(&mut self, token: Token) -> Result<()> {
-        if self.peek_token()? == token {
-            self.next();
-        }
-        Ok(())
-    }
-    pub fn skip_until(&mut self, token: Token) -> Result<()> {
-        while self.peek_token()? != token {
-            self.skip_any();
-        }
-        self.skip(token);
-        Ok(())
-    }
-    pub fn skip(&mut self, token: Token) -> Result<()> {
-        if self.peek_token()? == token {
-            self.next();
-            return Ok(());
-        } else {
-            return Err(ExpectedToken(token, 999));
-        }
-    }
-    pub fn skip_any(&mut self) {
-        self.next();
-    }
-    pub fn expect_token(&mut self, expected_token: Token) -> Result<Token> {
-        if let Some(itoken) = self.next() {
-            if itoken == expected_token {
-                return Ok(expected_token);
-            } else {
-                return Err(ExpectedToken(expected_token, itoken.index));
-            }
-        }
-        return Err(UnexpectedEnd);
-    }
-    pub fn peek_until(&mut self, end_token: Token) -> Result<Option<&IndexedToken>> {
-        if let Some(itoken) = self.peek() {
-            if itoken != end_token {
-                Ok(Some(itoken))
-            } else {
-                Ok(None)
-            }
-        } else {
-            Err(FormattedMesssage(format!(
-                "Unexpected end, was looking for {:?}",
-                end_token
-            )))
-        }
-    }
-    pub fn loop_until(&mut self, token: Token) -> Result<bool> {
-        if self.peek_token()? != token {
-            Ok(true)
-        } else {
-            self.next();
-            Ok(false)
-        }
-    }
-    pub fn next(&mut self) -> Option<IndexedToken> {
-        self.iter.next()
-    }
-    pub fn peek(&mut self) -> Option<&IndexedToken> {
-        self.iter.reset_peek();
-        self.iter.peek()
+    pub fn move_token_into_node(&mut self) -> Result<NodeIndex> {
+        let token = self.tokens.next().unwrap().token;
+        Ok(self.graph.add_node(token))
     }
 }

@@ -7,6 +7,7 @@ pub fn parse(s: &str) -> Result<Vec<IndexedToken>> {
     parser.update_peek();
     let mut indexed_tokens = vec![];
     while let Some((index, piece)) = parser.peek {
+        println!("{}", piece);
         if let Some(value) = parser.match_value(piece)? {
             indexed_tokens.push(IndexedToken {
                 index,
@@ -15,8 +16,28 @@ pub fn parse(s: &str) -> Result<Vec<IndexedToken>> {
         } else if let Some(token) = Token::matches(piece) {
             indexed_tokens.push(IndexedToken { index, token });
             parser.next();
-        } else if let Some(term) = parser.validate_term(piece) {
-            indexed_tokens.push(IndexedToken { index, token: term });
+        } else if TERM.is_match(piece) {
+            if POSSESSIVE_TERM.is_match(piece) { 
+                // split the term and possesive pieces
+                let (term, possession) = piece.split_at(piece.find("'").unwrap());
+                let possession_index = index + term.len();
+                indexed_tokens.push(IndexedToken {
+                    index,
+                    token: Term(Text::from_str(term)),
+                });
+                indexed_tokens.push(IndexedToken {
+                    index: possession_index,
+                    token: Possessive,
+                });
+            } else { 
+                // parse as regular Term
+                indexed_tokens.push(IndexedToken {
+                    index,
+                    token: Term(Text::from_str(piece)),
+                });
+            }
+            parser.next();
+            
         } else {
             return Err(Parsing(format!(
                 r#"I don't know how to parse '{:?}'"#,
@@ -91,9 +112,14 @@ impl<'a> Parser<'a> {
     fn match_value(&mut self, piece: &str) -> Result<Option<Token>> {
         let value = match piece {
             piece if NUMBER.is_match(piece) => {
-                let num = piece.replacen(",", ".", 1);
+                let num_string = piece.replacen(",", ".", 1);
+                let mut num = Number::from_string(num_string)?;
                 self.next();
-                Value::Num(Number::from_string(num)?)
+                if let Some((_, "%")) = self.peek {
+                    num.from_percentage()?;
+                    self.next();
+                }
+                Value::Num(num)
             }
             piece if TEXT.is_match(piece) => Value::Txt(self.collect_text()),
             "{" => {
@@ -112,21 +138,13 @@ impl<'a> Parser<'a> {
         };
         Ok(Some(V(value)))
     }
-
-    fn validate_term(&mut self, piece: &str) -> Option<Token> {
-        if TERM.is_match(piece) {
-            self.next();
-            Some(Term(Text::from_str(piece)))
-        } else {
-            None
-        }
-    }
 }
 
 lazy_static! {
-    static ref IGNORED: Regex = Regex::new(r"^(?i)(a|the|let|,|\t| |\?)+$").unwrap();
-    static ref LITERAL_END: Regex = Regex::new(r"^(?i)(\.|\n|\t| |\?)+$").unwrap();
+    static ref IGNORED: Regex = Regex::new(r"^(?i)(a|the|\t| )+$").unwrap();
+    static ref LITERAL_END: Regex = Regex::new(r"^(?i)(\.|\n|\t| )+$").unwrap();
     static ref TERM: Regex = Regex::new(r"^\p{Letter}+").unwrap();
+    static ref POSSESSIVE_TERM: Regex = Regex::new(r"^\p{Letter}+('s)$").unwrap();
     static ref NUMBER: Regex = Regex::new(r"^(\d+([\.,]\d+)?)$").unwrap();
-    static ref TEXT: Regex = Regex::new(r#"^("|')$"#).unwrap();
+    static ref TEXT: Regex = Regex::new(r#"^"$"#).unwrap();
 }

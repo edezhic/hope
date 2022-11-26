@@ -1,3 +1,7 @@
+mod token_impl;
+mod token_iter;
+pub use token_iter::IndexedTokensIter;
+
 use crate::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -16,6 +20,8 @@ pub enum Token {
     This,
     #[matches(regex = r"^(?i)(:|=|is|are|equal)$")]
     Be,
+    #[matches(regex = r"^,$")]
+    Comma,
     #[matches(regex = r"^\.$")]
     Dot,
     #[matches(regex = r"^(\n|\p{Zl})$")]
@@ -23,23 +29,31 @@ pub enum Token {
     #[matches(regex = r"^(\]|\})$")]
     CollectionEnd,
 
-    And,
+    And, // X and Y = Tuple(X,Y)/List[X,Y]?
     Or,
+    Either,
     Not,
 
     Do,
     Else,
     If,
     While,
-    Return,
     Match,
     Then,
+    
+    Return, 
+    Yield,
+    
     Try,
     Panic,
 
-    Where,
-    Any,
-    Each,
+    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
+    Where, // X where conds = Xiter.filter(x matches conds)? 
+
+    // These into Token::M(Modifier)?
+    Any, // Any X = ?
+    Each, // Each X = X.try_IntoIter?
+    All, // All X = collect from X / = Each?
 
     Than,
 
@@ -50,10 +64,15 @@ pub enum Token {
     V(Value),
     #[matches(nothing)]
     Term(Text),
+    #[matches(regex = "'")]
+    Possessive,
     //#[matches(nothing)]
-    //Script(Id), // for custom scripts
+    // + Script(Id?) or C(Script) for custom scripts
     // + static?
-    // + T(Type)
+    // + T(Type) with built-in types
+    // + Description(?) for custom types
+    // ??? syntax as term type ???
+    // + Define for script/description definitions?
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]

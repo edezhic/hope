@@ -29,7 +29,6 @@ mod builder;
 mod error;
 mod parser;
 mod token;
-mod token_impls;
 mod value;
 pub use builder::build;
 pub use derive_matches::Matches;
@@ -40,7 +39,6 @@ pub use parser::parse;
 pub use token::{Algebra::*, Comparative::*, Function::*, Preposition::*, Token::*, *};
 pub use value::{Value::*, *};
 
-pub type IndexedTokenIter = MultiPeek<IntoIter<IndexedToken>>;
 pub type TokenGraph = StableDiGraph<Token, Token>;
 
 #[wasm_bindgen]
@@ -55,7 +53,9 @@ pub fn get_test() -> Result<JsValue> {
     Ok(JsValue::from_serde(&TEST).unwrap())
 }
 
-pub const TEST: &'static str = r#"Testscript X of Y
-Z is 1, xyz is [x, y, sum of [x, y, z]], abc is @abcd. S is the sum of xyz. Show it. Substract 1 from s.
-If this is less than 10 then show "hell yeah" and add z to s, else show it. Show "it works!".
+
+pub static TEST: &'static str = r#" Valuate product with promos in currency
+AccumulatedDiscount is the sum of each promos' discount. If accumulatedDiscount is equal or more than 100% then return 0.
+If the currency is "dollar" then conversionRate is 1, else get the exchangeRate from (@http://exchange.com/dollar/to/.currency) and store it in the converstionRate.
+Return ((product's price * (1 - accumulatedDiscount)) * conversionRate)
 "#;

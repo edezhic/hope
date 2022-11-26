@@ -1,7 +1,7 @@
 # Hope
 Human-oriented programming environment
 
-This project is about making a 'programming language' that is as close to natural language (currently targeting English) as possible. You can find an example of such "code" and HOBot (human-oriented bot) compiled into wasm module that builds the script on the fly [on the github pages of this repo](https://edezhic.github.io/hope/). 
+This project is about making a 'programming language' that is as close to natural language (currently targeting English) as possible. You can find an example of such "code" and HOBot (human-oriented bot) compiled into wasm module that builds the script on the fly [on the github pages of this repo](https://edezhic.github.io/hope/). Also there you can find the actual example of such a script.
 
 ## Motivation
 
@@ -12,21 +12,6 @@ I believe that the best way to solve this is to create a programming language(PL
 Besides that, the whole compilation process needs to be redesigned. Inspectable PL can't be done with a dozen of unintuitive intermediate representations, so for now I want to keep only tokens and computational graph. Execution flow has to be simplified. Things like mandatory semicolons/indentation and base2 float arithmetic rounding errors have to leave the stage already. And there is plenty of other details that are intuitive to software engineers but very confusing to regular folks. Also, I think it should be comfortable to read and write on small devices like smartphones and tablets. 
 
 The end result should look like an instruction for execution of a command in regular formal english with a few(!) special symbols for convenience. And anyone with the knowledge of natural language should be able to grasp the core ideas in less than an hour.
-
-## An example of script in hope
-Which can be parsed into tokens already and some parts of it even linked into the graph. It was carefully crafted to capture syntax that could be linked and executed relatively easily in an intuitive manner without ambiguities. However, syntax is still unstable and will most likely differ in multiple ways from this example.
-
-Header:
-
-> CustomScript X of Y 
-
-Body:
-
-> Z is 1, xyz is [x, y, z], s is (x + y + z). Show s, sum xyz and show it. If x is less than 2 and y is more than 3 then show {x, y, z, xyz, s}. 
-For each number in xyz show (number * 2). For each message at @protocol://domain/endpoint/path/ show @message/content. For each message from @URI return x.
-Get @http<area>://wikipedia.com, sign as user and send the result to @db:wiki. Select entries from @db:x where element is more than 0 and (element * 2) is less than 10. If any entries then show 'found'.
-Match X: 0 then show 'zero', 1 then show 'one'.
-Try sum [0, 'a']. If result contains 'error' show 'error expected here'. Try panic with 'error', show result.
 
 ## Roadmap
 

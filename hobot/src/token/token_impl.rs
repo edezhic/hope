@@ -1,5 +1,14 @@
 use crate::*;
 
+impl Token {
+    pub fn is_valid_ref_start(&self) -> bool {
+        match self {
+            Each | Term(_) => true,
+            _ => false,
+        }
+    }
+}
+
 impl PartialEq for IndexedToken {
     fn eq(&self, other: &Self) -> bool {
         if self.token == other.token {
