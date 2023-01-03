@@ -27,7 +27,7 @@ pub fn parse(s: &str) -> Result<Vec<IndexedToken>> {
                 });
                 indexed_tokens.push(IndexedToken {
                     index: possession_index,
-                    token: Possessive,
+                    token: D(Possessive),
                 });
             } else { 
                 // parse as regular Term

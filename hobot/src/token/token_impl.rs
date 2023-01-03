@@ -3,14 +3,14 @@ use crate::*;
 impl Token {
     pub fn is_valid_ref_start(&self) -> bool {
         match self {
-            Each | Term(_) => true,
+            D(Each) | Term(_) => true,
             _ => false,
         }
     }
     pub fn is_valid_ref_part(&self) -> bool {
         match self {
             _ if self.is_valid_ref_start() => true,
-            Any | All | Possessive => true,
+            D(Any) | D(All) | D(Possessive) => true,
             _ => false,
         }
     }

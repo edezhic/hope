@@ -13,6 +13,28 @@ pub struct IndexedToken {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches, OfType)]
 pub enum Token {
     #[matches(nothing)]
+    Term(Text),
+
+    A(Algebra),
+    C(Command),
+    D(Determiner),
+    F(Flow),
+    P(Preposition),
+    R(Relational), 
+    V(Value),
+    
+    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
+    Where, // X where conds = Xiter.filter(x matches conds)? 
+    Which, // Filter X where conditions?
+    // That? When? etc
+
+    And, // X and Y = Tuple(X,Y)/List[X,Y]?
+    Or,
+    Either,
+    Neither,
+    Not,
+
+    #[matches(nothing)]
     Edge,
     #[matches(nothing)]
     Input,
@@ -27,50 +49,29 @@ pub enum Token {
     #[matches(regex = r"^(\n|\p{Zl})$")]
     Linebreak,
     #[matches(regex = r"^(\]|\})$")] 
-    CollectionEnd, // -> ?
+    CollectionEnd, // -> ListEnd + StructEnd?    
+}
 
-    // ? Control-like smth
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
+pub enum Flow {
     Do,
     Else,
     If,
     While,
-    Match,
     Then,
     Return, 
     Yield,
     Try,
     Panic,
+}
 
-    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
-    Where, // X where conds = Xiter.filter(x matches conds)? 
-    Which, // Filter X where conditions?
-    // => S(Selector)?
-
-    // Conjunctions/Junctions? => Relational?
-    And, // X and Y = Tuple(X,Y)/List[X,Y]?
-    Or,
-    Either,
-    Neither,
-    Not, // => Determiner?
-
-    Than, // => Relational?
-
-    // These into D(Determiner)? S(Selector)
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
+pub enum Determiner {
     Any, // Any X = ?
     Each, // Each X = X.intoIter and yield a single X if it's a singlular value?
     All, // All X = collect from X / = Each?
     #[matches(regex = "'")]
-    Possessive, // => Determiner?
-
-    A(Algebra),
-    C(Command), // -> C(Command)? + Command::Custom or smth alike
-    D, // Determiner? 
-    P(Preposition),
-    R(Relational), 
-    T, // T(Type)/D(Description)/D(Definition) for types etc
-    V(Value),
-    #[matches(nothing)]
-    Term(Text),
+    Possessive,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
@@ -78,6 +79,7 @@ pub enum Relational {
     Less,
     More,
     Contains,
+    Than,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

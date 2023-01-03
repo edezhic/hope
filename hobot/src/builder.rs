@@ -16,8 +16,8 @@ pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
 
     while let Some(IndexedToken { index, token }) = builder.tokens.peek() {
         match token {
-            If => {
-                builder.tokens.skip(If);
+            F(If) => {
+                builder.tokens.skip(F(If));
                 let fork = match builder.tokens.peek_token()? {
                     Either => {
                         builder.tokens.skip(Either);
@@ -33,8 +33,8 @@ pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
                 let then_branch = builder.collect_sentence(fork, V(Yes))?;
                 let mut else_branch = fork;
 
-                if builder.tokens.next_sentence_starts_with(Else)? {
-                    builder.tokens.skip_until(Else);
+                if builder.tokens.next_sentence_starts_with(F(Else))? {
+                    builder.tokens.skip_until(F(Else));
                     builder.tip = fork;
                     builder.this = remembered_this;
                     else_branch = builder.collect_sentence(fork, V(No))?;
@@ -101,7 +101,7 @@ impl Builder {
     pub fn collect_sentence(&mut self, origin: NodeIndex, link: Token) -> Result<NodeIndex> {
         let mut tip = self.attach_phrase(link)?;
         while let Some(itoken) = self.tokens.peek() {
-            if itoken == Linebreak || itoken == Dot || itoken == Else {
+            if itoken == Linebreak || itoken == Dot || itoken == F(Else) {
                 break;
             }
             self.tokens.skip_optional(And);
@@ -111,7 +111,7 @@ impl Builder {
     }
 
     pub fn collect_conditions(&mut self, target: NodeIndex) -> Result<()> {
-        while let Some(IndexedToken { index, token }) = self.tokens.peek_until(Then)? {
+        while let Some(IndexedToken { index, token }) = self.tokens.peek_until(F(Then))? {
             let mut relation: Option<NodeIndex> = None;
             let left = self.collect_input(true)?;
             let mut right: Option<NodeIndex> = None;
@@ -122,7 +122,7 @@ impl Builder {
                 let relationship = R(self.tokens.take_relationship()?);
                 // if peek == Or => take more comparisons?
                 relation = Some(self.add_node(relationship));
-                self.tokens.skip_optional(Than);
+                self.tokens.skip_optional(R(Than));
                 // after all comparisons
                 right = Some(self.collect_input(true)?);
             }
@@ -144,7 +144,7 @@ impl Builder {
             }
             // Err(UnexpectedConditionToken(token, index))?
         }
-        self.tokens.skip(Then);
+        self.tokens.skip(F(Then));
         Ok(())
     }
 
@@ -216,8 +216,8 @@ impl Builder {
             }
             match token {
                 Term(_) => {}
-                Each => {}
-                Possessive => {}
+                D(Each) => {}
+                D(Possessive) => {}
                 _ => {
                     unreachable!("Shouldn't match invalid ref tokens")
                 }
@@ -225,13 +225,13 @@ impl Builder {
         }
         
         while let Some(IndexedToken {
-            token: Possessive, ..
+            token: D(Possessive), ..
         }) = self.tokens.peek()
         {
-            self.tokens.skip(Possessive);
+            self.tokens.skip(D(Possessive));
             let subterm = Term(self.tokens.take_term()?);
             let subterm_node = self.add_node(subterm);
-            self.link(reference, subterm_node, Possessive);
+            self.link(reference, subterm_node, D(Possessive));
             reference = subterm_node;
         }
         Ok((reference, true))
