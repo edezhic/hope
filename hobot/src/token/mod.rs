@@ -26,58 +26,55 @@ pub enum Token {
     Dot,
     #[matches(regex = r"^(\n|\p{Zl})$")]
     Linebreak,
-    #[matches(regex = r"^(\]|\})$")]
-    CollectionEnd,
+    #[matches(regex = r"^(\]|\})$")] 
+    CollectionEnd, // -> ?
 
-    And, // X and Y = Tuple(X,Y)/List[X,Y]?
-    Or,
-    Either,
-    Not,
-
+    // ? Control-like smth
     Do,
     Else,
     If,
     While,
     Match,
     Then,
-    
     Return, 
     Yield,
-    
     Try,
     Panic,
 
     //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
     Where, // X where conds = Xiter.filter(x matches conds)? 
+    Which, // Filter X where conditions?
+    // => S(Selector)?
 
-    // These into Token::M(Modifier)?
+    // Conjunctions/Junctions? => Relational?
+    And, // X and Y = Tuple(X,Y)/List[X,Y]?
+    Or,
+    Either,
+    Neither,
+    Not, // => Determiner?
+
+    Than, // => Relational?
+
+    // These into D(Determiner)? S(Selector)
     Any, // Any X = ?
-    Each, // Each X = X.try_IntoIter?
+    Each, // Each X = X.intoIter and yield a single X if it's a singlular value?
     All, // All X = collect from X / = Each?
-
-    Than,
+    #[matches(regex = "'")]
+    Possessive, // => Determiner?
 
     A(Algebra),
-    C(Comparative),
-    F(Function),
+    C(Command), // -> C(Command)? + Command::Custom or smth alike
+    D, // Determiner? 
     P(Preposition),
+    R(Relational), 
+    T, // T(Type)/D(Description)/D(Definition) for types etc
     V(Value),
     #[matches(nothing)]
     Term(Text),
-    #[matches(regex = "'")]
-    Possessive,
-    //#[matches(nothing)]
-    // + Script(Id?) or C(Script) for custom scripts
-    // + static?
-    // + T(Type) with built-in types
-    // + Description(?) for custom types
-    // ??? syntax as term type ???
-    // + Define for script/description definitions?
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Comparative {
-    // -> Relative? Relational?
+pub enum Relational {
     Less,
     More,
     Contains,
@@ -90,8 +87,8 @@ pub struct Syntax {
     pub returns: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Matches, FunctionSyntax)]
-pub enum Function {
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Matches, CommandSyntax)]
+pub enum Command {
     #[syntax(args = "To", returns)]
     Add,
     #[syntax(args = "From", returns)]
@@ -130,8 +127,8 @@ pub enum Algebra {
     Multiplication,
     #[matches(regex = r"^/$")]
     Division,
-    Mean,
-    Deviation,
+    // matches ???
+    Mean, // -> Average?
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Matches)]

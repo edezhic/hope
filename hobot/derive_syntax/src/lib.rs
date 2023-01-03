@@ -47,12 +47,12 @@ fn get_macro_attributes(variant: &Variant) -> (bool, IntoIter<Ident>, bool) {
     (expects_input, expected_args.into_iter(), returns_value)
 }
 
-#[proc_macro_derive(FunctionSyntax, attributes(syntax))]
-pub fn derive_function_syntax(input: TokenStream) -> TokenStream {
+#[proc_macro_derive(CommandSyntax, attributes(syntax))]
+pub fn derive_command_syntax(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let enum_name = input.ident;
 
-    let mut function_syntax_arm = TokenStream2::new();
+    let mut command_syntax_arm = TokenStream2::new();
 
     match input.data {
         Data::Enum(data_enum) => {
@@ -62,22 +62,22 @@ pub fn derive_function_syntax(input: TokenStream) -> TokenStream {
                 match &variant.fields {
                     Fields::Unit => {
                         let (expects_input, expected_args, returns) = get_macro_attributes(variant);
-                        function_syntax_arm.extend(quote_spanned! {variant.span() =>
-                            Function::#variant_name => Syntax { expects_input: #expects_input, expected_args: vec![#(#expected_args),*], returns: #returns },
+                        command_syntax_arm.extend(quote_spanned! {variant.span() =>
+                            Command::#variant_name => Syntax { expects_input: #expects_input, expected_args: vec![#(#expected_args),*], returns: #returns },
                         });
                     }
                     _ => continue,
                 }
             }
         }
-        _ => panic!("Syntax is only for Functions"),
+        _ => panic!("Syntax is only for Commands"),
     };
 
     let expanded = quote! {
         impl #enum_name {
             pub fn syntax(&self) -> Syntax {
                 match self {
-                    #function_syntax_arm
+                    #command_syntax_arm
                 }
             }
         }

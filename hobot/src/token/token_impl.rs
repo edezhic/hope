@@ -7,6 +7,13 @@ impl Token {
             _ => false,
         }
     }
+    pub fn is_valid_ref_part(&self) -> bool {
+        match self {
+            _ if self.is_valid_ref_start() => true,
+            Any | All | Possessive => true,
+            _ => false,
+        }
+    }
 }
 
 impl PartialEq for IndexedToken {

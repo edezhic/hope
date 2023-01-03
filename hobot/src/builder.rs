@@ -4,9 +4,10 @@ fn context_lookup_script(term: &Text) -> Option<Id> {
     None
 }
 /// Build loop logic:
-/// * 'If' -> collect conditions, collect sentence(potentially multiple phrases), optional ['else' + another sentence]
-/// * _    -> attach phrase(definition or function invocation)
-/// Definitions and functions are collecting inputs which might be references, values or outputs of other fns
+/// * 'If'  -> collect conditions, collect sentence(potentially multiple phrases), optional ['else' + another sentence]
+/// *  _    -> attach phrase(definition or command invocation)
+/// * 'Try' -> TODO
+/// Definitions and commands are collecting inputs which might be references, values or outputs of other fns
 
 type PhraseOutput = (NodeIndex, bool);
 
@@ -42,7 +43,6 @@ pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
                 builder.merge(then_branch, else_branch);
                 builder.this = None;
             }
-            //C(Try) => collect_sentence?
             Dot | And | Linebreak => {
                 builder.tokens.skip_any();
             } // ?
@@ -112,20 +112,16 @@ impl Builder {
 
     pub fn collect_conditions(&mut self, target: NodeIndex) -> Result<()> {
         while let Some(IndexedToken { index, token }) = self.tokens.peek_until(Then)? {
-            let mut comparison: Option<NodeIndex> = None;
+            let mut relation: Option<NodeIndex> = None;
             let left = self.collect_input(true)?;
             let mut right: Option<NodeIndex> = None;
 
             self.tokens.skip_optional(Be)?;
 
-            if let Not = self.tokens.peek_token()? {
-                // 'No' link from comparison to target?
-                return Err(Message("Unimplemented negation"));
-            }
-            if let C(_) = self.tokens.peek_token()? {
-                let comparative = C(self.tokens.take_comparison()?);
+            if let R(_) = self.tokens.peek_token()? {
+                let relationship = R(self.tokens.take_relationship()?);
                 // if peek == Or => take more comparisons?
-                comparison = Some(self.add_node(comparative));
+                relation = Some(self.add_node(relationship));
                 self.tokens.skip_optional(Than);
                 // after all comparisons
                 right = Some(self.collect_input(true)?);
@@ -139,7 +135,7 @@ impl Builder {
                 return Err(Message("Unimplemented AND conditions"));
             }
 
-            if let Some(node) = comparison {
+            if let Some(node) = relation {
                 self.link(left, node, Input);
                 self.link(right.unwrap(), node, Input);
                 self.link(node, target, Input);
@@ -155,8 +151,7 @@ impl Builder {
     pub fn attach_phrase(&mut self, link: Token) -> Result<NodeIndex> {
         let IndexedToken { index, token } = self.tokens.peek().unwrap();
         let (phrase_tip, returns) = match token {
-            // Term(term) if context_find_script(term) => ?
-            F(_) => self.collect_function()?,
+            C(_) => self.collect_command()?,
             _ if token.is_valid_ref_start() => (self.collect_definition()?, true), // Each X`s Y is ...? Wtf?
             //Return => self.script_syntax.returns = true, collect_input,
             _ => return Err(UnexpectedPhraseToken(token.clone(), *index)),
@@ -172,21 +167,22 @@ impl Builder {
     }
 
     pub fn collect_definition(&mut self) -> Result<NodeIndex> {
-        let reference = self.collect_ref()?;
+        let (reference, returns) = self.collect_ref()?;
+        // what if returns or !returns?
         self.tokens.expect(Be)?;
         self.attach_input_to(reference, Input, false)?;
         // context.add_definition(term)?
         Ok(reference)
     }
 
-    pub fn collect_function(&mut self) -> Result<PhraseOutput> {
-        let function = self.tokens.take_function()?;
-        let syntax = function.syntax();
-        let target = self.add_node(F(function.clone()));
+    pub fn collect_command(&mut self) -> Result<PhraseOutput> {
+        let command = self.tokens.take_command()?;
+        let syntax = command.syntax();
+        let target = self.add_node(C(command.clone()));
         if syntax.expects_input {
             self.attach_input_to(target, Input, true)?;
         }
-        // TODO: REPLACE LOOP WITH COLLECTING IN ANY ORDER, AND BREAK IF ENCOUNTERED A COMMA
+        // TODO: REPLACE LOOP WITH COLLECTING IN ANY ORDER, AND BREAK IF ENCOUNTERED A COMMA OR FOUND ALL EXPECTED ARGS
         for expected_prep in syntax.expected_args {
             let prep = self.tokens.expect(P(expected_prep))?;
             self.attach_input_to(target, prep, false)?;
@@ -194,12 +190,40 @@ impl Builder {
         Ok((target, syntax.returns))
     }
 
-    pub fn collect_ref(&mut self) -> Result<NodeIndex> {
-        // TODO
-        //Term(term) if let Some(id) = context_lookup_script(term) => ?
+    pub fn collect_ref(&mut self) -> Result<PhraseOutput> {
+        // TODO Each, Any, All, Where and other thingies
 
-        // Terms, Possesives, Each, All, Where and other thingies
+        let Some(IndexedToken { index, token }) = self.tokens.peek() 
+            else { return Err(Message("Expected a reference at the end")) };
+
+        if !token.is_valid_ref_start() {
+            return Err(FormattedMesssage(format!(
+                "Expecting a valid reference at {:?} but got {:?}",
+                index, token
+            )));
+        }
+
         let mut reference = self.move_token_into_node()?;
+
+        // X's Y === Y <-'s- X
+        // Each X === Each <--- X
+        // Each X's Y === Y <-'s- Each <--- X
+        // Each X's each Y === Each <--- Y <-'s- Each <--- X
+
+        while let Some(IndexedToken { index, token }) = self.tokens.peek() {
+            if !token.is_valid_ref_part() {
+                break;
+            }
+            match token {
+                Term(_) => {}
+                Each => {}
+                Possessive => {}
+                _ => {
+                    unreachable!("Shouldn't match invalid ref tokens")
+                }
+            }
+        }
+        
         while let Some(IndexedToken {
             token: Possessive, ..
         }) = self.tokens.peek()
@@ -210,14 +234,25 @@ impl Builder {
             self.link(reference, subterm_node, Possessive);
             reference = subterm_node;
         }
-        Ok(reference)
+        Ok((reference, true))
     }
 
     pub fn collect_input(&mut self, lookup_this: bool) -> Result<NodeIndex> {
-        let IndexedToken { index, token } = self.tokens.peek_Itoken()?;
+        let IndexedToken { index: idx, token } = self.tokens.peek_Itoken()?;
+        let index = idx.clone();
         // the error ^ is wrong if fn at the end of the script takes `this` as input
         let input = match token {
-            _ if token.is_valid_ref_start() => self.collect_ref()?,
+            _ if token.is_valid_ref_start() => {
+                let (reference, returns) = self.collect_ref()?;
+                if returns {
+                    reference
+                } else {
+                    return Err(FormattedMesssage(format!(
+                        "Expected input at {:?} but reference doesn't return any",
+                        index
+                    )));
+                }
+            }
             V(Struct(_)) => {
                 let target = self.move_token_into_node()?;
                 while self.tokens.next_isnt(CollectionEnd)? {
@@ -244,13 +279,13 @@ impl Builder {
                     )));
                 }
             }
-            F(function) => {
-                if function.syntax().returns {
-                    self.collect_function()?.0
+            C(command) => {
+                if command.syntax().returns {
+                    self.collect_command()?.0
                 } else {
                     return Err(FormattedMesssage(format!(
-                        "Can't use function {:?} that doesn't return as input to another thing at {:?}",
-                        function.clone(), index
+                        "Can't use command {:?} that doesn't return as input to another thing at {:?}",
+                        command.clone(), index
                     )));
                 }
             }
@@ -266,7 +301,7 @@ impl Builder {
                         )));
                     }
                 } else {
-                    return Err(UnexpectedInputToken(token.clone(), *index));
+                    return Err(UnexpectedInputToken(token.clone(), index));
                 }
             }
         };

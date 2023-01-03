@@ -8,6 +8,7 @@
     unused_assignments
 )]
 #![feature(if_let_guard)]
+#![feature(let_else)]
 pub use core::fmt;
 pub use derive_more;
 pub use itertools::Itertools;
@@ -33,10 +34,10 @@ mod value;
 pub use builder::build;
 pub use derive_matches::Matches;
 pub use derive_of_type::OfType;
-pub use derive_syntax::FunctionSyntax;
+pub use derive_syntax::CommandSyntax;
 pub use error::{Error, Error::*, Result};
 pub use parser::parse;
-pub use token::{Algebra::*, Comparative::*, Function::*, Preposition::*, Token::*, *};
+pub use token::{Algebra::*, Relational::*, Command::*, Preposition::*, Token::*, *};
 pub use value::{Value::*, *};
 
 pub type TokenGraph = StableDiGraph<Token, Token>;
@@ -54,8 +55,8 @@ pub fn get_test() -> Result<JsValue> {
 }
 
 
-pub static TEST: &'static str = r#" Valuate product with promos in currency
+pub static TEST: &'static str = r#" Valuated product with promos in currency
 AccumulatedDiscount is the sum of each promos' discount. If accumulatedDiscount is equal or more than 100% then return 0.
-If the currency is "dollar" then conversionRate is 1, else get the exchangeRate from (@http://exchange.com/dollar/to/.currency) and store it in the converstionRate.
-Return ((product's price * (1 - accumulatedDiscount)) * conversionRate)
+If no currency or the currency is "dollar" then conversionRate is 1, else get the exchangeRate from (@http://exchange.com/dollar/to/.currency) and store it in the converstionRate.
+Return ((product's price * (100% - accumulatedDiscount)) * conversionRate)
 "#;

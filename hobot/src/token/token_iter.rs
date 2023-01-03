@@ -13,18 +13,18 @@ impl IndexedTokensIter {
             Err(Message("Expected token at the end of script"))
         }
     }
-    pub fn take_comparison(&mut self) -> Result<Comparative> {
-        if let C(comparison) = self.take_token()? {
+    pub fn take_relationship(&mut self) -> Result<Relational> {
+        if let R(comparison) = self.take_token()? {
             Ok(comparison)
         } else {
             Err(Message("Expected comparison"))
         }
     }
-    pub fn take_function(&mut self) -> Result<Function> {
-        if let F(function) = self.take_token()? {
-            Ok(function)
+    pub fn take_command(&mut self) -> Result<Command> {
+        if let C(command) = self.take_token()? {
+            Ok(command)
         } else {
-            Err(Message("Expected function"))
+            Err(Message("Expected command"))
         }
     }
     pub fn take_preposition(&mut self) -> Result<Preposition> {
@@ -126,5 +126,12 @@ impl IndexedTokensIter {
     pub fn peek(&mut self) -> Option<&IndexedToken> {
         self.0.reset_peek();
         self.0.peek()
+    }
+    pub fn more(&mut self) -> bool {
+        if let Some(_) = self.peek() {
+            true
+        } else {
+            false
+        }
     }
 }
