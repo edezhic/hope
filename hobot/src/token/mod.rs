@@ -23,11 +23,6 @@ pub enum Token {
     R(Relational), 
     V(Value),
     
-    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
-    Where, // X where conds = Xiter.filter(x matches conds)? 
-    Which, // Filter X where conditions?
-    // That? When? etc
-
     And, // X and Y = Tuple(X,Y)/List[X,Y]?
     Or,
     Either,
@@ -38,7 +33,7 @@ pub enum Token {
     Edge,
     #[matches(nothing)]
     Input,
-    #[matches(regex = r"^(?i)(result|this|it|that)$")]
+    #[matches(regex = r"^(?i)(this|it)$")]
     This,
     #[matches(regex = r"^(?i)(:|=|is|are|equal)$")]
     Be,
@@ -58,6 +53,7 @@ pub enum Flow {
     Else,
     If,
     While,
+    When,
     Then,
     Return, 
     Yield,
@@ -72,6 +68,9 @@ pub enum Determiner {
     All, // All X = collect from X / = Each?
     #[matches(regex = "'")]
     Possessive,
+     //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
+    That, // Filter X stream values which satisfy conditions?
+
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]

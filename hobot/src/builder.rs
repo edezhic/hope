@@ -205,10 +205,21 @@ impl Builder {
 
         let mut reference = self.move_token_into_node()?;
 
-        // X's Y === Y <-'s- X
-        // Each X === Each <--- X
-        // Each X's Y === Y <-'s- Each <--- X
-        // Each X's each Y === Each <--- Y <-'s- Each <--- X
+        // X's Y             ||| <?- T(Y) <-D(P)- T(X) 
+        // Each X            ||| <-D(Each)- T(X) 
+        // Each X's Y        ||| <- T(Y) <-(D(Each)+D(P))- T(X) 
+        // Each X's any Y    ||| <-D(Any)- T(Y) <-(D(P)+D(Each))- T(X) 
+        // X's each Y        ||| <-D(Each)- T(Y) <-D(P)- T(X) 
+        // Each X that C     ||| <- D(That) <-D(Each)- T(X)
+        // ---               |||       ^- C
+        // X's any Y where C ||| <- D(Where) <-D(Any)- T(Y) <-D(P)- T(X)
+        // ---               |||       ^- C
+        // X such that C     ||| <- D(That) <- T(X)
+        // ---               |||       ^- C
+        // Any X that C      ||| <- D(That) <-D(Any)- T(X)
+        // ---               |||       ^- C
+
+        // D(Any/Each/All) as self-referential edges + D(P) as directed edge + D(That) node?
 
         while let Some(IndexedToken { index, token }) = self.tokens.peek() {
             if !token.is_valid_ref_part() {
