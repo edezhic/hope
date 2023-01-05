@@ -3,14 +3,14 @@ use crate::*;
 fn context_lookup_script(term: &Text) -> Option<Id> {
     None
 }
+
+type PhraseOutput = (NodeIndex, bool);
+
 /// Build loop logic:
 /// * 'If'  -> collect conditions, collect sentence(potentially multiple phrases), optional ['else' + another sentence]
 /// *  _    -> attach phrase(definition or command invocation)
 /// * 'Try' -> TODO
 /// Definitions and commands are collecting inputs which might be references, values or outputs of other fns
-
-type PhraseOutput = (NodeIndex, bool);
-
 pub fn build(indexed_tokens: Vec<IndexedToken>) -> Result<Builder> {
     let mut builder = Builder::init(indexed_tokens)?;
 
@@ -98,6 +98,7 @@ impl Builder {
         Ok(builder)
     }
 
+    /// Attaches phrases until sentence breaker: Linebreak, Dot, F(Else), ?
     pub fn collect_sentence(&mut self, origin: NodeIndex, link: Token) -> Result<NodeIndex> {
         let mut tip = self.attach_phrase(link)?;
         while let Some(itoken) = self.tokens.peek() {
@@ -110,6 +111,7 @@ impl Builder {
         Ok(tip)
     }
 
+    /// Collect left + relation + right parts until F(Then)
     pub fn collect_conditions(&mut self, target: NodeIndex) -> Result<()> {
         while let Some(IndexedToken { index, token }) = self.tokens.peek_until(F(Then))? {
             let mut relation: Option<NodeIndex> = None;
@@ -148,6 +150,7 @@ impl Builder {
         Ok(())
     }
 
+    /// Attach command or definition to link
     pub fn attach_phrase(&mut self, link: Token) -> Result<NodeIndex> {
         let IndexedToken { index, token } = self.tokens.peek().unwrap();
         let (phrase_tip, returns) = match token {
@@ -166,15 +169,17 @@ impl Builder {
         Ok(phrase_tip)
     }
 
+    /// Collect ref and attach input to it
     pub fn collect_definition(&mut self) -> Result<NodeIndex> {
         let (reference, returns) = self.collect_ref()?;
-        // what if returns or !returns?
+        // what if returns vs !returns?
         self.tokens.expect(Be)?;
         self.attach_input_to(reference, Input, false)?;
         // context.add_definition(term)?
         Ok(reference)
     }
 
+    /// Collect command with arguments
     pub fn collect_command(&mut self) -> Result<PhraseOutput> {
         let command = self.tokens.take_command()?;
         let syntax = command.syntax();
@@ -191,49 +196,30 @@ impl Builder {
     }
 
     pub fn collect_ref(&mut self) -> Result<PhraseOutput> {
-        // TODO Each, Any, All, Where and other thingies
-
-        let Some(IndexedToken { index, token }) = self.tokens.peek() 
-            else { return Err(Message("Expected a reference at the end")) };
-
-        if !token.is_valid_ref_start() {
-            return Err(FormattedMesssage(format!(
-                "Expecting a valid reference at {:?} but got {:?}",
-                index, token
-            )));
-        }
-
-        let mut reference = self.move_token_into_node()?;
-
-        // X's Y             ||| <?- T(Y) <-D(P)- T(X) 
-        // Each X            ||| <-D(Each)- T(X) 
-        // Each X's Y        ||| <- T(Y) <-(D(Each)+D(P))- T(X) 
-        // Each X's any Y    ||| <-D(Any)- T(Y) <-(D(P)+D(Each))- T(X) 
-        // X's each Y        ||| <-D(Each)- T(Y) <-D(P)- T(X) 
-        // Each X that C     ||| <- D(That) <-D(Each)- T(X)
-        // ---               |||       ^- C
-        // X's any Y where C ||| <- D(Where) <-D(Any)- T(Y) <-D(P)- T(X)
-        // ---               |||       ^- C
-        // X such that C     ||| <- D(That) <- T(X)
-        // ---               |||       ^- C
-        // Any X that C      ||| <- D(That) <-D(Any)- T(X)
-        // ---               |||       ^- C
-
-        // D(Any/Each/All) as self-referential edges + D(P) as directed edge + D(That) node?
-
+        // X's Y             ||| <- T(Y) <-D(P)- T(X) 
+        // Each X            ||| <- T(X)><D(Each) 
+        // Each X's Y        ||| <- T(Y)><D(Each) <-D(P)- T(X) 
+        // Each X's any Y    ||| <- T(Y)><D(Any) <-D(P)- T(X)><D(Each) 
+        // X's each Y        ||| <- T(Y)><D(Each) <-D(P)- T(X) 
+        // Each X that C     ||| <- T(X)><D(Each) <-D(That)- C
+        // X's any Y where C ||| <- T(Y)><D(Any) <-D(P)- T(X)
+        // ---               |||       ^-D(Where)- C
+        // X such that C     ||| <- T(X) <-D(That)- C
+        // Any X that C      ||| <- T(X)><D(Any) <-D(That)- C
         while let Some(IndexedToken { index, token }) = self.tokens.peek() {
-            if !token.is_valid_ref_part() {
-                break;
-            }
             match token {
                 Term(_) => {}
-                D(Each) => {}
+                D(Each) | D(Any) | D(All) => {}
                 D(Possessive) => {}
+                D(That) => {}
                 _ => {
                     unreachable!("Shouldn't match invalid ref tokens")
                 }
             }
         }
+
+        // OLD STUFF BELOW
+        let mut reference = self.move_token_into_node()?;
         
         while let Some(IndexedToken {
             token: D(Possessive), ..
@@ -246,13 +232,26 @@ impl Builder {
             reference = subterm_node;
         }
         Ok((reference, true))
+        // /OLD STUFF
     }
 
+    /// Collect anything evaluable 
     pub fn collect_input(&mut self, lookup_this: bool) -> Result<NodeIndex> {
         let IndexedToken { index: idx, token } = self.tokens.peek_Itoken()?;
         let index = idx.clone();
         // the error ^ is wrong if fn at the end of the script takes `this` as input
         let input = match token {
+            V(_) => self.collect_value()?,
+            This => {
+                let Some(node) = self.this else {
+                    return Err(FormattedMesssage(format!(
+                        "Unexpected local reference at {:?}: don't know where it should lead.",
+                        index
+                    )));
+                    
+                };
+                node
+            }
             _ if token.is_valid_ref_start() => {
                 let (reference, returns) = self.collect_ref()?;
                 if returns {
@@ -264,32 +263,7 @@ impl Builder {
                     )));
                 }
             }
-            V(Struct(_)) => {
-                let target = self.move_token_into_node()?;
-                while self.tokens.next_isnt(CollectionEnd)? {
-                    let attr_name = Term(Text::from_str("attr")); // collect proper name for an attribute
-                    self.attach_input_to(target, attr_name, false);
-                }
-                target
-            }
-            V(Lst(_)) => {
-                let target = self.move_token_into_node()?;
-                while self.tokens.next_isnt(CollectionEnd)? {
-                    self.attach_input_to(target, Input, false);
-                }
-                target
-            }
-            V(_) => self.move_token_into_node()?,
-            This => {
-                if let Some(node) = self.this {
-                    node
-                } else {
-                    return Err(FormattedMesssage(format!(
-                        "Unexpected local reference at {:?}: don't know where it should lead.",
-                        index
-                    )));
-                }
-            }
+            
             C(command) => {
                 if command.syntax().returns {
                     self.collect_command()?.0
@@ -301,6 +275,7 @@ impl Builder {
                 }
             }
             //A(Start) => { collect_formula }
+            // any other token
             token => {
                 if lookup_this {
                     if let Some(node) = self.this {
@@ -319,6 +294,28 @@ impl Builder {
         Ok(input)
     }
 
+    pub fn collect_value(&mut self) -> Result<NodeIndex> {
+        match self.tokens.peek_token()? {
+            V(Struct(_)) => {
+                let target = self.move_token_into_node()?;
+                while self.tokens.next_isnt(CollectionEnd)? {
+                    let attr_name = Term(Text::from_str("attr")); // collect proper name for an attribute
+                    self.attach_input_to(target, attr_name, false);
+                }
+                Ok(target)
+            }
+            V(Lst(_)) => {
+                let target = self.move_token_into_node()?;
+                while self.tokens.next_isnt(CollectionEnd)? {
+                    self.attach_input_to(target, Input, false);
+                }
+                Ok(target)
+            }
+            V(_) => Ok(self.move_token_into_node()?),
+            _ => unreachable!("shouldn't be reachable?"),
+        }
+    }
+
     pub fn attach_input_to(
         &mut self,
         target: NodeIndex,
@@ -329,6 +326,7 @@ impl Builder {
         Ok(self.link(input, target, label))
     }
 
+    /// Connect two nodes with Edges into Edge node
     pub fn merge(&mut self, branch1: NodeIndex, branch2: NodeIndex) -> Result<()> {
         let node = self.add_node(Edge);
         self.link(branch1, node, Edge);
@@ -336,6 +334,8 @@ impl Builder {
         self.tip = node;
         Ok(())
     }
+
+    /// Append current tip with a node
     pub fn attach_node(&mut self, token: Token) -> NodeIndex {
         let node = self.add_node(token);
         self.link(self.tip, node, Edge);
@@ -348,6 +348,7 @@ impl Builder {
     pub fn link(&mut self, source: NodeIndex, target: NodeIndex, label: Token) {
         self.graph.add_edge(source, target, label);
     }
+    /// Unwrap next token and add to the graph
     pub fn move_token_into_node(&mut self) -> Result<NodeIndex> {
         let token = self.tokens.next().unwrap().token;
         Ok(self.graph.add_node(token))

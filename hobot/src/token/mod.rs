@@ -13,7 +13,7 @@ pub struct IndexedToken {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches, OfType)]
 pub enum Token {
     #[matches(nothing)]
-    Term(Text),
+    Term(Text), // => Determiner?
 
     A(Algebra),
     C(Command),
