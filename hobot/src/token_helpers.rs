@@ -3,7 +3,7 @@ use crate::*;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Syntax {
     pub expects_input: bool,
-    pub expected_args: Vec<Preposition>,
+    pub expected_args: Vec<Spec>,
     pub returns: bool,
 }
 
@@ -20,7 +20,7 @@ impl IndexedTokensIter {
             Err(Message("Expected token at the end of script"))
         }
     }
-    pub fn take_relationship(&mut self) -> Result<Relational> {
+    pub fn take_relationship(&mut self) -> Result<Relation> {
         if let R(comparison) = self.take_token()? {
             Ok(comparison)
         } else {
@@ -34,15 +34,15 @@ impl IndexedTokensIter {
             Err(Message("Expected command"))
         }
     }
-    pub fn take_preposition(&mut self) -> Result<Preposition> {
-        if let P(preposition) = self.take_token()? {
+    pub fn take_preposition(&mut self) -> Result<Spec> {
+        if let S(preposition) = self.take_token()? {
             Ok(preposition)
         } else {
             Err(Message("Expected preposition"))
         }
     }
     pub fn take_term(&mut self) -> Result<Text> {
-        if let D(Term(term)) = self.take_token()? {
+        if let S(Term(term)) = self.take_token()? {
             Ok(term)
         } else {
             Err(Message("Expected term"))

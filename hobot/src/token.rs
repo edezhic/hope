@@ -10,10 +10,9 @@ pub struct IndexedToken {
 pub enum Token {
     A(Algebra),
     C(Command),
-    D(Descriptor),
     F(Flow),
-    P(Preposition), // -> ?
-    R(Relational), 
+    R(Relation), 
+    S(Spec),
     V(Value),
     
     And, // X and Y = Tuple(X,Y)/List[X,Y]?
@@ -23,10 +22,19 @@ pub enum Token {
     Not,
 
     #[matches(nothing)]
+    Term(Text), 
+    #[matches(regex = r"^(?i)(this|it)$")]
+    This,
+    #[matches(regex = "'")]
+    Possessive,
+    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
+    That, // Filter X stream values which satisfy conditions?
+
+    #[matches(nothing)]
     Edge,
     #[matches(nothing)]
     Input,
-    #[matches(regex = r"^(?i)(:|=|is|are|equal)$")]
+    #[matches(regex = r"^(?i)(:|=|is|are)$")]
     Be,
     #[matches(regex = r"^,$")]
     Comma,
@@ -53,27 +61,12 @@ pub enum Flow {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Descriptor {
-    #[matches(nothing)]
-    Term(Text), 
-    #[matches(regex = r"^(?i)(this|it)$")]
-    This,
-    #[matches(regex = "'")]
-    Possessive,
-    Any, // Any X = ?
-    Each, // Each X = X.intoIter and yield a single X if it's a singlular value?
-    All, // All X = collect from X / = Each?
-    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
-    That, // Filter X stream values which satisfy conditions?
-
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Relational {
+pub enum Relation {
     Less,
     More,
     Contains,
     Than,
+    Equal,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Matches, CommandSyntax)]
@@ -121,7 +114,7 @@ pub enum Algebra {
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Matches)]
-pub enum Preposition {
+pub enum Spec {
     For,
     With,
     By,
@@ -131,4 +124,7 @@ pub enum Preposition {
     In,
     At,
     As,
+    Any,
+    Each, 
+    All,
 }

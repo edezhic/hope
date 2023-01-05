@@ -23,17 +23,17 @@ pub fn parse(s: &str) -> Result<Vec<IndexedToken>> {
                 let possession_index = index + term.len();
                 indexed_tokens.push(IndexedToken {
                     index,
-                    token: D(Term(Text::from_str(term))),
+                    token: S(Term(Text::from_str(term))),
                 });
                 indexed_tokens.push(IndexedToken {
                     index: possession_index,
-                    token: D(Possessive),
+                    token: S(Possessive),
                 });
             } else { 
                 // parse as regular Term
                 indexed_tokens.push(IndexedToken {
                     index,
-                    token: D(Term(Text::from_str(piece))),
+                    token: S(Term(Text::from_str(piece))),
                 });
             }
             parser.next();

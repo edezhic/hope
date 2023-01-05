@@ -67,7 +67,7 @@ impl Builder {
 
         let script = iter.take_term()?;
         let mut graph = TokenGraph::new();
-        let scriptNode = graph.add_node(D(Term(script)));
+        let scriptNode = graph.add_node(Term(script));
 
         let mut builder = Builder {
             tokens: iter,
@@ -81,7 +81,7 @@ impl Builder {
             },
         };
 
-        if let D(Term(term)) = builder.tokens.peek_token()? {
+        if let Term(term) = builder.tokens.peek_token()? {
             let input = builder.move_token_into_node()?;
             builder.link(input, scriptNode, Input);
             builder.this = Some(input);
@@ -90,9 +90,9 @@ impl Builder {
 
         while builder.tokens.next_isnt(Linebreak)? {
             let prep = builder.tokens.take_preposition()?;
-            let arg = D(Term(builder.tokens.take_term()?));
+            let arg = Term(builder.tokens.take_term()?);
             let argNode = builder.add_node(arg);
-            builder.link(argNode, scriptNode, P(prep));
+            builder.link(argNode, scriptNode, S(prep));
             builder.script_syntax.expected_args.push(prep);
         }
         Ok(builder)
@@ -155,7 +155,7 @@ impl Builder {
         let IndexedToken { index, token } = self.tokens.peek().unwrap();
         let (phrase_tip, returns) = match token {
             C(_) => self.collect_command()?,
-            D(_) => (self.collect_definition()?, true), // Each X`s Y is ...? Wtf?
+            Term(_) | S(_) => (self.collect_definition()?, true), // Each X`s Y is ...? Wtf?
             //Return => self.script_syntax.returns = true, collect_input,
             _ => return Err(UnexpectedPhraseToken(token.clone(), *index)),
         };
@@ -189,29 +189,29 @@ impl Builder {
         }
         // TODO: REPLACE LOOP WITH COLLECTING IN ANY ORDER, AND BREAK IF ENCOUNTERED A COMMA OR FOUND ALL EXPECTED ARGS
         for expected_prep in syntax.expected_args {
-            let prep = self.tokens.expect(P(expected_prep))?;
+            let prep = self.tokens.expect(S(expected_prep))?;
             self.attach_input_to(target, prep, false)?;
         }
         Ok((target, syntax.returns))
     }
 
     pub fn collect_ref(&mut self) -> Result<PhraseOutput> {
-        // X's Y             ||| <- T(Y) <-D(P)- T(X) 
-        // Each X            ||| <- T(X)><D(Each) 
-        // Each X's Y        ||| <- T(Y)><D(Each) <-D(P)- T(X) 
-        // Each X's any Y    ||| <- T(Y)><D(Any) <-D(P)- T(X)><D(Each) 
-        // X's each Y        ||| <- T(Y)><D(Each) <-D(P)- T(X) 
-        // Each X that C     ||| <- T(X)><D(Each) <-D(That)- C
-        // X's any Y where C ||| <- T(Y)><D(Any) <-D(P)- T(X)
-        // ---               |||       ^-D(Where)- C
-        // X such that C     ||| <- T(X) <-D(That)- C
-        // Any X that C      ||| <- T(X)><D(Any) <-D(That)- C
+        // X's Y             ||| <- T(Y) <-S(P)- T(X) 
+        // Each X            ||| <- T(X)><S(Each) 
+        // Each X's Y        ||| <- T(Y)><S(Each) <-S(P)- T(X) 
+        // Each X's any Y    ||| <- T(Y)><S(Any) <-S(P)- T(X)><S(Each) 
+        // X's each Y        ||| <- T(Y)><S(Each) <-S(P)- T(X) 
+        // Each X that C     ||| <- T(X)><S(Each) <-S(That)- C
+        // X's any Y where C ||| <- T(Y)><S(Any) <-S(P)- T(X)
+        // ---               |||       ^-S(Where)- C
+        // X such that C     ||| <- T(X) <-S(That)- C
+        // Any X that C      ||| <- T(X)><S(Any) <-S(That)- C
         while let Some(IndexedToken { index, token }) = self.tokens.peek() {
             match token {
-                D(Term(_)) => {}
-                D(Each) | D(Any) | D(All) => {}
-                D(Possessive) => {}
-                D(That) => {}
+                Term(_) => {}
+                Possessive => {}
+                That => {}
+                S(Each) | S(Any) | S(All) => {}
                 _ => {
                     unreachable!("Shouldn't match invalid ref tokens")
                 }
@@ -222,13 +222,13 @@ impl Builder {
         let mut reference = self.move_token_into_node()?;
         
         while let Some(IndexedToken {
-            token: D(Possessive), ..
+            token: Possessive, ..
         }) = self.tokens.peek()
         {
-            self.tokens.skip(D(Possessive));
-            let subterm = D(Term(self.tokens.take_term()?));
+            self.tokens.skip(Possessive);
+            let subterm = Term(self.tokens.take_term()?);
             let subterm_node = self.add_node(subterm);
-            self.link(reference, subterm_node, D(Possessive));
+            self.link(reference, subterm_node, Possessive);
             reference = subterm_node;
         }
         Ok((reference, true))
@@ -242,7 +242,7 @@ impl Builder {
         // the error ^ is wrong if fn at the end of the script takes `this` as input
         let input = match token {
             V(_) => self.collect_value()?,
-            D(This) => {
+            This => {
                 let Some(node) = self.this else {
                     return Err(FormattedMesssage(format!(
                         "Unexpected local reference at {:?}: don't know where it should lead.",
@@ -252,7 +252,7 @@ impl Builder {
                 };
                 node
             }
-            D(_) => {
+            Term(_) | S(_)  => {
                 let (reference, returns) = self.collect_ref()?;
                 if returns {
                     reference
@@ -298,7 +298,7 @@ impl Builder {
             V(Struct(_)) => {
                 let target = self.move_token_into_node()?;
                 while self.tokens.next_isnt(CollectionEnd)? {
-                    let attr_name = D(Term(Text::from_str("attr"))); 
+                    let attr_name = Term(Text::from_str("attr")); 
                     // collect proper name for an attribute ^^^
                     self.attach_input_to(target, attr_name, false);
                 }

@@ -38,7 +38,7 @@ pub use derive_matches::Matches;
 pub use derive_syntax::CommandSyntax;
 pub use error::{Error, Error::*, Result};
 pub use parser::parse;
-pub use token::{Algebra::*, Relational::*, Command::*, Preposition::*, Descriptor::*, Flow::*, Token::*, *};
+pub use token::{Algebra::*, Relation::*, Command::*, Spec::*, Descriptor::*, Flow::*, Token::*, *};
 pub use token_helpers::{IndexedTokensIter, Syntax};
 pub use value::{Value::*, *};
 
