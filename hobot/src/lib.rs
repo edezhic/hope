@@ -30,14 +30,16 @@ mod builder;
 mod error;
 mod parser;
 mod token;
+mod token_helpers;
 mod value;
+
 pub use builder::build;
 pub use derive_matches::Matches;
-pub use derive_of_type::OfType;
 pub use derive_syntax::CommandSyntax;
 pub use error::{Error, Error::*, Result};
 pub use parser::parse;
-pub use token::{Algebra::*, Relational::*, Command::*, Preposition::*, Determiner::*, Flow::*, Token::*, *};
+pub use token::{Algebra::*, Relational::*, Command::*, Preposition::*, Descriptor::*, Flow::*, Token::*, *};
+pub use token_helpers::{IndexedTokensIter, Syntax};
 pub use value::{Value::*, *};
 
 pub type TokenGraph = StableDiGraph<Token, Token>;

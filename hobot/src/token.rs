@@ -1,7 +1,3 @@
-mod token_impl;
-mod token_iter;
-pub use token_iter::IndexedTokensIter;
-
 use crate::*;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -10,16 +6,13 @@ pub struct IndexedToken {
     pub token: Token,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches, OfType)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
 pub enum Token {
-    #[matches(nothing)]
-    Term(Text), // => Determiner?
-
     A(Algebra),
     C(Command),
-    D(Determiner),
+    D(Descriptor),
     F(Flow),
-    P(Preposition),
+    P(Preposition), // -> ?
     R(Relational), 
     V(Value),
     
@@ -33,8 +26,6 @@ pub enum Token {
     Edge,
     #[matches(nothing)]
     Input,
-    #[matches(regex = r"^(?i)(this|it)$")]
-    This,
     #[matches(regex = r"^(?i)(:|=|is|are|equal)$")]
     Be,
     #[matches(regex = r"^,$")]
@@ -62,13 +53,17 @@ pub enum Flow {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]
-pub enum Determiner {
+pub enum Descriptor {
+    #[matches(nothing)]
+    Term(Text), 
+    #[matches(regex = r"^(?i)(this|it)$")]
+    This,
+    #[matches(regex = "'")]
+    Possessive,
     Any, // Any X = ?
     Each, // Each X = X.intoIter and yield a single X if it's a singlular value?
     All, // All X = collect from X / = Each?
-    #[matches(regex = "'")]
-    Possessive,
-     //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
+    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
     That, // Filter X stream values which satisfy conditions?
 
 }
@@ -79,13 +74,6 @@ pub enum Relational {
     More,
     Contains,
     Than,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Syntax {
-    pub expects_input: bool,
-    pub expected_args: Vec<Preposition>,
-    pub returns: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Matches, CommandSyntax)]

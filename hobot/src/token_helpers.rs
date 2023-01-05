@@ -1,5 +1,12 @@
 use crate::*;
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Syntax {
+    pub expects_input: bool,
+    pub expected_args: Vec<Preposition>,
+    pub returns: bool,
+}
+
 pub struct IndexedTokensIter(MultiPeek<IntoIter<IndexedToken>>);
 
 impl IndexedTokensIter {
@@ -35,7 +42,7 @@ impl IndexedTokensIter {
         }
     }
     pub fn take_term(&mut self) -> Result<Text> {
-        if let Term(term) = self.take_token()? {
+        if let D(Term(term)) = self.take_token()? {
             Ok(term)
         } else {
             Err(Message("Expected term"))
@@ -133,5 +140,56 @@ impl IndexedTokensIter {
         } else {
             false
         }
+    }
+}
+
+impl PartialEq for IndexedToken {
+    fn eq(&self, other: &Self) -> bool {
+        if self.token == other.token {
+            return true;
+        }
+        false
+    }
+    fn ne(&self, other: &Self) -> bool {
+        if self.token != other.token {
+            return true;
+        }
+        false
+    }
+}
+impl PartialEq<Token> for IndexedToken {
+    fn eq(&self, other: &Token) -> bool {
+        self.token.eq(other)
+    }
+    fn ne(&self, other: &Token) -> bool {
+        self.token.ne(other)
+    }
+}
+impl PartialEq<&Token> for IndexedToken {
+    fn eq(&self, other: &&Token) -> bool {
+        self.token.eq(other)
+    }
+    fn ne(&self, other: &&Token) -> bool {
+        self.token.ne(other)
+    }
+}
+impl PartialEq<Token> for &IndexedToken {
+    fn eq(&self, other: &Token) -> bool {
+        self.token.eq(other)
+    }
+    fn ne(&self, other: &Token) -> bool {
+        self.token.ne(other)
+    }
+}
+
+impl<'a> PartialEq<&'a Token> for Token {
+    fn eq(&self, other: &&'a Token) -> bool {
+        self == *other
+    }
+}
+
+impl<'a> PartialEq<Token> for &'a Token {
+    fn eq(&self, other: &Token) -> bool {
+        *self == other
     }
 }

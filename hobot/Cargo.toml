@@ -11,7 +11,6 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 derive_matches = { path = "./derive_matches"}
-derive_of_type = { path = "./derive_of_type"}
 derive_syntax = { path = "./derive_syntax"}
 chrono = { version = "0.4.19", features = ["wasmbind", "serde"] }
 serde = { version = "1.0.130", features = ["derive"] }

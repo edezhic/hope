@@ -67,7 +67,7 @@ impl Builder {
 
         let script = iter.take_term()?;
         let mut graph = TokenGraph::new();
-        let scriptNode = graph.add_node(Term(script));
+        let scriptNode = graph.add_node(D(Term(script)));
 
         let mut builder = Builder {
             tokens: iter,
@@ -81,7 +81,7 @@ impl Builder {
             },
         };
 
-        if let Term(term) = builder.tokens.peek_token()? {
+        if let D(Term(term)) = builder.tokens.peek_token()? {
             let input = builder.move_token_into_node()?;
             builder.link(input, scriptNode, Input);
             builder.this = Some(input);
@@ -90,7 +90,7 @@ impl Builder {
 
         while builder.tokens.next_isnt(Linebreak)? {
             let prep = builder.tokens.take_preposition()?;
-            let arg = Term(builder.tokens.take_term()?);
+            let arg = D(Term(builder.tokens.take_term()?));
             let argNode = builder.add_node(arg);
             builder.link(argNode, scriptNode, P(prep));
             builder.script_syntax.expected_args.push(prep);
@@ -155,7 +155,7 @@ impl Builder {
         let IndexedToken { index, token } = self.tokens.peek().unwrap();
         let (phrase_tip, returns) = match token {
             C(_) => self.collect_command()?,
-            _ if token.is_valid_ref_start() => (self.collect_definition()?, true), // Each X`s Y is ...? Wtf?
+            D(_) => (self.collect_definition()?, true), // Each X`s Y is ...? Wtf?
             //Return => self.script_syntax.returns = true, collect_input,
             _ => return Err(UnexpectedPhraseToken(token.clone(), *index)),
         };
@@ -208,7 +208,7 @@ impl Builder {
         // Any X that C      ||| <- T(X)><D(Any) <-D(That)- C
         while let Some(IndexedToken { index, token }) = self.tokens.peek() {
             match token {
-                Term(_) => {}
+                D(Term(_)) => {}
                 D(Each) | D(Any) | D(All) => {}
                 D(Possessive) => {}
                 D(That) => {}
@@ -226,7 +226,7 @@ impl Builder {
         }) = self.tokens.peek()
         {
             self.tokens.skip(D(Possessive));
-            let subterm = Term(self.tokens.take_term()?);
+            let subterm = D(Term(self.tokens.take_term()?));
             let subterm_node = self.add_node(subterm);
             self.link(reference, subterm_node, D(Possessive));
             reference = subterm_node;
@@ -242,7 +242,7 @@ impl Builder {
         // the error ^ is wrong if fn at the end of the script takes `this` as input
         let input = match token {
             V(_) => self.collect_value()?,
-            This => {
+            D(This) => {
                 let Some(node) = self.this else {
                     return Err(FormattedMesssage(format!(
                         "Unexpected local reference at {:?}: don't know where it should lead.",
@@ -252,7 +252,7 @@ impl Builder {
                 };
                 node
             }
-            _ if token.is_valid_ref_start() => {
+            D(_) => {
                 let (reference, returns) = self.collect_ref()?;
                 if returns {
                     reference
@@ -263,7 +263,6 @@ impl Builder {
                     )));
                 }
             }
-            
             C(command) => {
                 if command.syntax().returns {
                     self.collect_command()?.0
@@ -299,7 +298,8 @@ impl Builder {
             V(Struct(_)) => {
                 let target = self.move_token_into_node()?;
                 while self.tokens.next_isnt(CollectionEnd)? {
-                    let attr_name = Term(Text::from_str("attr")); // collect proper name for an attribute
+                    let attr_name = D(Term(Text::from_str("attr"))); 
+                    // collect proper name for an attribute ^^^
                     self.attach_input_to(target, attr_name, false);
                 }
                 Ok(target)
