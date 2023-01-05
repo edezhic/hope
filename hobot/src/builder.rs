@@ -208,13 +208,12 @@ impl Builder {
         // Any X that C      ||| <- T(X)><S(Any) <-S(That)- C
         while let Some(IndexedToken { index, token }) = self.tokens.peek() {
             match token {
-                Term(_) => {}
-                Possessive => {}
-                That => {}
-                S(Each) | S(Any) | S(All) => {}
-                _ => {
-                    unreachable!("Shouldn't match invalid ref tokens")
-                }
+                Term(_) => {} // check wtf, add node anyway
+                Possessive => {} // link it next to current
+                That => {} // collect conditions and link to current with That
+                S(Each) | S(Any) | S(All) => {} // link next to itself?
+                S(_) => {} // arguments?
+                _ => {} // ??????
             }
         }
 
