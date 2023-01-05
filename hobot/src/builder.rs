@@ -89,7 +89,7 @@ impl Builder {
         }
 
         while builder.tokens.next_isnt(Linebreak)? {
-            let prep = builder.tokens.take_preposition()?;
+            let prep = builder.tokens.take_spec()?;
             let arg = Term(builder.tokens.take_term()?);
             let argNode = builder.add_node(arg);
             builder.link(argNode, scriptNode, S(prep));
@@ -120,10 +120,11 @@ impl Builder {
 
             self.tokens.skip_optional(Be)?;
 
+            // TODO: Add helper like .next_relation at least to avoid _temp thing
             if let R(_) = self.tokens.peek_token()? {
-                let relationship = R(self.tokens.take_relationship()?);
+                let _temp = R(self.tokens.take_relation()?);
                 // if peek == Or => take more comparisons?
-                relation = Some(self.add_node(relationship));
+                relation = Some(self.add_node(_temp));
                 self.tokens.skip_optional(R(Than));
                 // after all comparisons
                 right = Some(self.collect_input(true)?);
@@ -208,12 +209,15 @@ impl Builder {
         // Any X that C      ||| <- T(X)><S(Any) <-S(That)- C
         while let Some(IndexedToken { index, token }) = self.tokens.peek() {
             match token {
-                Term(_) => {} // check wtf, add node anyway
-                Possessive => {} // link it next to current
+                Term(_) => {} // add node, check syntax: 
+                // whether expects input, collect args anyway? Unify with commands.
+                // whether returns... or has to return so that reference makes sense?
+                // What about commands? Unify only syntax or collection as well?
+                Possessive => {} // link it next to current. Append to modifiers?
                 That => {} // collect conditions and link to current with That
-                S(Each) | S(Any) | S(All) => {} // link next to itself?
+                S(Each) | S(Any) | S(All) => {} // link next to itself. Append to modifiers?
                 S(_) => {} // arguments?
-                _ => {} // ??????
+                _ => {} // ?????? Break?
             }
         }
 
@@ -251,7 +255,7 @@ impl Builder {
                 };
                 node
             }
-            Term(_) | S(_)  => {
+            Term(_) | S(_)  => { // + | C(command)?
                 let (reference, returns) = self.collect_ref()?;
                 if returns {
                     reference
@@ -273,8 +277,7 @@ impl Builder {
                 }
             }
             //A(Start) => { collect_formula }
-            // any other token
-            token => {
+            any_other_token => {
                 if lookup_this {
                     if let Some(node) = self.this {
                         self.this.take().unwrap()
@@ -285,7 +288,7 @@ impl Builder {
                         )));
                     }
                 } else {
-                    return Err(UnexpectedInputToken(token.clone(), index));
+                    return Err(UnexpectedInputToken(any_other_token.clone(), index));
                 }
             }
         };
@@ -293,8 +296,11 @@ impl Builder {
     }
 
     pub fn collect_value(&mut self) -> Result<NodeIndex> {
-        match self.tokens.peek_token()? {
-            V(Struct(_)) => {
+        let V(value) = self.tokens.peek_token()? else {
+            unreachable!("as of now it's called only if encountered V(_)")
+        };
+        match value {
+            Struct(_) => {
                 let target = self.move_token_into_node()?;
                 while self.tokens.next_isnt(CollectionEnd)? {
                     let attr_name = Term(Text::from_str("attr")); 
@@ -303,15 +309,14 @@ impl Builder {
                 }
                 Ok(target)
             }
-            V(Lst(_)) => {
+            Lst(_) => {
                 let target = self.move_token_into_node()?;
                 while self.tokens.next_isnt(CollectionEnd)? {
                     self.attach_input_to(target, Input, false);
                 }
                 Ok(target)
             }
-            V(_) => Ok(self.move_token_into_node()?),
-            _ => unreachable!("shouldn't be reachable?"),
+            _ => Ok(self.move_token_into_node()?),
         }
     }
 

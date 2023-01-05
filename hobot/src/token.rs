@@ -23,12 +23,12 @@ pub enum Token {
 
     #[matches(nothing)]
     Term(Text), 
-    #[matches(regex = r"^(?i)(this|it)$")]
-    This,
     #[matches(regex = "'")]
     Possessive,
-    //#[matches(regex = r"^(?i)(which|that|whose)$")] ?
-    That, // Filter X stream values which satisfy conditions?
+    #[matches(regex = r"^(?i)(this|it)$")]
+    This,
+    #[matches(regex = r"^(?i)(that|which|where)$")]
+    That,
 
     #[matches(nothing)]
     Edge,
@@ -43,7 +43,7 @@ pub enum Token {
     #[matches(regex = r"^(\n|\p{Zl})$")]
     Linebreak,
     #[matches(regex = r"^(\]|\})$")] 
-    CollectionEnd, // -> ListEnd + StructEnd?    
+    CollectionEnd, // -> ListEnd + StructEnd? Yes please   
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Matches)]

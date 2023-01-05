@@ -20,7 +20,7 @@ impl IndexedTokensIter {
             Err(Message("Expected token at the end of script"))
         }
     }
-    pub fn take_relationship(&mut self) -> Result<Relation> {
+    pub fn take_relation(&mut self) -> Result<Relation> {
         if let R(comparison) = self.take_token()? {
             Ok(comparison)
         } else {
@@ -34,15 +34,15 @@ impl IndexedTokensIter {
             Err(Message("Expected command"))
         }
     }
-    pub fn take_preposition(&mut self) -> Result<Spec> {
-        if let S(preposition) = self.take_token()? {
-            Ok(preposition)
+    pub fn take_spec(&mut self) -> Result<Spec> {
+        if let S(spec) = self.take_token()? {
+            Ok(spec)
         } else {
-            Err(Message("Expected preposition"))
+            Err(Message("Expected spec"))
         }
     }
     pub fn take_term(&mut self) -> Result<Text> {
-        if let S(Term(term)) = self.take_token()? {
+        if let Term(term) = self.take_token()? {
             Ok(term)
         } else {
             Err(Message("Expected term"))

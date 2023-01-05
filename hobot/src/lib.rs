@@ -8,7 +8,6 @@
     unused_assignments
 )]
 #![feature(if_let_guard)]
-#![feature(let_else)]
 pub use core::fmt;
 pub use derive_more;
 pub use itertools::Itertools;
@@ -38,7 +37,7 @@ pub use derive_matches::Matches;
 pub use derive_syntax::CommandSyntax;
 pub use error::{Error, Error::*, Result};
 pub use parser::parse;
-pub use token::{Algebra::*, Relation::*, Command::*, Spec::*, Descriptor::*, Flow::*, Token::*, *};
+pub use token::{Algebra::*, Relation::*, Command::*, Spec::*, Flow::*, Token::*, *};
 pub use token_helpers::{IndexedTokensIter, Syntax};
 pub use value::{Value::*, *};
 
