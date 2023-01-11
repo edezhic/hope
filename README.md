@@ -1,3 +1,6 @@
+# Archived
+Project stopped because I realized the complexity that morphology brings into all of that. I've tried to process only the bare minimum (posessives and plurals) but got into lots of language-specific issues. While I still think that something like that is possible to create, it will require lots of code for each language and there won't be much reusability/translatability. It occurs to me that evolving current PLs (mostly Rust and Python) might be the way to go, also recent progress with GPT shows that NNs are pretty good at translating natural language to programming ones. That's probably the optimal way since project could be described in a natural language and "compiled" into something machines could execute. This approach still requires thoughtful manual validation of the result but can already speed up development significantly. So, I don't think there is much sense in continuing this project. If anyone will be pursuing similar ideas, I'd suggest exploring NN-powered tokenization to avoid dealing with morphology and syntax, and start from building on top of abstract trees instead of raw text. 
+
 # Hope
 Human-oriented programming environment
 
